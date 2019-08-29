@@ -15,7 +15,7 @@ enum allocationAlgorithm
 
 /* When called with an element from allocationAlgorithm sets the function pointer allocAlgo (decleared in
    algorithm.hpp) to the corresponding function and returns true. If the argument is not valid return's false. */
-bool setAllocationAlgorithm(const allocationAlgorithm algo);
+bool setAllocationAlgorithm(const enum allocationAlgorithm algo);
 /* Checks for a chunk (big enough to meet the allocation request) in holes (based on the currently set allocation
    strategy. The default being first fit.) If a chunk large enough is found and it is larger than what is requested
    the chunk will be split up (with the new chunk matching the requested chunk size being returned (and put on the
