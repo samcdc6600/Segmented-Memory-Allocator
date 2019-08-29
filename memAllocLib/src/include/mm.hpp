@@ -15,6 +15,8 @@ enum allocationAlgorithm
   };
 
 
+extern "C"			// ([-{REMOVE--ME}-])
+{	// ([-{REMOVE--ME}-])
   /* When called with an element from allocationAlgorithm sets the function pointer allocAlgo (decleared in
      algorithm.hpp) to the corresponding function and returns true. If the argument is not valid return's false. */
   bool setAllocationAlgorithm(const enum allocationAlgorithm algo);
@@ -28,6 +30,7 @@ enum allocationAlgorithm
   /* Searches for chunk in inUse. If found remove from inUse and add to holes (merging with other chunks if need be.)
      If chunk is not found in inUse aborts program! */
   void dealloc(const void * chunk);
+}	// ([-{REMOVE--ME}-])
 
 
 #endif

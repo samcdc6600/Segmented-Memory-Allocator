@@ -1,6 +1,7 @@
 CC      = clang
 CFLAGS	= -Wall -std=c11 -Wpedantic -Wextra -O3
-LIBS	= -l/include/libMM
+#LIBS	= -l/include/libMM
+LIBS	= -llibMM.a
 BIN_NAME = profiler
 SRC   = ./src
 IDIR  = $(SRC)/include
@@ -16,7 +17,7 @@ $(ODIR)/%.o: $(SRC)/%.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 $(BIN_NAME): $(OBJ)
-	$(CC) -o $@ $^ $(LIBS) $(CFLAGS)
+	$(CC) -v -o $@ $^ $(LIBS)
 
 .PHONY: clean
 

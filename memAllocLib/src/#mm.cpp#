@@ -5,7 +5,7 @@
 
 extern "C"
 {				// These function names are to be the interface to this library from a C program.
-  void * alloc(const size_t chunk_size)
+  void * alloc(const size_t chunk_size)a
   {
     mmState::address ret;
     try

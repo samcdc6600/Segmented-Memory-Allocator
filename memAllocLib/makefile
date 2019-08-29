@@ -6,7 +6,7 @@ LIB_NAME = libMM.a
 SRC   = ./src
 IDIR  = $(SRC)/include
 ODIR  = ./obj
-DEPS  = $(wildcard $(IDIR)/*.h*)
+DEPS  = $(wildcard $(IDIR)/*.hpp)
 CPP_DIRS  =  $(wildcard $(SRC)/*.cpp) # Get list of .cpp file directories.
 CPP_FILES = $(subst $(SRC)/,,$(CPP_DIRS)) # Strip srings of paths.
 OBJ_FILES = $(patsubst %.cpp,%.o,$(CPP_FILES)) # Replace .cpp with .o.
@@ -17,7 +17,7 @@ $(ODIR)/%.o: $(SRC)/%.cpp $(DEPS)
 	$(CXX) -c -o $@ $< $(CXXFLAGS)
 
 $(LIB_NAME): $(OBJ)
-	$(AR) $(AR_OPS) $@ 
+	$(AR) $(AR_OPS) $@ $<
 
 .PHONY: clean
 
