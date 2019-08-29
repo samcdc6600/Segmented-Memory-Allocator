@@ -24,7 +24,7 @@ $(ODIR)/%.o: $(SRC)/%.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 $(BIN_NAME): $(OBJ)
-	$(CC) -v -o $@ $^ $(LIBS)
+	$(CC) -o $@ $^ $(LIBS)
 
 .PHONY: clean
 

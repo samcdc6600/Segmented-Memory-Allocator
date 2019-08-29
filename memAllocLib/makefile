@@ -2,7 +2,7 @@
 CXX	 = g++
 AR	 = ar
 AR_OPS	 = rcs
-CXXFLAGS = -std=c++14 -Wall -Wpedantic -Wextra
+CXXFLAGS = -std=c++14 -Wall -Wpedantic -Wextra -O3
 LIB_NAME = libMM.a
 SRC   = ./src
 IDIR  = $(SRC)/include
