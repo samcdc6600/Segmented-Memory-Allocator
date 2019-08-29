@@ -300,34 +300,37 @@ void checkPODProper()
 }
 
 
-bool setAllocationAlgorithm(const allocationAlgorithm algo)
-{
-  std::cout<<"We should not be here !\n";
-  if(podChecked)
-    {
-      switch(algo)
-	{
-	case firstFit:
-	  allocAlgo = _firstFit;
-	  std::cout<<"Set to first fit...\n";
-	  break;
-	case bestFit:
-	  allocAlgo = _bestFit;
-	  std::cout<<"Set to best fit...\n";
-	  break;
-	case worstFit:
-	  allocAlgo = _worstFit;
-	  std::cout<<"Set to worst fit...\n";
-	  break;
-	default:
-	  std::cout<<"setAllocationAlgorithm called but value of algo out of range!\n";
-	  return false;		// algo out of range :'(.
-	}
-    }
-  else
-    {
-      checkPODProper();
-      return setAllocationAlgorithm(algo);
-    }
-  return true;
-}
+//extern "C"
+//{
+  bool setAllocationAlgorithm(const allocationAlgorithm algo)
+  {
+    //    std::cout<<"We should not be here !\n";
+    if(podChecked)
+      {
+	switch(algo)
+	  {
+	  case firstFit:
+	    allocAlgo = _firstFit;
+	    //	    std::cout<<"Set to first fit...\n";
+	    break;
+	  case bestFit:
+	    allocAlgo = _bestFit;
+	    //	    std::cout<<"Set to best fit...\n";
+	    break;
+	  case worstFit:
+	    allocAlgo = _worstFit;
+	    //	    std::cout<<"Set to worst fit...\n";
+	    break;
+	  default:
+	    //	    std::cout<<"setAllocationAlgorithm called but value of algo out of range!\n";
+	    return false;		// algo out of range :'(.
+	  }
+      }
+    else
+      {
+	checkPODProper();
+	return setAllocationAlgorithm(algo);
+      }
+    return true;
+  }
+//}

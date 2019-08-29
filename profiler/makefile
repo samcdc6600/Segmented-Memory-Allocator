@@ -1,7 +1,14 @@
-CC      = clang
+#CC      = clang
+CC	= gcc
 CFLAGS	= -Wall -std=c11 -Wpedantic -Wextra -O3
-#LIBS	= -l/include/libMM
-LIBS	= -llibMM.a
+# -lstdc++ is very very important here!
+# Gcc and clang don't link it by default like g++ and clang++!
+# This took a while to figour out. Not as long as the fact that
+# I accidently wasn't linking one of the .o files in the other
+# make file when building the library causing the linker not to
+# be able to fine setAllocationAlgorithm, alloc and dealloc
+# (that took ages to figour out >:'( haha.
+LIBS	= src/include/libMM.a -lstdc++
 BIN_NAME = profiler
 SRC   = ./src
 IDIR  = $(SRC)/include

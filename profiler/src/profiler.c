@@ -6,10 +6,9 @@ int main()
 {
   size_t allocSz = 1024;
   int a = 1, b = 1;
-
-  alloc(5);
   
   int * nums1;
+
   nums1 = ((int *)(alloc(allocSz * sizeof(int))));
 
   for(size_t iter = 0; iter < allocSz; ++iter)
@@ -20,7 +19,7 @@ int main()
     for(size_t iter = 0; iter < allocSz; ++iter)
     {
       printf("nums1[iter] = %i\n", nums1[iter]);
-    }
+      }
   
   printf("hello world\n");
 }

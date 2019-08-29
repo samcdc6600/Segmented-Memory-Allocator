@@ -1,7 +1,8 @@
-CXX      = clang++
+#CXX      = clang++
+CXX	 = g++
 AR	 = ar
 AR_OPS	 = rcs
-CXXFLAGS = -std=c++14 -Wall -Wpedantic -Wextra -O3
+CXXFLAGS = -std=c++14 -Wall -Wpedantic -Wextra
 LIB_NAME = libMM.a
 SRC   = ./src
 IDIR  = $(SRC)/include
@@ -17,7 +18,7 @@ $(ODIR)/%.o: $(SRC)/%.cpp $(DEPS)
 	$(CXX) -c -o $@ $< $(CXXFLAGS)
 
 $(LIB_NAME): $(OBJ)
-	$(AR) $(AR_OPS) $@ $<
+	$(AR) $(AR_OPS) $@ $^
 
 .PHONY: clean
 

@@ -3,8 +3,8 @@
 #include "include/algorithm.hpp"
 
 
-extern "C"
-{				// These function names are to be the interface to this library from a C program.
+//extern "C"
+//{				// These function names are to be the interface to this library from a C program.
   void * alloc(const size_t chunk_size)
   {
     mmState::address ret;
@@ -20,9 +20,10 @@ extern "C"
     return ret;
   }
 
+  
 
   void dealloc(const void * chunk)
   {
     free(chunk);
   }
-}
+//}

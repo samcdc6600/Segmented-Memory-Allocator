@@ -7,6 +7,8 @@
 #define MM_HPP_
 
 
+#include <stddef.h>
+
 enum allocationAlgorithm
   {
     firstFit,
