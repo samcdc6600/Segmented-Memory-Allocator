@@ -4,17 +4,20 @@
 
 int main()
 {
-  size_t allocSz (1024);
-  int a (1), b (1);
-  
-  int * nums1 ((int *)alloc(allocSz * sizeof(int)));
+  size_t allocSz = 1024;
+  int a = 1, b = 1;
 
-  for(size_t iter (0); iter < allocSz; ++iter)
+  alloc(5);
+  
+  int * nums1;
+  nums1 = ((int *)(alloc(allocSz * sizeof(int))));
+
+  for(size_t iter = 0; iter < allocSz; ++iter)
     {
       nums1[iter] = a * b;
-      ++a, ++b
+      ++a, ++b;
     }
-    for(size_t iter (0); iter < allocSz; ++iter)
+    for(size_t iter = 0; iter < allocSz; ++iter)
     {
       printf("nums1[iter] = %i\n", nums1[iter]);
     }
