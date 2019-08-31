@@ -32,68 +32,14 @@ void * _firstFit(const size_t chunk_size)
       for(auto candidate {holes.before_begin()}; std::next(candidate) != holes.cend(); ++candidate)
 	{ /* We will need to add new accounting info when we split the chunk so it must have space for it. */
 	  if(((*std::next(candidate))->size) >= (chunk_size + chunkAccountingSize))
-	    {			// We have found a chunk but it is too big. There is more work to be done :'(.	      
-	      auto ret = (*std::next(candidate))->base; // Base address of chunk to be returned.
-	      // CALCULATE FOR NEW HOLES CHUNK---------------------------------------------------------------
-	      {						// New chunk.
-		// Base address of new chunk to be put in holes.
-		auto newBase ((char *)(ret) + chunk_size + chunkAccountingSize);
-		// Set new chunk's base address accounting info to the base address of new chunk.
-		((chunk *)((char *)(ret) + chunk_size))->base = newBase;
-		// Set new chunk's size accounting info to the the size of the new chunk.
-		((chunk *)((char *)(ret) + chunk_size))->size =
-		  (*std::next(candidate))->size - (chunkAccountingSize + chunk_size);
-	      }
-
-	      // UPDATE HOLES AND INUSE--------------------------------------------------------------------
-	      // Set new size of chunk to be returned.
-	      (*std::next(candidate))->size = chunk_size;
-	      // Push new hole onto inUse list.
-	      inUse.push_front(*std::next(candidate));
-	      // Remove old hole from holes list.
-
-	      // TEST CODE-=============================================================================
-	      // TEST CODE-=============================================================================
-	      /*	      std::cout<<"AFTER--------SPLIT:\n"
-		       <<"\t new inUse.size = "<<(*std::next(candidate))->size
-		       <<"\n\t new inUse.base = "<<(*std::next(candidate))->base
-		       <<"\n\t new holes.size = "<<((chunk *)((char*)ret + chunk_size))->size
-		       <<"\n\t new holes.base = "<<((chunk *)((char*)ret + chunk_size))->base<<'\n';
-	      std::cout<<"All list's\n";
-	      for(auto a: inUse)
-		{
-		  std::cout<<"\tinUse\n"
-			   <<"a.size = "<<a->size<<"\na.base = "
-			   <<a->base<<'\n';
-		}
-	      for(auto a: holes)
-		{
-		  std::cout<<"\tholes\n"
-			   <<"a.size = "<<a->size<<"\na.base = "
-			   <<a->base<<'\n';
-		}
-		std::cout<<'\n';*/
-	      // TEST CODE-=============================================================================
-	      // TEST CODE-=============================================================================
-	      std::cout<<"split\n";
-	      
-	      holes.erase_after(candidate);
-	      // Add new hole to holes list.
-	      holes.push_front((chunk *)((char*)ret + chunk_size));
-
-	      
-	      return ret;
+	    {			// We have found a chunk but it is too big. There is more work to be done :'(.
+	      return splitChunkFromHoles(chunk_size, candidate);
 	    }
 	  else
 	    {			// We dont split the chunk if it is equal in size so we don't need any extra space.
 	      if(((*std::next(candidate))->size) == chunk_size)
 		{			// The chunk is exactly the right size :).
-		  auto ret = (*std::next(candidate))->base;
-		  inUse.push_front(*std::next(candidate));
-		  holes.erase_after(candidate);
-
-		  std::cout<<"returning (*std::next(candidate))->base\n"<<ret<<'\n';
-		  return ret;
+		  return useChunkFromHoles(candidate);
 		}
 	    }
 	}
@@ -105,9 +51,30 @@ void * _firstFit(const size_t chunk_size)
 
 void * _bestFit(const size_t chunk_size)
 {
-  using namespace mmState;
+    using namespace mmState;
+  std::cout<<"In best fit\n";
 
-    if(chunk_size == 0)
+    // TEST--------------------------------------------------------------------------
+  // TEST--------------------------------------------------------------------------
+  std::cout<<"FF:before free\n";
+  for(auto a: inUse)
+    {
+      std::cout<<"\tinUse\n"
+	       <<"a.size = "<<a->size<<"\na.base = "
+	       <<a->base<<'\n';
+    }
+  for(auto a: holes)
+    {
+    std::cout<<"\tholes\n"
+	       <<"a.size = "<<a->size<<"\na.base = "
+	       <<a->base<<'\n';
+    }
+    std::cout<<'\n';
+// TEST--------------------------------------------------------------------------
+  // TEST--------------------------------------------------------------------------
+  
+
+  if(chunk_size == 0)
     {				// We need to implement this
       //      return sbrk(chunk_size);
       std::cerr<<"error alloc(0) not implemented!\n";
@@ -115,12 +82,72 @@ void * _bestFit(const size_t chunk_size)
     }
   else
     {
-      for(auto candidate {holes.before_begin()}; std::next(candidate) != holes.cend(); ++candidate)
-	{}
+      if(!holes.empty())
+	{
+	  if(std::next(holes.begin()) == holes.cend())
+	    {			// There is only one hole in the holes list.
+	      std::cout<<"Holes contains 1 iterm\n";
+	      if(((*holes.begin())->size) >= (chunk_size + chunkAccountingSize))
+		{		// We have found a chunk but it is too big. There is more work to be done.
+		  return splitChunkFromHoles(chunk_size, holes.before_begin());
+		}
+	      if(((*holes.begin())->size) == chunk_size)
+		{		// The chunk is exactly the right size :).
+		  return useChunkFromHoles(holes.before_begin());
+		}
+	    }
+	  else
+	    {
+	      auto bestFit {holes.before_begin()};
+	      bool foundBestFit {false};
+	      for(auto candidate {holes.before_begin()}; std::next(candidate) != holes.cend(); ++candidate)
+		{
+		  if(((*std::next(candidate))->size) == chunk_size)
+		    {		// Must be best fit.
+		      return useChunkFromHoles(candidate);
+		    }
+		  else
+		    {
+		      if(((*std::next(candidate))->size) >= (chunk_size + chunkAccountingSize))
+			{	// We have found a hole large enough.
+			  if(foundBestFit)
+			    {
+			      bestFit = (((*std::next(candidate))->size) < (*bestFit)->size) ?
+			    std::next(candidate): bestFit;
+			    }
+			  else
+			    {
+			      foundBestFit = true;
+			      bestFit = std::next(candidate);
+			    }
+			}
+		    }
+		}
+	      if(foundBestFit)
+		{		// A best fit (not exact size) was found.
+		  return useChunkFromHoles(bestFit);
+		}
+	    }
+	}
     }
+
+  /*
+    if(((*std::next(candidate))->size) >= (chunk_size + chunkAccountingSize))
+    {			// We have found a chunk but it is too big. There is more work to be done :'(.
+    return splitChunkFromHoles(chunk_size, candidate);
+    }
+    else
+    {			// We dont split the chunk if it is equal in size so we don't need any extra space.
+    if(((*std::next(candidate))->size) == chunk_size)
+    {			// The chunk is exactly the right size :).
+    return useChunkFromHoles(candidate);
+    }
+    }
+  */
+  std::cout<<"Getting new memory from system\n";
   
-  std::cout<<"In _bestFit()\n";
-  return (void *)(0);		// tmp
+  // Holes was empty or no hole of large enough size was found.
+  return getNewChunkFromSystem(chunk_size);
 }
 
 
@@ -133,6 +160,48 @@ void * _worstFit(const size_t chunk_size)
   
   std::cout<<"In _worstFit()\n";
   return (void *)(0);		// tmp
+}
+
+
+template <typename T> inline void * splitChunkFromHoles(const size_t chunk_size, T candidate)
+{
+  using namespace mmState;
+  
+  auto ret = (*std::next(candidate))->base; // Base address of chunk to be returned.
+  // CALCULATE FOR NEW HOLES CHUNK---------------------------------------------------------------
+  {						// New chunk.
+    // Base address of new chunk to be put in holes.
+    auto newBase ((char *)(ret) + chunk_size + chunkAccountingSize);
+    // Set new chunk's base address accounting info to the base address of new chunk.
+    ((chunk *)((char *)(ret) + chunk_size))->base = newBase;
+    // Set new chunk's size accounting info to the the size of the new chunk.
+    ((chunk *)((char *)(ret) + chunk_size))->size =
+      (*std::next(candidate))->size - (chunkAccountingSize + chunk_size);
+  }
+
+  // UPDATE HOLES AND INUSE--------------------------------------------------------------------
+  // Set new size of chunk to be returned.
+  (*std::next(candidate))->size = chunk_size;
+  // Push new hole onto inUse list.
+  inUse.push_front(*std::next(candidate));
+  // Remove old hole from holes list.
+  holes.erase_after(candidate);
+  // Add new hole to holes list.
+  holes.push_front((chunk *)((char*)ret + chunk_size));
+  
+  return ret;
+}
+
+
+template <typename T> inline void * useChunkFromHoles(T candidate)
+{
+  using namespace mmState;
+  auto ret = (*std::next(candidate))->base;
+  inUse.push_front(*std::next(candidate));
+  holes.erase_after(candidate);
+
+  std::cout<<"returning (*std::next(candidate))->base\n"<<ret<<'\n';
+  return ret;
 }
 
 

@@ -37,6 +37,12 @@ extern void * (* allocAlgo)(const size_t chunk_size);
 void * _firstFit(const size_t chunk_size);
 void * _bestFit(const size_t chunk_size);
 void * _worstFit(const size_t chunk_size);
+/* Splits candidate into  */
+template <typename T> inline void * splitChunkFromHoles(const size_t chunk_size, T candidate);
+/* Moves candidate from holes to inUse and returns base address of candidate (it is assumed that the size of the
+   chunk candidate has already been checked.) */
+template <typename T> inline void * useChunkFromHoles(T candidate);
+// Allocates a chunk of chunk_size using sbrk() and put's it on the inUse list and then returns base address.
 inline void * getNewChunkFromSystem(const size_t chunk_size);
 void free(const void * chunk);
 /* Merges adjacent holes. Should be called whenever a new holes is inserted into holes. E.g., at the end of free. */
