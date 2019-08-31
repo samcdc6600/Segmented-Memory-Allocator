@@ -22,8 +22,10 @@ void * _firstFit(const size_t chunk_size)
   using namespace mmState;
 
   if(chunk_size == 0)
-    {
-      return sbrk(chunk_size);
+    {				// We need to implement this
+      //      return sbrk(chunk_size);
+      std::cerr<<"error alloc(0) not implemented!\n";
+      exit(-1);
     }
   else
     {
@@ -97,29 +99,24 @@ void * _firstFit(const size_t chunk_size)
 	}
     }
   // Holes was empty or we didn't find a large enough chunk
-  // Get new chunk (plus memory for accounting.)
-  address virtualChunk {address(sbrk(chunk_size + chunkAccountingSize))};
-
-  std::cout<<"virtualChunk = "<<virtualChunk<<", real chunk = "<<(void *)((char *)virtualChunk + chunkAccountingSize)<<'\n';
-  if(virtualChunk == (address)(error::SBRK))
-    {				// The allocation wasn't successfull :'(.
-      std::cerr<<"Error in _firstFit: ";
-      throw std::bad_alloc();
-    }
-  // Store base address of virtual chunk.
-  ((chunk *)(virtualChunk))->base = ((char *)virtualChunk + chunkAccountingSize);
-  ((chunk *)(virtualChunk))->size = chunk_size;			  // Store length of virtual chunk.
-  inUse.push_front((chunk *)(virtualChunk));			  // Put new chunk accounting info on the inUse list.
-  
-  return ((chunk *)(virtualChunk))->base;
+  return getNewChunkFromSystem(chunk_size);
 }
 
 
 void * _bestFit(const size_t chunk_size)
 {
   using namespace mmState;
-  if(holes.empty())
-    {				// This is our first allocation (no need to walk the list.)
+
+    if(chunk_size == 0)
+    {				// We need to implement this
+      //      return sbrk(chunk_size);
+      std::cerr<<"error alloc(0) not implemented!\n";
+      exit(-1);
+    }
+  else
+    {
+      for(auto candidate {holes.before_begin()}; std::next(candidate) != holes.cend(); ++candidate)
+	{}
     }
   
   std::cout<<"In _bestFit()\n";
@@ -136,6 +133,32 @@ void * _worstFit(const size_t chunk_size)
   
   std::cout<<"In _worstFit()\n";
   return (void *)(0);		// tmp
+}
+
+
+inline void * getNewChunkFromSystem(const size_t chunk_size)
+{
+  using namespace mmState;
+    // Get new chunk (plus memory for accounting.)
+  address virtualChunk {address(sbrk(chunk_size + chunkAccountingSize))};
+
+  // TEST================================================================================================
+  // TEST================================================================================================
+  std::cout<<"virtualChunk = "<<virtualChunk<<", real chunk = "<<(void *)((char *)virtualChunk + chunkAccountingSize)<<'\n';
+  // TEST================================================================================================
+  // TEST================================================================================================
+  
+  if(virtualChunk == (address)(error::SBRK))
+    {				// The allocation wasn't successfull :'(.
+      std::cerr<<"Error in _firstFit: ";
+      throw std::bad_alloc();
+    }
+  // Store base address of virtual chunk.
+  ((chunk *)(virtualChunk))->base = ((char *)virtualChunk + chunkAccountingSize);
+  ((chunk *)(virtualChunk))->size = chunk_size;			  // Store length of virtual chunk.
+  inUse.push_front((chunk *)(virtualChunk));			  // Put new chunk accounting info on the inUse list.
+  
+  return ((chunk *)(virtualChunk))->base;
 }
 
 
@@ -222,7 +245,7 @@ void free(const void * chunk)
 }
 
 
-void mergeHoles()
+inline void mergeHoles()
 {
   using namespace mmState;
   // We must make sure that the holes is sorted (it may be more efficient to do this differently.)
@@ -232,51 +255,37 @@ void mergeHoles()
     return;			// There is only one hole in the list.
   else
     {
-      /*      if(std::next(std::next(holes.begin())) == holes.cend())
-	{		      // There are only two holes in the list.
-	  if(holeAbuttedAgainstHole(*holes.begin(), *std::next(holes.begin())))
+      for(auto candidate {holes.begin()}; std::next(candidate) != holes.cend(); )
+	{
+	  if(holeAbuttedAgainstHole(*candidate, *std::next(candidate)))
 	    {			// Resize lower hole.
-	      (*holes.begin())->size += ((*std::next(holes.begin()))->size + chunkAccountingSize);
+	      (*candidate)->size += ((*std::next(candidate))->size + chunkAccountingSize);
 	      // Remove higher hole from holes list :).
-	      holes.erase_after(holes.begin());
-		return;
+	      std::cout<<"Hello :)\n";
+	      candidate = holes.erase_after(candidate);
+	      if(candidate == holes.cend()) // Avoid seg fault with std::next().
+		break;
+	      /* Erase_after() returns "An iterator pointing to the element that follows the last element erased
+		 by the function call", therefore we must skip ++candidate */
+	      continue;
 	    }
+	  ++candidate;
 	}
-      else
-      {		 // There are three or more holes in the list.*/
-	  for(auto candidate {holes.begin()}; std::next(candidate) != holes.cend(); )
-	    {
-	      if(holeAbuttedAgainstHole(*candidate, *std::next(candidate)))
-		{			// Resize lower hole.
-		  (*candidate)->size += ((*std::next(candidate))->size + chunkAccountingSize);
-		  // Remove higher hole from holes list :).
-		  std::cout<<"Hello :)\n";
-		  candidate = holes.erase_after(candidate);
-		  if(candidate == holes.cend()) // Avoid seg fault with std::next().
-		      break;
-		  /* Erase_after() returns "An iterator pointing to the element that follows the last element erased
-		     by the function call", therefore we must skip ++candidate */
-		  continue;
-		}
-	      ++candidate;
-	    }
-	  //	}
     }
 }
 
 
 
-bool holeComp(mmState::chunk * a, mmState::chunk * b)
+inline bool holeComp(mmState::chunk * a, mmState::chunk * b)
 {				// Sort from low to high.
   return a->base < b->base ? true : false;
 }
 
 
-bool holeAbuttedAgainstHole(mmState::chunk * a, mmState::chunk * b)
+inline bool holeAbuttedAgainstHole(mmState::chunk * a, mmState::chunk * b)
 {
   return (((char *)(a->base) + a->size) == ((char *)(b->base) - chunkAccountingSize)) ? true : false;
 }
-
 
 
 /* We put these definitions that are below this point so that they are the only ones that may see podChecked since it
@@ -290,47 +299,45 @@ void * _checkPOD(const size_t chunk)
   return allocAlgo(chunk);
 }
 
-void checkPODProper()
+
+inline void checkPODProper()
 {
   if(!std::is_pod<mmState::chunk>::value)
     {
       std::cerr<<"Fatal error: Struct \"check\" was found not to be a POD\n";
       exit(error::POD);
     }
+  podChecked = true;
 }
 
 
-//extern "C"
-//{
-  bool setAllocationAlgorithm(const allocationAlgorithm algo)
-  {
-    //    std::cout<<"We should not be here !\n";
-    if(podChecked)
-      {
-	switch(algo)
-	  {
-	  case firstFit:
-	    allocAlgo = _firstFit;
-	    //	    std::cout<<"Set to first fit...\n";
-	    break;
-	  case bestFit:
-	    allocAlgo = _bestFit;
-	    //	    std::cout<<"Set to best fit...\n";
-	    break;
-	  case worstFit:
-	    allocAlgo = _worstFit;
-	    //	    std::cout<<"Set to worst fit...\n";
-	    break;
-	  default:
-	    //	    std::cout<<"setAllocationAlgorithm called but value of algo out of range!\n";
-	    return false;		// algo out of range :'(.
-	  }
-      }
-    else
-      {
-	checkPODProper();
-	return setAllocationAlgorithm(algo);
-      }
-    return true;
-  }
-//}
+bool setAllocationAlgorithm(const allocationAlgorithm algo)
+{
+  if(podChecked)
+    {
+      switch(algo)
+	{
+	case firstFit:
+	  allocAlgo = _firstFit;
+	  //	    std::cout<<"Set to first fit...\n";
+	  break;
+	case bestFit:
+	  allocAlgo = _bestFit;
+	  //	    std::cout<<"Set to best fit...\n";
+	  break;
+	case worstFit:
+	  allocAlgo = _worstFit;
+	  //	    std::cout<<"Set to worst fit...\n";
+	  break;
+	default:
+	  //	    std::cout<<"setAllocationAlgorithm called but value of algo out of range!\n";
+	  return false;		// algo out of range :'(.
+	}
+    }
+  else
+    {
+      checkPODProper();
+      return setAllocationAlgorithm(algo);
+    }
+  return true;
+}

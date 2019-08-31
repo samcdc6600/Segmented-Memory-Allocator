@@ -11,7 +11,7 @@ cd ./memAllocLib
 echo "\n========================================================================="
 echo "Attempting to build libMM..."
 echo "=========================================================================\n"
-make
+make -j8
 cd ../profiler
 echo "\n========================================================================="
 echo "Attempting to copy (or copy and override) $allocatorLib to\n\"./profiler/src/include\"."
@@ -22,4 +22,4 @@ sed '/'$lineIdentifier'/d' ../memAllocLib/src/include/$allocatorHeaderCpp > ./sr
 echo "\n========================================================================="
 echo "Attempting to build profiler..."
 echo "=========================================================================\n"
-make
+make -j8

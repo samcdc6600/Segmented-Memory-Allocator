@@ -4,6 +4,9 @@
 
 int main()
 {
+    printf("hell\n");
+    //  setAllocationAlgorithm(bestFit);
+  printf("hell\n");
   size_t allocSz = 1024;
   int a = 1, b = 1;
   
