@@ -8,6 +8,7 @@
 
 
 #include <stddef.h>
+#include <stdbool.h>		// We need this when used with C.
 
 enum allocationAlgorithm
   {

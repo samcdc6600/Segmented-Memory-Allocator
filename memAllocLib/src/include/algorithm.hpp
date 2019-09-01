@@ -45,7 +45,8 @@ template <typename T> inline void * useChunkFromHoles(T candidate);
 // Allocates a chunk of chunk_size using sbrk() and put's it on the inUse list and then returns base address.
 inline void * getNewChunkFromSystem(const size_t chunk_size);
 void free(const void * chunk);
-/* Merges adjacent holes. Should be called whenever a new holes is inserted into holes. E.g., at the end of free. */
+/* Merges adjacent holes. Should be called whenever a new holes is inserted into holes. E.g., at the end of free.
+   Most importantly it should be called twice (because it will only ever merge two holes in a single call. */
 inline void mergeHoles();
 inline bool holeComp(mmState::chunk * a, mmState::chunk * b);
 // Returns true if chunk a is adjacent to chunk b. Returns false otherwise.

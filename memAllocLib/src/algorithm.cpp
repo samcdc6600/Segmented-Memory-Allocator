@@ -104,6 +104,7 @@ void * _bestFit(const size_t chunk_size)
 		{
 		  if(((*std::next(candidate))->size) == chunk_size)
 		    {		// Must be best fit.
+		      std::cout<<"Found exact fit\n";
 		      return useChunkFromHoles(candidate);
 		    }
 		  else
@@ -125,6 +126,7 @@ void * _bestFit(const size_t chunk_size)
 		}
 	      if(foundBestFit)
 		{		// A best fit (not exact size) was found.
+		  std::cout<<"Found best fit\n";
 		  return useChunkFromHoles(bestFit);
 		}
 	    }
@@ -188,6 +190,22 @@ template <typename T> inline void * splitChunkFromHoles(const size_t chunk_size,
   holes.erase_after(candidate);
   // Add new hole to holes list.
   holes.push_front((chunk *)((char*)ret + chunk_size));
+
+
+  std::cout<<"splitChunkFromHoles\n";
+  for(auto a: inUse)
+    {
+      std::cout<<"\tinUse\n"
+	       <<"a.size = "<<a->size<<"\na.base = "
+	       <<a->base<<'\n';
+    }
+  for(auto a: holes)
+    {
+      std::cout<<"\tholes\n"
+	       <<"a.size = "<<a->size<<"\na.base = "
+	       <<a->base<<'\n';
+    }
+  std::cout<<'\n';
   
   return ret;
 }
@@ -200,7 +218,23 @@ template <typename T> inline void * useChunkFromHoles(T candidate)
   inUse.push_front(*std::next(candidate));
   holes.erase_after(candidate);
 
-  std::cout<<"returning (*std::next(candidate))->base\n"<<ret<<'\n';
+
+  std::cout<<"useChunkFromHoles\n";
+  for(auto a: inUse)
+    {
+      std::cout<<"\tinUse\n"
+	       <<"a.size = "<<a->size<<"\na.base = "
+	       <<a->base<<'\n';
+    }
+  for(auto a: holes)
+    {
+    std::cout<<"\tholes\n"
+	       <<"a.size = "<<a->size<<"\na.base = "
+	       <<a->base<<'\n';
+    }
+    std::cout<<'\n';
+
+  
   return ret;
 }
 
@@ -284,6 +318,7 @@ void free(const void * chunk)
 	  // TEST--------------------------------------------------------------------------
 
 	  mergeHoles();
+	  mergeHoles();
 
 	  // TEST--------------------------------------------------------------------------
 	  // TEST--------------------------------------------------------------------------
@@ -317,7 +352,7 @@ void free(const void * chunk)
 inline void mergeHoles()
 {
   using namespace mmState;
-  // We must make sure that the holes is sorted (it may be more efficient to do this differently.)
+  // We must make sure that holes is sorted (it may be more efficient to do this differently.)
   holes.sort(holeComp);
   
   if(std::next(holes.begin()) == holes.cend())
@@ -332,11 +367,14 @@ inline void mergeHoles()
 	      // Remove higher hole from holes list :).
 	      std::cout<<"Hello :)\n";
 	      candidate = holes.erase_after(candidate);
-	      if(candidate == holes.cend()) // Avoid seg fault with std::next().
+	      /* A merge should only be possible after inserting a new node, so no more then two merges should
+	      even need to be done (i.e. mergeHoles() should be called twice.) */
+	      break;
+	      /*	      if(candidate == holes.cend()) // Avoid seg fault with std::next().
 		break;
 	      /* Erase_after() returns "An iterator pointing to the element that follows the last element erased
-		 by the function call", therefore we must skip ++candidate */
-	      continue;
+		 by the function call", therefore we must skip ++candidate 
+	      continue;*/
 	    }
 	  ++candidate;
 	}
