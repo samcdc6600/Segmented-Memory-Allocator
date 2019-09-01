@@ -22,3 +22,9 @@ written in C so I don't need to overload new or delete for it.
 
 Also you can't mark me down for long functions because I'm doing it puerly for efficiency reasons ;) (don't want too many of those expensive function calls.) Also don't worry about the fact that it's probably all wildly nonoptimal
 anyway ;)
+
+I have made the decision not to populate memory allocated in the tests because that seems like a test of they memory
+and caching subsystems of my mahcine rather then a test of the allocator and would acctually just make it harder
+to see discrepancies in the timings. Once the allocator has returned a pointer it is not involved untill that pointer
+is passed back to it for deallocation. So populating the memory that that pointer points to has nothing to do with the
+performance of the allocator.

@@ -1,0 +1,16 @@
+*~
+#*
+./memAllocLib/libMM.a
+./memAllocLib/obj/*
+./memAllocLib/src/#*
+./memAllocLib/src/*~
+./memAllocLib/src/include/#*
+./memAllocLib/src/include/*~
+
+./profiler/profiler
+./profiler/obj/*
+./profiler/src/#*
+./profiler/src/*~
+./profiler/src/include/#*
+./profiler/src/include/*~
+./profiler/src/include/*.a

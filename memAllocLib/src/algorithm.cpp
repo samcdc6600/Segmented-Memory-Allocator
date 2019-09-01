@@ -37,6 +37,7 @@ void * _firstFit(const size_t chunk_size)
 	    }
 	}
     }
+
   // Holes was empty or we didn't find a large enough chunk
   return getNewChunkFromSystem(chunk_size);
 }
