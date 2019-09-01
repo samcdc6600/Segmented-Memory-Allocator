@@ -104,7 +104,6 @@ void * _worstFit(const size_t chunk_size)
     {
       if(std::next(holes.begin()) == holes.cend())
 	{			// There is only one hole in the holes list.
-	  std::cout<<"found one hole\n";
 	  auto ret = handleOneHole(chunk_size);
 	  if(ret != nullptr)
 	    return ret;
@@ -149,7 +148,6 @@ void * _worstFit(const size_t chunk_size)
 	      }
 	}
     }
-    std::cout<<"Getting memory from the system\n";
   // Holes was empty or no hole of large enough size was found.
   return getNewChunkFromSystem(chunk_size);
 }
@@ -206,22 +204,6 @@ template <typename T> inline void * splitChunkFromHoles(const size_t chunk_size,
   holes.erase_after(candidate);
   // Add new hole to holes list.
   holes.push_front((chunk *)((char*)ret + chunk_size));
-
-
-  std::cout<<"splitChunkFromHoles\n";
-  for(auto a: inUse)
-    {
-      std::cout<<"\tinUse\n"
-	       <<"a.size = "<<a->size<<"\na.base = "
-	       <<a->base<<'\n';
-    }
-  for(auto a: holes)
-    {
-      std::cout<<"\tholes\n"
-	       <<"a.size = "<<a->size<<"\na.base = "
-	       <<a->base<<'\n';
-    }
-  std::cout<<'\n';
   
   return ret;
 }
@@ -233,23 +215,6 @@ template <typename T> inline void * useChunkFromHoles(T candidate)
   auto ret = (*std::next(candidate))->base;
   inUse.push_front(*std::next(candidate));
   holes.erase_after(candidate);
-
-
-  std::cout<<"useChunkFromHoles\n";
-  for(auto a: inUse)
-    {
-      std::cout<<"\tinUse\n"
-	       <<"a.size = "<<a->size<<"\na.base = "
-	       <<a->base<<'\n';
-    }
-  for(auto a: holes)
-    {
-    std::cout<<"\tholes\n"
-	       <<"a.size = "<<a->size<<"\na.base = "
-	       <<a->base<<'\n';
-    }
-    std::cout<<'\n';
-
   
   return ret;
 }
@@ -260,12 +225,6 @@ inline void * getNewChunkFromSystem(const size_t chunk_size)
   using namespace mmState;
     // Get new chunk (plus memory for accounting.)
   address virtualChunk {address(sbrk(chunk_size + chunkAccountingSize))};
-
-  // TEST================================================================================================
-  // TEST================================================================================================
-  std::cout<<"virtualChunk = "<<virtualChunk<<", real chunk = "<<(void *)((char *)virtualChunk + chunkAccountingSize)<<'\n';
-  // TEST================================================================================================
-  // TEST================================================================================================
   
   if(virtualChunk == (address)(error::SBRK))
     {				// The allocation wasn't successfull :'(.
@@ -284,27 +243,6 @@ inline void * getNewChunkFromSystem(const size_t chunk_size)
 void free(const void * chunk)
 {
   using namespace mmState;
-
-  
-  // TEST--------------------------------------------------------------------------
-  // TEST--------------------------------------------------------------------------
-  std::cout<<"FF:before free\n";
-  for(auto a: inUse)
-    {
-      std::cout<<"\tinUse\n"
-	       <<"a.size = "<<a->size<<"\na.base = "
-	       <<a->base<<'\n';
-    }
-  for(auto a: holes)
-    {
-    std::cout<<"\tholes\n"
-	       <<"a.size = "<<a->size<<"\na.base = "
-	       <<a->base<<'\n';
-    }
-    std::cout<<'\n';
-// TEST--------------------------------------------------------------------------
-  // TEST--------------------------------------------------------------------------
-
     
   for(auto candidate {inUse.before_begin()}; std::next(candidate) != inUse.cend(); ++candidate)
     {
@@ -312,48 +250,8 @@ void free(const void * chunk)
 	{
 	  holes.push_front(*std::next(candidate));
 	  inUse.erase_after(candidate);
-
-	  
-	  // TEST--------------------------------------------------------------------------
-	  // TEST--------------------------------------------------------------------------
-	  std::cout<<"FF:after free\n";
-	  for(auto a: inUse)
-	    {
-	      std::cout<<"\tinUse\n"
-		       <<"a.size = "<<a->size<<"\na.base = "
-		       <<a->base<<'\n';
-	    }
-	  for(auto a: holes)
-	    {
-	      std::cout<<"\tholes\n"
-		       <<"a.size = "<<a->size<<"\na.base = "
-		       <<a->base<<'\n';
-		       }
-	  std::cout<<'\n';
-	  // TEST--------------------------------------------------------------------------
-	  // TEST--------------------------------------------------------------------------
-
 	  mergeHoles();
 	  mergeHoles();
-
-	  // TEST--------------------------------------------------------------------------
-	  // TEST--------------------------------------------------------------------------
-	  std::cout<<"FM:after free and merge\n";
-	  for(auto a: inUse)
-	    {
-	      std::cout<<"\tinUse\n"
-		       <<"a.size = "<<a->size<<"\na.base = "
-		       <<a->base<<'\n';
-	    }
-	  for(auto a: holes)
-	    {
-	      std::cout<<"\tholes\n"
-		       <<"a.size = "<<a->size<<"\na.base = "
-		       <<a->base<<'\n';
-	    }
-	  std::cout<<"\n-----------------------------------------------------------------------\n";
-	  // TEST--------------------------------------------------------------------------
-	  // TEST--------------------------------------------------------------------------
 	  
 	  return;
 	}
@@ -381,16 +279,10 @@ inline void mergeHoles()
 	    {			// Resize lower hole.
 	      (*candidate)->size += ((*std::next(candidate))->size + chunkAccountingSize);
 	      // Remove higher hole from holes list :).
-	      std::cout<<"Hello :)\n";
 	      candidate = holes.erase_after(candidate);
 	      /* A merge should only be possible after inserting a new node, so no more then two merges should
 	      even need to be done (i.e. mergeHoles() should be called twice.) */
 	      break;
-	      /*	      if(candidate == holes.cend()) // Avoid seg fault with std::next().
-		break;
-	      /* Erase_after() returns "An iterator pointing to the element that follows the last element erased
-		 by the function call", therefore we must skip ++candidate 
-	      continue;*/
 	    }
 	  ++candidate;
 	}
@@ -442,18 +334,14 @@ bool setAllocationAlgorithm(const allocationAlgorithm algo)
 	{
 	case firstFit:
 	  allocAlgo = _firstFit;
-	  //	    std::cout<<"Set to first fit...\n";
 	  break;
 	case bestFit:
 	  allocAlgo = _bestFit;
-	  //	    std::cout<<"Set to best fit...\n";
 	  break;
 	case worstFit:
 	  allocAlgo = _worstFit;
-	  //	    std::cout<<"Set to worst fit...\n";
 	  break;
 	default:
-	  //	    std::cout<<"setAllocationAlgorithm called but value of algo out of range!\n";
 	  return false;		// algo out of range :'(.
 	}
     }
