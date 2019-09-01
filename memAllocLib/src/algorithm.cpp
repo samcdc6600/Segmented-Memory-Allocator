@@ -21,26 +21,19 @@ void * _firstFit(const size_t chunk_size)
 {
   using namespace mmState;
 
-  if(chunk_size == 0)
-    {
-      // It doesn't make sense to return the program brk because we could have holes before it.
-      std::cerr<<"Fatal error: can't allocate 0 bytes.\n";
-      exit(error::ALLOC);
-    }
-  else
-    {
-      for(auto candidate {holes.before_begin()}; std::next(candidate) != holes.cend(); ++candidate)
-	{ /* We will need to add new accounting info when we split the chunk so it must have space for it. */
-	  if(((*std::next(candidate))->size) >= (chunk_size + chunkAccountingSize))
-	    {			// We have found a chunk but it is too big. There is more work to be done :'(.
-	      return splitChunkFromHoles(chunk_size, candidate);
-	    }
-	  else
-	    {			// We dont split the chunk if it is equal in size so we don't need any extra space.
-	      if(((*std::next(candidate))->size) == chunk_size)
-		{			// The chunk is exactly the right size :).
-		  return useChunkFromHoles(candidate);
-		}
+  checkZeroChunkSize(chunk_size);
+  
+  for(auto candidate {holes.before_begin()}; std::next(candidate) != holes.cend(); ++candidate)
+    { /* We will need to add new accounting info when we split the chunk so it must have space for it. */
+      if(((*std::next(candidate))->size) >= (chunk_size + chunkAccountingSize))
+	{			// We have found a chunk but it is too big. There is more work to be done :'(.
+	  return splitChunkFromHoles(chunk_size, candidate);
+	}
+      else
+	{			// We dont split the chunk if it is equal in size so we don't need any extra space.
+	  if(((*std::next(candidate))->size) == chunk_size)
+	    {			// The chunk is exactly the right size :).
+	      return useChunkFromHoles(candidate);
 	    }
 	}
     }
@@ -53,61 +46,49 @@ void * _bestFit(const size_t chunk_size)
 {
   using namespace mmState;
 
-  if(chunk_size == 0)
+  checkZeroChunkSize(chunk_size);
+  
+  if(!holes.empty())
     {
-      std::cerr<<"Fatal error: can't allocate 0 bytes.\n";
-      exit(error::ALLOC);
-    }
-  else
-    {
-      if(!holes.empty())
+      if(std::next(holes.begin()) == holes.cend())
+	{			// There is only one hole in the holes list.
+	  auto ret = handleOneHole(chunk_size);
+	  if(ret != nullptr)
+	    return ret;
+	}
+      else
 	{
-	  if(std::next(holes.begin()) == holes.cend())
-	    {			// There is only one hole in the holes list.
-	      if(((*holes.begin())->size) >= (chunk_size + chunkAccountingSize))
-		{		// We have found a chunk but it is too big. There is more work to be done.
-		  return splitChunkFromHoles(chunk_size, holes.before_begin());
-		}
-	      if(((*holes.begin())->size) == chunk_size)
-		{		// The chunk is exactly the right size :).
-		  return useChunkFromHoles(holes.before_begin());
-		}
-	    }
-	  else
+	  auto bestFit {holes.before_begin()};
+	  bool foundBestFit {false};
+	  for(auto candidate {holes.before_begin()}; std::next(candidate) != holes.cend(); ++candidate)
 	    {
-	      auto bestFit {holes.before_begin()};
-	      bool foundBestFit {false};
-	      for(auto candidate {holes.before_begin()}; std::next(candidate) != holes.cend(); ++candidate)
+	      if(((*std::next(candidate))->size) == chunk_size)
+		{		// Must be best fit.
+		  return useChunkFromHoles(candidate);
+		}
+	      else
 		{
-		  if(((*std::next(candidate))->size) == chunk_size)
-		    {		// Must be best fit.
-		      return useChunkFromHoles(candidate);
-		    }
-		  else
-		    {
-		      if(((*std::next(candidate))->size) >= (chunk_size + chunkAccountingSize))
-			{	// We have found a hole large enough.
-			  if(foundBestFit)
-			    {
-			      bestFit = (((*std::next(candidate))->size) < (*bestFit)->size) ?
+		  if(((*std::next(candidate))->size) >= (chunk_size + chunkAccountingSize))
+		    {	// We have found a hole large enough.
+		      if(foundBestFit)
+			{
+			  bestFit = (((*std::next(candidate))->size) < (*bestFit)->size) ?
 			    std::next(candidate): bestFit;
-			    }
-			  else
-			    {
-			      foundBestFit = true;
-			      bestFit = std::next(candidate);
-			    }
+			}
+		      else
+			{
+			  foundBestFit = true;
+			  bestFit = std::next(candidate);
 			}
 		    }
 		}
-	      if(foundBestFit)
-		{		// A best fit (not exact size) was found.
-		  return useChunkFromHoles(bestFit);
-		}
+	    }
+	  if(foundBestFit)
+	    {		// A best fit (not exact size) was found.
+	      return useChunkFromHoles(bestFit);
 	    }
 	}
     }
-  
   // Holes was empty or no hole of large enough size was found.
   return getNewChunkFromSystem(chunk_size);
 }
@@ -116,72 +97,87 @@ void * _bestFit(const size_t chunk_size)
 void * _worstFit(const size_t chunk_size)
 {
   using namespace mmState;
-  
-    if(chunk_size == 0)
+
+  checkZeroChunkSize(chunk_size);
+
+  if(!holes.empty())
+    {
+      if(std::next(holes.begin()) == holes.cend())
+	{			// There is only one hole in the holes list.
+	  std::cout<<"found one hole\n";
+	  auto ret = handleOneHole(chunk_size);
+	  if(ret != nullptr)
+	    return ret;
+	}
+      else
+	{
+	  auto worstFit {holes.before_begin()};
+	  // When we don't find a worst fit (we use + chunkAccountingSize) we may use equal.
+	  auto equal {holes.before_begin()};
+	  bool foundWorstFit {false};
+	  for(auto candidate {holes.before_begin()}; std::next(candidate) != holes.cend(); ++candidate)
+	    {
+	      if(((*std::next(candidate))->size) == chunk_size && equal == holes.before_begin())
+		{		// Must be best fit.
+		  equal = candidate;
+		}
+	      else
+		{
+		  if(((*std::next(candidate))->size) >= (chunk_size + chunkAccountingSize))
+		    {	// We have found a hole large enough.
+		      if(foundWorstFit)
+			{
+			  worstFit = (((*std::next(candidate))->size) > (*worstFit)->size) ?
+			    std::next(candidate): worstFit;
+			}
+		      else
+			{
+			  foundWorstFit = true;
+			  worstFit = std::next(candidate);
+			}
+		    }
+		}
+	    }
+	  if(foundWorstFit)
+	    {		// A best fit (not exact size) was found.
+	      return useChunkFromHoles(worstFit);
+	    }
+	  else
+	    if(equal != holes.before_begin())
+	      {
+		return useChunkFromHoles(equal);
+	      }
+	}
+    }
+    std::cout<<"Getting memory from the system\n";
+  // Holes was empty or no hole of large enough size was found.
+  return getNewChunkFromSystem(chunk_size);
+}
+
+
+inline void checkZeroChunkSize(const size_t chunk_size)
+{
+  if(chunk_size == 0)
     {
       std::cerr<<"Fatal error: can't allocate 0 bytes.\n";
       exit(error::ALLOC);
     }
-  else
-    {
-      if(!holes.empty())
-	{
-	  if(std::next(holes.begin()) == holes.cend())
-	    {			// There is only one hole in the holes list.
-	      if(((*holes.begin())->size) >= (chunk_size + chunkAccountingSize))
-		{		// We have found a chunk but it is too big. There is more work to be done.
-		  return splitChunkFromHoles(chunk_size, holes.before_begin());
-		}
-	      if(((*holes.begin())->size) == chunk_size)
-		{		// The chunk is exactly the right size :).
-		  return useChunkFromHoles(holes.before_begin());
-		}
-	    }
-	  else
-	    {
-	      auto worstFit {holes.before_begin()};
-	      // When we don't find a worst fit (we use + chunkAccountingSize) we may use equal.
-	      auto equal {holes.before_begin()};
-	      bool foundWorstFit {false};
-	      for(auto candidate {holes.before_begin()}; std::next(candidate) != holes.cend(); ++candidate)
-		{
-		  if(((*std::next(candidate))->size) == chunk_size && equal == holes.before_begin())
-		    {		// Must be best fit.
-		      equal = candidate;
-		    }
-		  else
-		    {
-		      if(((*std::next(candidate))->size) >= (chunk_size + chunkAccountingSize))
-			{	// We have found a hole large enough.
-			  if(foundWorstFit)
-			    {
-			      worstFit = (((*std::next(candidate))->size) > (*worstFit)->size) ?
-			    std::next(candidate): worstFit;
-			    }
-			  else
-			    {
-			      foundWorstFit = true;
-			      worstFit = std::next(candidate);
-			    }
-			}
-		    }
-		}
-	      if(foundWorstFit)
-		{		// A best fit (not exact size) was found.
-		  return useChunkFromHoles(worstFit);
-		}
-	      else
-		if(equal != holes.before_begin())
-		  {
-		    return useChunkFromHoles(equal);
-		  }
-	    }
-	}
+}
+
+
+inline void * handleOneHole(const size_t chunk_size)
+{
+  using namespace mmState;
+  if(((*holes.begin())->size) >= (chunk_size + chunkAccountingSize))
+    {		// We have found a chunk but it is too big. There is more work to be done.
+      return splitChunkFromHoles(chunk_size, holes.before_begin());
+    }
+  if(((*holes.begin())->size) == chunk_size)
+    {		// The chunk is exactly the right size :).
+      return useChunkFromHoles(holes.before_begin());
     }
 
-    std::cout<<"Getting memory from the system\n";
-  // Holes was empty or no hole of large enough size was found.
-  return getNewChunkFromSystem(chunk_size);
+  return nullptr;
 }
 
 

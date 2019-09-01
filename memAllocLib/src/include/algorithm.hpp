@@ -37,6 +37,10 @@ extern void * (* allocAlgo)(const size_t chunk_size);
 void * _firstFit(const size_t chunk_size);
 void * _bestFit(const size_t chunk_size);
 void * _worstFit(const size_t chunk_size);
+// Exit's if chunk_size is zero. It doesn't make sense to return a brk value since there may be holes.
+inline void checkZeroChunkSize(const size_t chunk_size);
+// If we are allocating and there is only one hole.
+inline void * handleOneHole(const size_t chunk_size);
 /* Splits candidate into  */
 template <typename T> inline void * splitChunkFromHoles(const size_t chunk_size, T candidate);
 /* Moves candidate from holes to inUse and returns base address of candidate (it is assumed that the size of the

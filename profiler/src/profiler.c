@@ -34,11 +34,11 @@ int main()
       printf("nums1[iter] = %i\n", nums1[iter]);
     }
 
-  //  dealloc(nums1);
+   dealloc(nums1);
 
   allocSz = 10;
 
-  /*  int * nums2;
+    int * nums2;
   nums2 = ((int *)(alloc(allocSz * sizeof(int))));
   for(size_t iter = 0; iter < allocSz; ++iter)
     {
@@ -80,12 +80,12 @@ int main()
       printf("nums4[iter] = %i\n", nums4[iter]);
     }
 
-  dealloc(nums1);
+  //  dealloc(nums1);
     dealloc(nums4);
     dealloc(nums3);
   //  dealloc(nums3);
   
-  printf("hello world\n");
+    /*  printf("hello world\n");
   printf("%i\n", 4096*16*16*16*16);
   genRandomAllocations();*/
 }
