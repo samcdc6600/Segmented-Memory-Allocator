@@ -35,8 +35,15 @@ and the randomAllocationsAndDeallocations() functions, as I have yet to figoure 
 random deallocations but only for already allocated memory. And of course I may tweak these functions if I think of
 anything new or notice any problems when writing my report.
 
+I might also implement some testing functions that use getrusage() to test things such as page faults.
+I don't see the point in testing memory usage at the moment though (since the allocator only uses 16 bytes for each
+chunk allocated (excluding the memory used by forward_list, however)). Maybe we will test this if we have time.
+We don't know how memory hungery forward_list is but we suspet it's not more then a few pointers.
+
 If you want to know exactly what the arguments to the profiler do you'll have to look at the code because I haven't
 Implemented any sort of help switch.
 
 The reason I used C++ for the memory manager was mostly down to being more familiar with it and also the nice
 forward_list<> type :).
+
+Also I still need to tweek the values for veriable allocation's to allow for longer runs.

@@ -3,6 +3,8 @@
 #include <time.h>
 #include "include/mm.h"
 
+
+const int maxPolicyNum = 2;	/* There are only three policies */
 /* Number of allocations to make for tests. (Maximum is less for veriable sized allocation tests because of memory
    constraints.) */
 const int testSizes[] = {1024*1, 1024*4, 1024*16, 1024*64, 1024*256, 1024*1024, 1024*4096};
@@ -33,7 +35,9 @@ int setAllocationUnitMaxIndex(const int size);
 
 int main(const int argc, const char **argv)
 {
-  //  srand(time(NULL));
+  const argcArgs = 4;		/* We must be passed exactly this many arguments. */
+  const int argPolicy = 1, argTestNum = 2, argTestSize = 3;
+  srand(time(NULL));
   void (*test[])(const int size) = {sequentialFixedSizeAllocationAndDeallocation,
 				    sequentialFixedSizeAllocationAndReverseDeallocation,
 				    interleavedFixedSizeAllocationAndDeallocation, randomFixedSizeAllocationsAndDeallocations,
@@ -41,12 +45,28 @@ int main(const int argc, const char **argv)
 				    interleavedAllocationAndDeallocation, randomAllocationsAndDeallocations};
   const int testNum = (sizeof(test) / sizeof(void (*)(const int)));
 
-  if(argc == 3)
+  if(argc == argcArgs)
     {
-      if((atoi(argv[1]) >= 0  && atoi(argv[1]) < testNum) &&
-	 (atoi(argv[2]) >= 0 && (unsigned)atoi(argv[2]) < (sizeof(testSizes) / sizeof(int))))
+      if((atoi(argv[argPolicy]) >= 0 && atoi(argv[argPolicy]) <= maxPolicyNum) &&
+	 (atoi(argv[argTestNum]) >= 0  && atoi(argv[argTestNum]) < testNum) &&
+	 (atoi(argv[argTestSize]) >= 0 && (unsigned)atoi(argv[argTestSize]) < (sizeof(testSizes) / sizeof(int))))
 	{
-	  test[atoi(argv[1])](atoi(argv[2]));
+	  switch(atoi(argv[argPolicy]))
+	    {
+	    case 0:
+	      printf("Using first fit.\n");
+	      setAllocationAlgorithm(firstFit);
+	      break;
+	    case 1:
+	      printf("Using best fit.\n");
+	      setAllocationAlgorithm(bestFit);
+	      break;
+	    case 2:
+	      printf("Using worst fit.\n");
+	      setAllocationAlgorithm(worstFit);
+	      break;
+	    }
+	  test[atoi(argv[argTestNum])](atoi(argv[argTestSize]));
 	}
       else
 	{
@@ -63,10 +83,11 @@ int main(const int argc, const char **argv)
 
 void printArgumentErrorMsg(const int testNum)
 {
-  printf("Error malformed arguments, the format is: command testNum sizeNum\nWhere "
-	 "command is the name of the program, testNum is the number of the test\n"
-	 "(the range is [0,%i]) and sizeNum is the number of allocations to perform\n"
-	 "in the test (the range is [0,%lu].)\n", testNum -1, (sizeof(testSizes) / sizeof(int)) -1);
+  printf("Error malformed arguments, the format is: command policy testNum sizeNum\nWhere "
+	 "command is the name of the program, policy is the memory allocation policy\n"
+	 "(the range is [0, %i]), testNum is the number of the test (the range is [0,%i])\n"
+	 "and sizeNum is the number of allocations to perform in the test (the range is [0,%lu].)\n",
+	 maxPolicyNum, testNum -1, (sizeof(testSizes) / sizeof(int)) -1);
 }
 
 
@@ -197,6 +218,10 @@ void randomFixedSizeAllocationsAndDeallocations(const int size)
     {
       printf("iter = %i\n", allocOrder[iter]);
     }*/
+
+
+  
+  
   printf("Please implement me :'(\n");
 }
 
@@ -300,25 +325,6 @@ void interleavedAllocationAndDeallocation(int size)
   double time = (double)(end - begin) / CLOCKS_PER_SEC;
   printf("\tTotal time = %f\n", time);
 }
-
-
-/*
-  const int fixedSizeAllocationUnit = 1;
-  printf("In interleavedFixedSizeAllocationAndDeallocation():\nTest size = %i,\nAllocation unit = %i.\nStats:\n"
-	 , testSizes[size], fixedSizeAllocationUnit);
-  clock_t begin = clock();
-  
-  for(int iter = 0; iter < testSizes[size]; ++iter)
-    {			// Make n allocations.
-      allocs[iter] = alloc(1);
-      *(char *)(allocs[iter]) = iter;
-      dealloc(allocs[iter]);
-    }
-
-  clock_t end = clock();
-  double time = (double)(end - begin) / CLOCKS_PER_SEC;
-  printf("\tTotal time = %f\n", time);
- */
 
 
 void randomAllocationsAndDeallocations(int size)
