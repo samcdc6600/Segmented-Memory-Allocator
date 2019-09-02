@@ -7,8 +7,10 @@
    constraints.) */
 const int testSizes[] = {1024*1, 1024*4, 1024*16, 1024*64, 1024*256, 1024*1024, 1024*4096};
 const int fixedSizeAllocationUnit = 1; /* For tests with fixed alloction unit size. */
+/* We don't want to allow test sizes of more then this index because we only have so much time and memory. */
+const int veriableAllocationUnitTestSizesSaturationIndex = 4;
 /* Ranges for test with veriable allocation unit sizes. */
-const int allocationUnitMin = 1, allocationUnitMax[] = {1024*1, 1024*4};
+const int allocationUnitMin = 1, allocationUnitMax[] = {1024*1, 1024*4, 1024*16, 1024*64, 1024*256};
 
 
 void printArgumentErrorMsg(const int testNum);
@@ -18,12 +20,15 @@ void sequentialFixedSizeAllocationAndDeallocation(const int size);
    sort holes in mergeHoles() (to make it easier to compare addresses.) */
 void sequentialFixedSizeAllocationAndReverseDeallocation(const int size);
 void interleavedFixedSizeAllocationAndDeallocation(const int size);
-void randomFixedSizeAllocations(const int size);
+void randomFixedSizeAllocationsAndDeallocations(const int size);
 /* All functions without moniker component "FixedSize" use random allocation units */
 void sequentialAllocationAndDeallocation(const int size);
 void sequentialAllocationAndReverseDeallocation(const int size);
 void interleavedAllocationAndDeallocation(const int size);
-void randomAllocations(const int size);
+void randomAllocationsAndDeallocations(const int size);
+/* We want our maximum allocation unit to be the inverse of our test size. This function shouldn't be called from
+   any functions with the moniker component "FixedSize" */
+int setAllocationUnitMaxIndex(const int size);
 
 
 int main(const int argc, const char **argv)
@@ -31,9 +36,9 @@ int main(const int argc, const char **argv)
   //  srand(time(NULL));
   void (*test[])(const int size) = {sequentialFixedSizeAllocationAndDeallocation,
 				    sequentialFixedSizeAllocationAndReverseDeallocation,
-				    interleavedFixedSizeAllocationAndDeallocation, randomFixedSizeAllocations,
+				    interleavedFixedSizeAllocationAndDeallocation, randomFixedSizeAllocationsAndDeallocations,
 				    sequentialAllocationAndDeallocation, sequentialAllocationAndReverseDeallocation,
-				    interleavedAllocationAndDeallocation, randomAllocations};
+				    interleavedAllocationAndDeallocation, randomAllocationsAndDeallocations};
   const int testNum = (sizeof(test) / sizeof(void (*)(const int)));
 
   if(argc == 3)
@@ -70,7 +75,7 @@ void printArgumentErrorMsg(const int testNum)
 void * allocs[4096*16*16*16*16];
 void sequentialFixedSizeAllocationAndDeallocation(const int size)
 {
-  printf("In sequentialAllocationAndDeallocation():\nTest size = %i,\nAllocation unit = %i.\nStats:\n"
+  printf("In sequentialFixedSizeAllocationAndDeallocation():\nTest size = %i,\nAllocation unit = %i.\nStats:\n"
 	 , testSizes[size], fixedSizeAllocationUnit);
   clock_t begin = clock();
   
@@ -101,7 +106,7 @@ void sequentialFixedSizeAllocationAndDeallocation(const int size)
 void sequentialFixedSizeAllocationAndReverseDeallocation(const int size)
 {
   const int fixedSizeAllocationUnit = 1;
-  printf("In sequentialAllocationAndReverseDeallocation():\nTest size = %i,\nAllocation unit = %i.\nStats:\n"
+  printf("In sequentialFixedSizeAllocationAndReverseDeallocation():\nTest size = %i,\nAllocation unit = %i.\nStats:\n"
 	 , testSizes[size], fixedSizeAllocationUnit);
   clock_t begin = clock();
   
@@ -148,7 +153,7 @@ void interleavedFixedSizeAllocationAndDeallocation(const int size)
 }
 
 
-void randomFixedSizeAllocations(const int size)
+void randomFixedSizeAllocationsAndDeallocations(const int size)
 {				/* I.e. we allocate an absolute maximum of 256 MB (testSize * maxAllocSize.) */
 
   /*  int testSize = 5;//65536;
@@ -192,4 +197,154 @@ void randomFixedSizeAllocations(const int size)
     {
       printf("iter = %i\n", allocOrder[iter]);
     }*/
+}
+
+
+void sequentialAllocationAndDeallocation(int size)
+{
+  if(size > veriableAllocationUnitTestSizesSaturationIndex)
+    {
+      size = veriableAllocationUnitTestSizesSaturationIndex; /* We don't want to wast all of our time and memory. */
+      printf("Capping allocation size at %i\n", size);
+    }
+  int allocationUnitMaxIndex = setAllocationUnitMaxIndex(size);
+  
+  printf("In sequentialAllocationAndDeallocation():\nTest size = %i,\nAllocation unit = %i.\nStats:\n"
+	 , testSizes[size], allocationUnitMax[allocationUnitMaxIndex]);
+  printf("AllocationUnitMax[allocationUnitMaxIndex] = %i\n AllocationUnitMaxIndex = %i\n",
+	 allocationUnitMax[allocationUnitMaxIndex], allocationUnitMaxIndex);
+  
+  clock_t begin = clock();
+  
+  for(int iter = 0; iter < testSizes[size]; ++iter)
+    {			// Make n allocations.
+      allocs[iter] = alloc(abs(rand() % (allocationUnitMax[allocationUnitMaxIndex])) + allocationUnitMin);
+      /* Some dummy data to make sure the compiler is not doing anything tricky idk. */
+      *(char *)(allocs[iter]) = iter;
+    }
+  
+  clock_t end = clock();
+  double timeAlloc = (double)(end - begin) / CLOCKS_PER_SEC;
+  printf("\tAllocation time = %f\n", timeAlloc);
+  begin = clock();
+  
+  for(int iter = 0; iter < testSizes[size]; ++iter)
+    {			// Make n deallocations.
+      dealloc(allocs[iter]);
+    }
+
+  end = clock();
+  double timeDealloc = (double)(end - begin) / CLOCKS_PER_SEC;
+  printf("\tDeallocation time = %f\n", timeDealloc);
+  printf("\tTotal time = %f\n", timeAlloc + timeDealloc);
+}
+
+
+void sequentialAllocationAndReverseDeallocation(int size)
+{
+  if(size > veriableAllocationUnitTestSizesSaturationIndex)
+    {
+      size = veriableAllocationUnitTestSizesSaturationIndex; /* We don't want to wast all of our time and memory. */
+      printf("Capping allocation size at %i\n", size);
+    }
+  int allocationUnitMaxIndex = setAllocationUnitMaxIndex(size);
+  
+  printf("In sequentialAllocationAndReverseDeallocation():\nTest size = %i,\nAllocation unit = %i.\nStats:\n"
+	 , testSizes[size], allocationUnitMax[allocationUnitMaxIndex]);
+  printf("AllocationUnitMax[allocationUnitMaxIndex] = %i\n AllocationUnitMaxIndex = %i\n",
+	 allocationUnitMax[allocationUnitMaxIndex], allocationUnitMaxIndex);
+    
+  clock_t begin = clock();
+  
+  for(int iter = 0; iter < testSizes[size]; ++iter)
+    {			// Make n allocations.
+      allocs[iter] = alloc(abs(rand() % (allocationUnitMax[allocationUnitMaxIndex])) + allocationUnitMin);
+      /* Some dummy data to make sure the compiler is not doing anything tricky idk. */
+      *(char *)(allocs[iter]) = iter;
+    }
+  
+  clock_t end = clock();
+  double timeAlloc = (double)(end - begin) / CLOCKS_PER_SEC;
+  printf("\tAllocation time = %f\n", timeAlloc);
+  begin = clock();
+  
+  for(int iter = (testSizes[size] -1); iter >= 0 ; --iter)
+    {			// Make n deallocations.
+      dealloc(allocs[iter]);
+    }
+
+  end = clock();
+  double timeDealloc = (double)(end - begin) / CLOCKS_PER_SEC;
+  printf("\tDeallocation time = %f\n", timeDealloc);
+  printf("\tTotal time = %f\n", timeAlloc + timeDealloc);
+}
+
+
+/*  const int fixedSizeAllocationUnit = 1;
+  printf("In sequentialFixedSizeAllocationAndReverseDeallocation():\nTest size = %i,\nAllocation unit = %i.\nStats:\n"
+	 , testSizes[size], fixedSizeAllocationUnit);
+  clock_t begin = clock();
+  
+  for(int iter = 0; iter < testSizes[size]; ++iter)
+    {			// Make n allocations.
+      allocs[iter] = alloc(1);
+      *(char *)(allocs[iter]) = iter;
+    }
+
+  clock_t end = clock();
+  double timeAlloc = (double)(end - begin) / CLOCKS_PER_SEC;
+  printf("\tAllocation time = %f\n", timeAlloc);
+  begin = clock();
+  
+  for(int iter = (testSizes[size] -1); iter >= 0; --iter)
+    {			// Make n deallocations.
+      dealloc(allocs[iter]);
+    }
+
+  end = clock();
+  double timeDealloc = (double)(end - begin) / CLOCKS_PER_SEC;
+  printf("\tDeallocation time = %f\n", timeDealloc);
+  printf("\tTotal time = %f\n", timeAlloc + timeDealloc);*/
+
+
+void interleavedAllocationAndDeallocation(int size)
+{
+  if(size > veriableAllocationUnitTestSizesSaturationIndex)
+    size = veriableAllocationUnitTestSizesSaturationIndex;
+}
+
+
+void randomAllocationsAndDeallocations(int size)
+{
+  if(size > veriableAllocationUnitTestSizesSaturationIndex)
+    size = veriableAllocationUnitTestSizesSaturationIndex;
+}
+
+
+/* This very much need's to be improved!!! */
+int setAllocationUnitMaxIndex(const int size)
+{
+  switch(size)
+    {				/* We are seting allocationUnitMaxIndex to the number furthest away in the possible
+				   range (if you conside the range to be circular. We need to figoure out a better
+				   way to do this :'( .) */
+    case 0:
+      return 4;
+      break;
+    case 1:
+      return 3;
+      break;
+    case 2:
+      return 2;
+      break;
+    case 3:
+      return 1;
+      break;
+    case 4:
+      return 0;
+      break;
+    default:
+      printf("Error in setAllocationUnitMaxIndex(), no case for size (%i) in switch.\n", size);
+      exit(-1);
+    }
 }
