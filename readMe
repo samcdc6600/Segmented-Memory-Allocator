@@ -34,3 +34,9 @@ Also I have not finished writing all the test's yet. Specifically the randomFixe
 and the randomAllocationsAndDeallocations() functions, as I have yet to figoure out how to write the code to perform
 random deallocations but only for already allocated memory. And of course I may tweak these functions if I think of
 anything new or notice any problems when writing my report.
+
+If you want to know exactly what the arguments to the profiler do you'll have to look at the code because I haven't
+Implemented any sort of help switch.
+
+The reason I used C++ for the memory manager was mostly down to being more familiar with it and also the nice
+forward_list<> type :).

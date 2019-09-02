@@ -82,7 +82,7 @@ void sequentialFixedSizeAllocationAndDeallocation(const int size)
   for(int iter = 0; iter < testSizes[size]; ++iter)
     {			// Make n allocations.
       allocs[iter] = alloc(fixedSizeAllocationUnit);
-      /* Some dummy data to make sure the compiler is not doing anything tricky idk. */
+      /* Some dummy data to make sure the compiler is not doing anything tricky idk (although I highly doubt it.) */
       *(char *)(allocs[iter]) = iter;
     }
   
@@ -197,6 +197,7 @@ void randomFixedSizeAllocationsAndDeallocations(const int size)
     {
       printf("iter = %i\n", allocOrder[iter]);
     }*/
+  printf("Please implement me :'(\n");
 }
 
 
@@ -211,15 +212,12 @@ void sequentialAllocationAndDeallocation(int size)
   
   printf("In sequentialAllocationAndDeallocation():\nTest size = %i,\nAllocation unit = %i.\nStats:\n"
 	 , testSizes[size], allocationUnitMax[allocationUnitMaxIndex]);
-  printf("AllocationUnitMax[allocationUnitMaxIndex] = %i\n AllocationUnitMaxIndex = %i\n",
-	 allocationUnitMax[allocationUnitMaxIndex], allocationUnitMaxIndex);
   
   clock_t begin = clock();
   
   for(int iter = 0; iter < testSizes[size]; ++iter)
     {			// Make n allocations.
       allocs[iter] = alloc(abs(rand() % (allocationUnitMax[allocationUnitMaxIndex])) + allocationUnitMin);
-      /* Some dummy data to make sure the compiler is not doing anything tricky idk. */
       *(char *)(allocs[iter]) = iter;
     }
   
@@ -251,15 +249,12 @@ void sequentialAllocationAndReverseDeallocation(int size)
   
   printf("In sequentialAllocationAndReverseDeallocation():\nTest size = %i,\nAllocation unit = %i.\nStats:\n"
 	 , testSizes[size], allocationUnitMax[allocationUnitMaxIndex]);
-  printf("AllocationUnitMax[allocationUnitMaxIndex] = %i\n AllocationUnitMaxIndex = %i\n",
-	 allocationUnitMax[allocationUnitMaxIndex], allocationUnitMaxIndex);
     
   clock_t begin = clock();
   
   for(int iter = 0; iter < testSizes[size]; ++iter)
     {			// Make n allocations.
       allocs[iter] = alloc(abs(rand() % (allocationUnitMax[allocationUnitMaxIndex])) + allocationUnitMin);
-      /* Some dummy data to make sure the compiler is not doing anything tricky idk. */
       *(char *)(allocs[iter]) = iter;
     }
   
@@ -280,8 +275,36 @@ void sequentialAllocationAndReverseDeallocation(int size)
 }
 
 
-/*  const int fixedSizeAllocationUnit = 1;
-  printf("In sequentialFixedSizeAllocationAndReverseDeallocation():\nTest size = %i,\nAllocation unit = %i.\nStats:\n"
+void interleavedAllocationAndDeallocation(int size)
+{
+  if(size > veriableAllocationUnitTestSizesSaturationIndex)
+    {
+      size = veriableAllocationUnitTestSizesSaturationIndex; /* We don't want to wast all of our time and memory. */
+      printf("Capping allocation size at %i\n", size);
+    }
+  int allocationUnitMaxIndex = setAllocationUnitMaxIndex(size);
+  
+  printf("In interleavedAllocationAndDeallocation():\nTest size = %i,\nAllocation unit = %i.\nStats:\n"
+	 , testSizes[size], allocationUnitMax[allocationUnitMaxIndex]);
+    
+  clock_t begin = clock();
+
+  for(int iter = 0; iter < testSizes[size]; ++iter)
+    {			// Make n allocations.
+      allocs[iter] = alloc(1);
+      *(char *)(allocs[iter]) = iter;
+      dealloc(allocs[iter]);
+    }
+
+  clock_t end = clock();
+  double time = (double)(end - begin) / CLOCKS_PER_SEC;
+  printf("\tTotal time = %f\n", time);
+}
+
+
+/*
+  const int fixedSizeAllocationUnit = 1;
+  printf("In interleavedFixedSizeAllocationAndDeallocation():\nTest size = %i,\nAllocation unit = %i.\nStats:\n"
 	 , testSizes[size], fixedSizeAllocationUnit);
   clock_t begin = clock();
   
@@ -289,35 +312,18 @@ void sequentialAllocationAndReverseDeallocation(int size)
     {			// Make n allocations.
       allocs[iter] = alloc(1);
       *(char *)(allocs[iter]) = iter;
-    }
-
-  clock_t end = clock();
-  double timeAlloc = (double)(end - begin) / CLOCKS_PER_SEC;
-  printf("\tAllocation time = %f\n", timeAlloc);
-  begin = clock();
-  
-  for(int iter = (testSizes[size] -1); iter >= 0; --iter)
-    {			// Make n deallocations.
       dealloc(allocs[iter]);
     }
 
-  end = clock();
-  double timeDealloc = (double)(end - begin) / CLOCKS_PER_SEC;
-  printf("\tDeallocation time = %f\n", timeDealloc);
-  printf("\tTotal time = %f\n", timeAlloc + timeDealloc);*/
-
-
-void interleavedAllocationAndDeallocation(int size)
-{
-  if(size > veriableAllocationUnitTestSizesSaturationIndex)
-    size = veriableAllocationUnitTestSizesSaturationIndex;
-}
+  clock_t end = clock();
+  double time = (double)(end - begin) / CLOCKS_PER_SEC;
+  printf("\tTotal time = %f\n", time);
+ */
 
 
 void randomAllocationsAndDeallocations(int size)
 {
-  if(size > veriableAllocationUnitTestSizesSaturationIndex)
-    size = veriableAllocationUnitTestSizesSaturationIndex;
+  printf("Please implement me :'(\n");
 }
 
 
