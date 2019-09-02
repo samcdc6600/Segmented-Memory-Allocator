@@ -9,10 +9,9 @@ const int testSizes[] = {1024*1, 1024*4, 1024*16, 1024*64, 1024*256, 1024*1024, 
 const int fixedSizeAllocationUnit = 1; /* For tests with fixed alloction unit size. */
 /* Ranges for test with veriable allocation unit sizes. */
 const int allocationUnitMin = 1, allocationUnitMax[] = {1024*1, 1024*4};
-const int testNum = 2;
 
 
-void printArgumentErrorMsg();
+void printArgumentErrorMsg(const int testNum);
 /* All functions with moniker component "FixedSize" use a constant allocation unit "allocationUnit" */
 void sequentialFixedSizeAllocationAndDeallocation(const int size);
 /* We think that with a large hols list the order of deallocations will make a big difference to performance since we
@@ -21,6 +20,10 @@ void sequentialFixedSizeAllocationAndReverseDeallocation(const int size);
 void interleavedFixedSizeAllocationAndDeallocation(const int size);
 void randomFixedSizeAllocations(const int size);
 /* All functions without moniker component "FixedSize" use random allocation units */
+void sequentialAllocationAndDeallocation(const int size);
+void sequentialAllocationAndReverseDeallocation(const int size);
+void interleavedAllocationAndDeallocation(const int size);
+void randomAllocations(const int size);
 
 
 int main(const int argc, const char **argv)
@@ -28,7 +31,10 @@ int main(const int argc, const char **argv)
   //  srand(time(NULL));
   void (*test[])(const int size) = {sequentialFixedSizeAllocationAndDeallocation,
 				    sequentialFixedSizeAllocationAndReverseDeallocation,
-				    interleavedFixedSizeAllocationAndDeallocation, randomFixedSizeAllocations};
+				    interleavedFixedSizeAllocationAndDeallocation, randomFixedSizeAllocations,
+				    sequentialAllocationAndDeallocation, sequentialAllocationAndReverseDeallocation,
+				    interleavedAllocationAndDeallocation, randomAllocations};
+  const int testNum = (sizeof(test) / sizeof(void (*)(const int)));
 
   if(argc == 3)
     {
@@ -36,35 +42,26 @@ int main(const int argc, const char **argv)
 	 (atoi(argv[2]) >= 0 && (unsigned)atoi(argv[2]) < (sizeof(testSizes) / sizeof(int))))
 	{
 	  test[atoi(argv[1])](atoi(argv[2]));
-	  /*	  switch(atoi(argv[1]))
-	    {
-	    case 0:
-	      sequentialAllocationAndDeallocation(atoi(argv[2]));
-	      break;
-	    case 1:
-	      sequentialAllocationAndReverseDeallocation(atoi(argv[2]));
-	      break;
-	      }*/
 	}
       else
 	{
 	  printf("Error malformed arguments, testNum or sizeNum not in range.\n");
-	  printArgumentErrorMsg();
+	  printArgumentErrorMsg(testNum);
 	}
     }
   else
     {
-      printArgumentErrorMsg();
+      printArgumentErrorMsg(testNum);
     }
 }
 
 
-void printArgumentErrorMsg()
+void printArgumentErrorMsg(const int testNum)
 {
   printf("Error malformed arguments, the format is: command testNum sizeNum\nWhere "
 	 "command is the name of the program, testNum is the number of the test\n"
 	 "(the range is [0,%i]) and sizeNum is the number of allocations to perform\n"
-	 "in the test (the range is [0,%lu].)\n", testNum, (sizeof(testSizes) / sizeof(int)));
+	 "in the test (the range is [0,%lu].)\n", testNum -1, (sizeof(testSizes) / sizeof(int)) -1);
 }
 
 
@@ -133,6 +130,21 @@ void sequentialFixedSizeAllocationAndReverseDeallocation(const int size)
 
 void interleavedFixedSizeAllocationAndDeallocation(const int size)
 {
+  const int fixedSizeAllocationUnit = 1;
+  printf("In interleavedFixedSizeAllocationAndDeallocation():\nTest size = %i,\nAllocation unit = %i.\nStats:\n"
+	 , testSizes[size], fixedSizeAllocationUnit);
+  clock_t begin = clock();
+  
+  for(int iter = 0; iter < testSizes[size]; ++iter)
+    {			// Make n allocations.
+      allocs[iter] = alloc(1);
+      *(char *)(allocs[iter]) = iter;
+      dealloc(allocs[iter]);
+    }
+
+  clock_t end = clock();
+  double time = (double)(end - begin) / CLOCKS_PER_SEC;
+  printf("\tTotal time = %f\n", time);
 }
 
 
