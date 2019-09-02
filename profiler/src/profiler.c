@@ -35,7 +35,7 @@ int setAllocationUnitMaxIndex(const int size);
 
 int main(const int argc, const char **argv)
 {
-  const argcArgs = 4;		/* We must be passed exactly this many arguments. */
+  const int argcArgs = 4;		/* We must be passed exactly this many arguments. */
   const int argPolicy = 1, argTestNum = 2, argTestSize = 3;
   srand(time(NULL));
   void (*test[])(const int size) = {sequentialFixedSizeAllocationAndDeallocation,
@@ -200,9 +200,9 @@ void randomFixedSizeAllocationsAndDeallocations(const int size)
   while(allocOrderAllocs != testSize)
     {
       if(allocOrderIndex == (testSize *2))
-	allocOrderIndex = 0;	/* Don't want to use an out of bounds index */
-      //      if(rand() % 2)		/* Randomly select this index. */
-	/*	{
+	allocOrderIndex = 0;	// Don't want to use an out of bounds index 
+      //      if(rand() % 2)		// Randomly select this index.
+		{
 	  if(allocOrder[allocOrderIndex] == -1)
 	  { *//* If we have not already made an assignment to this index. */
 	    /*	    allocOrder[allocOrderIndex] = rand() % maxAllocSize;

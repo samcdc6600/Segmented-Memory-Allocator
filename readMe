@@ -1,3 +1,7 @@
+I am using c++11 so the scl enable devtoolset-8 bash command must be run.
+To build run ./build. As explained below I do have make files!!!
+Also there are a couple of warnings about profiler.c. I haven't implemented those functions yet.
+
 I have written the allocator and profiler as two seperate programs. The memeory manager is not stand alone however as
 it does not have a main function. Each of these programs has an associated make file. The make file for the
 memory manager produces a static library "libMM.a". The make file for the profiler links "libMM.a" with the profiler
