@@ -35,9 +35,9 @@ int setAllocationUnitMaxIndex(const int size);
 
 int main(const int argc, const char **argv)
 {
+  srand(time(NULL));
   const int argcArgs = 4;		/* We must be passed exactly this many arguments. */
   const int argPolicy = 1, argTestNum = 2, argTestSize = 3;
-  srand(time(NULL));
   void (*test[])(const int size) = {sequentialFixedSizeAllocationAndDeallocation,
 				    sequentialFixedSizeAllocationAndReverseDeallocation,
 				    interleavedFixedSizeAllocationAndDeallocation, randomFixedSizeAllocationsAndDeallocations,
@@ -175,54 +175,99 @@ void interleavedFixedSizeAllocationAndDeallocation(const int size)
 
 
 void randomFixedSizeAllocationsAndDeallocations(const int size)
-{				/* I.e. we allocate an absolute maximum of 256 MB (testSize * maxAllocSize.) */
+{
+  int allocOrder[10 * 2];
+  int deallocOrder[10 * 2];
 
-  /*  int testSize = 5;//65536;
-  int maxAllocSize = 4096;
-  
-  int sizes[testSize];
-  int allocOrder[testSize * 2];
-  int deallocOrder[testSize * 2];
-
-
-  for(int iter = 0; iter < testSize; ++iter)*/
-  /*    {*/				/* -1 means that we have not given that index a value. Since
-				   all values for allocOrder are (rand() % X) they are never
-				   negative and since all values for deallocOrder are indexes
-				   into allocOrder they are also never negative. */
-      /*      allocOrder[iter] = -1;
+  for(int iter = 0; iter < (10 * 2); ++iter)
+    {				/* Mark elements with known value. */
+      allocOrder[iter] = -1;
       deallocOrder[iter] = -1;
-      }*/
-
-  /* How many indexs in allocOrder have we assigned random numbers to? */
-      /*  int allocOrderAllocs = 0;
-  int allocOrderIndex = 0;
-  while(allocOrderAllocs != testSize)
-    {
-      if(allocOrderIndex == (testSize *2))
-	allocOrderIndex = 0;	// Don't want to use an out of bounds index 
-      //      if(rand() % 2)		// Randomly select this index.
-		{
-	  if(allocOrder[allocOrderIndex] == -1)
-	  { *//* If we have not already made an assignment to this index. */
-	    /*	    allocOrder[allocOrderIndex] = rand() % maxAllocSize;
-	    ++allocOrderAllocs;
-	    ++allocOrderIndex;
-	    continue;
-	  }
-	}
-      ++allocOrderIndex;
     }
 
-  for(int iter = 0; iter < (testSize*2); ++iter)
-    {
-      printf("iter = %i\n", allocOrder[iter]);
-    }*/
+  /* Time steps are discrete and relate directly to indexes into allocOrder and deallocOrder. */
+  {				/* Populate allocOrder with random allocations. */
+    int i = 0, allocs = 0; /* How many future allocations have we assigned so far. */
+    while(allocs < 10)
+      {
+	if((rand() % 3) == 0)
+	  {
+	    if(allocOrder[i] == -1)
+	      {
+		allocOrder[i] = 1;
+		++allocs;
+	      }
+	  }
+	
+	++i;
+	if(i == (10 * 2))
+	  i = 0;		/* Cycle back around to the first index. */
+      }
+  }
+  {				/* Populate deallocOrder with random deallocations (with the restriction that each
+				   dealloction must follow it's corresponding allocation in allocOrder and no two
+				   deallocations can refere to the same allocation. */
+    int i = 0, deallocs = 0;
+    while(deallocs < 10)
+      {
+      asdf:
+	if((rand() % 3) == 0)
+	  {
+	    if(deallocOrder[i] == -1)
+	      {
+		  while(true)
+		    {
+		      int index = abs(rand()) % (10 * 2);
+		      if(index > i || allocOrder[index] == -1)
+			goto asdf;
 
+		      bool alreadyAllocated = false;
+		      for(int iter = 0; iter < (10 * 2) && !alreadyAllocated; ++iter)
+			{
+			  if(deallocOrder[iter] == index)
+			    alreadyAllocated = true;
+			}
+		      if(alreadyAllocated)
+			continue;
+
+		      deallocOrder[i] = index;
+		      break;
+		    }
+		++deallocs;
+	      }
+	  }
+
+	++i;
+	if(i == (10 * 2))
+	  i = 0;		/* Cycle back around to the first index. */
+      }
+  }
+
+
+    for(int iter = 0; iter < (10 * 2); ++iter)
+    {				/* Mark elements with known value. */
+      printf("alloc = %i, dealloc = %i\n", allocOrder[iter], deallocOrder[iter]);
+    }
+    printf("\n");
+    for(int iter = 0; iter < (10 * 2); ++iter)
+    {				/* Mark elements with known value. */
+      if(deallocOrder[iter] != -1)
+	printf("alloc (indexed by dealloc) = %i\n", allocOrder[deallocOrder[iter]]);
+    }
 
   
   
-  printf("Please implement me :'(\n");
+  /* 
+     const int maxPolicyNum = 2;	// There are only three policies
+     // Number of allocations to make for tests. (Maximum is less for veriable sized allocation tests because of memory
+     //   constraints.)
+     const int testSizes[] = {1024*1, 1024*4, 1024*16, 1024*64, 1024*256, 1024*1024, 1024*4096};
+     const int fixedSizeAllocationUnit = 1; // For tests with fixed alloction unit size.
+     // We don't want to allow test sizes of more then this index because we only have so much time and memory.
+     const int veriableAllocationUnitTestSizesSaturationIndex = 4;
+     // Ranges for test with veriable allocation unit sizes.
+     const int allocationUnitMin = 1, allocationUnitMax[] = {1024*1, 1024*4, 1024*16, 1024*64, 1024*256};
+  */
 }
 
 
