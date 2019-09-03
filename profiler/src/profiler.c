@@ -26,7 +26,7 @@ void randomFixedSizeAllocationsAndDeallocations(const int size);
 /* Fills arr with fill. */
 void fillArray(int * arr, const int size, const int fill);
 /* Fills alloc Order with size number of 1's at random indecies. AllocOrder should be of size size * 2 */
-void populateAllocOrder(int * allocOrder, const int size);
+void populateAllocOrder(int * allocOrder, const int size, const int allocOrderInUseVar);
 /* Fills deallocOrder with indexes into allocOrder that equal 1. Where each new entry in deallocOrder must be unique
    and the entry must be a lower number then the index of deallocOrder that it is being inserted into. */
 void  populateDeallocOrder(int * allocOrder, int * deallocOrder, const int size, const int allocSize,
@@ -184,27 +184,45 @@ void randomFixedSizeAllocationsAndDeallocations(const int size)
 {
   const int allocSize = 2, deallocSize = 3;
   const int fillVar = -1;		/* Fill ararys with this value initially. */
-  int allocOrder[size * allocSize];
-  int deallocOrder[size * deallocSize];
-  void * allocs[size * allocSize]; /* Store pointers returned from actual allocation. */
+  const int allocOrderInUseVar = 1;		/* AllocOrder indices that are in use equal this. */
+  int allocOrder[testSizes[size] * allocSize];
+  int deallocOrder[testSizes[size] * deallocSize];
+  void * allocs[testSizes[size] * allocSize]; /* Store pointers returned from actual allocation. */
 
-  fillArray(allocOrder, size * allocSize, fillVar); /* Fill arrays with known value */
-  fillArray(deallocOrder, size * deallocSize, fillVar);
+  printf("In randomFixedSizeAllocationsAndDeallocations():\nTest size = %i,\nAllocation unit = %i.\n"
+	 , testSizes[size], fixedSizeAllocationUnit);
+  printf("Calculating random allocation and deallocation sequence...\n");
 
-  populateAllocOrder(allocOrder, size); /* Setup allocation order */
-  populateDeallocOrder(allocOrder, deallocOrder, size, allocSize, deallocSize); /* Setup deallocation order */
+  fillArray(allocOrder, testSizes[size] * allocSize, fillVar); // Fill arrays with known value
+  fillArray(deallocOrder, testSizes[size] * deallocSize, fillVar);
 
-  for(int iter; iter < deallocSize; ++iter)
+  populateAllocOrder(allocOrder, testSizes[size], allocOrderInUseVar); // Setup allocation order
+  populateDeallocOrder(allocOrder, deallocOrder, testSizes[size], allocSize, deallocSize);// Setup deallocation order.
+
+  printf("Done! Running test.\nStats:\n");
+  clock_t begin = clock();
+
+
+  for(int iter; iter < (testSizes[size] * deallocSize); ++iter)
     {
-      if(iter < (size * allocSize))
-	{			/* Perform allocation. */
-	  if(allocOrder[iter] == fillVar)
+      if(iter < (testSizes[size] * allocSize))
+	{			// Perform allocation.
+	  if(allocOrder[iter] == allocOrderInUseVar)
 	    {
 	      allocs[iter] = alloc(fixedSizeAllocationUnit);
+	      //	      printf("allocated %p\n", allocs[iter]);
 	    }
 	}
-      if(deallocationOrder[iter] != fillVar
+      if(deallocOrder[iter] != fillVar)
+	{
+	  dealloc(allocs[deallocOrder[iter]]);
+	  //	  printf("deallocated %p\n", allocs[deallocOrder[iter]]);
+	}
     }
+
+  clock_t end = clock();
+  double time = (double)(end - begin) / CLOCKS_PER_SEC;
+  printf("\tTotal time = %f\n", time);
 }
 
 
@@ -219,7 +237,7 @@ void fillArray(int * arr, const int size, const int fill)
 
 /* We think that this function is not actually nessecary after all and we could do away with allocOrder.
    However we have already written it and choose to continue to use it (for now.) */
-void populateAllocOrder(int * allocOrder, const int size)
+ void populateAllocOrder(int * allocOrder, const int size, const int allocOrderInUseVar)
 {
   /* Time steps are discrete and relate directly to indexes into allocOrder and deallocOrder.
      Populate allocOrder with random allocations. */
@@ -230,7 +248,7 @@ void populateAllocOrder(int * allocOrder, const int size)
 	  {
 	    if(allocOrder[i] == -1)
 	      {
-		allocOrder[i] = 1;
+		allocOrder[i] = allocOrderInUseVar;
 		++allocs;
 	      }
 	  }
@@ -251,7 +269,7 @@ void  populateDeallocOrder(int * allocOrder, int * deallocOrder, const int size,
   int i = 0, deallocs = 0;
   while(deallocs < size)
     {
-    asdf:
+    again:
       if((rand() % 3) == 0)
 	{
 	  if(deallocOrder[i] == -1)
@@ -261,8 +279,7 @@ void  populateDeallocOrder(int * allocOrder, int * deallocOrder, const int size,
 		  int index = abs(rand()) % (size * allocSize);
 		  if(index > i || allocOrder[index] == -1)
 		    {
-		      //			  printf("index = %i\ti = %i\n", index, i);
-		      goto asdf;
+		      goto again;
 		    }
 
 		  bool alreadyAllocated = false;
@@ -273,7 +290,6 @@ void  populateDeallocOrder(int * allocOrder, int * deallocOrder, const int size,
 		    }
 		  if(alreadyAllocated)
 		    {
-		      //			  printf("already allocated\n");
 		      continue;
 		    }
 
@@ -393,7 +409,56 @@ void interleavedAllocationAndDeallocation(int size)
 
 void randomAllocationsAndDeallocations(int size)
 {
-  printf("Please implement me :'(\n");
+  const int allocSize = 2, deallocSize = 3;
+  const int fillVar = -1;		/* Fill ararys with this value initially. */
+  const int allocOrderInUseVar = 1;		/* AllocOrder indices that are in use equal this. */
+  int allocOrder[testSizes[size] * allocSize];
+  int deallocOrder[testSizes[size] * deallocSize];
+  void * allocs[testSizes[size] * allocSize]; /* Store pointers returned from actual allocation. */
+
+
+  if(size > veriableAllocationUnitTestSizesSaturationIndex)
+    {
+      size = veriableAllocationUnitTestSizesSaturationIndex; /* We don't want to wast all of our time and memory. */
+      printf("Capping allocation size at %i\n", size);
+    }
+  int allocationUnitMaxIndex = setAllocationUnitMaxIndex(size);
+  
+
+  printf("In randomAllocationsAndDeallocations():\nTest size = %i,\nAllocation unit = %i.\n"
+	 , testSizes[size], fixedSizeAllocationUnit);
+  printf("Calculating random allocation and deallocation sequence...\n");
+
+  fillArray(allocOrder, testSizes[size] * allocSize, fillVar); // Fill arrays with known value
+  fillArray(deallocOrder, testSizes[size] * deallocSize, fillVar);
+
+  populateAllocOrder(allocOrder, testSizes[size], allocOrderInUseVar); // Setup allocation order
+  populateDeallocOrder(allocOrder, deallocOrder, testSizes[size], allocSize, deallocSize);// Setup deallocation order.
+
+  printf("Done! Running test.\nStats:\n");
+  clock_t begin = clock();
+
+
+  for(int iter; iter < (testSizes[size] * deallocSize); ++iter)
+    {
+      if(iter < (testSizes[size] * allocSize))
+	{			// Perform allocation.
+	  if(allocOrder[iter] == allocOrderInUseVar)
+	    {
+	      allocs[iter] = alloc(abs(rand() % (allocationUnitMax[allocationUnitMaxIndex])) + allocationUnitMin);
+	      //	      printf("allocated %p\n", allocs[iter]);
+	    }
+	}
+      if(deallocOrder[iter] != fillVar)
+	{
+	  dealloc(allocs[deallocOrder[iter]]);
+	  //	  printf("deallocated %p\n", allocs[deallocOrder[iter]]);
+	}
+    }
+
+  clock_t end = clock();
+  double time = (double)(end - begin) / CLOCKS_PER_SEC;
+  printf("\tTotal time = %f\n", time);
 }
 
 
