@@ -23,6 +23,14 @@ void sequentialFixedSizeAllocationAndDeallocation(const int size);
 void sequentialFixedSizeAllocationAndReverseDeallocation(const int size);
 void interleavedFixedSizeAllocationAndDeallocation(const int size);
 void randomFixedSizeAllocationsAndDeallocations(const int size);
+/* Fills arr with fill. */
+void fillArray(int * arr, const int size, const int fill);
+/* Fills alloc Order with size number of 1's at random indecies. AllocOrder should be of size size * 2 */
+void populateAllocOrder(int * allocOrder, const int size);
+/* Fills deallocOrder with indexes into allocOrder that equal 1. Where each new entry in deallocOrder must be unique
+   and the entry must be a lower number then the index of deallocOrder that it is being inserted into. */
+void  populateDeallocOrder(int * allocOrder, int * deallocOrder, const int size, const int allocSize,
+			   const int deallocSize);
 /* All functions without moniker component "FixedSize" use random allocation units */
 void sequentialAllocationAndDeallocation(const int size);
 void sequentialAllocationAndReverseDeallocation(const int size);
@@ -126,14 +134,13 @@ void sequentialFixedSizeAllocationAndDeallocation(const int size)
 
 void sequentialFixedSizeAllocationAndReverseDeallocation(const int size)
 {
-  const int fixedSizeAllocationUnit = 1;
   printf("In sequentialFixedSizeAllocationAndReverseDeallocation():\nTest size = %i,\nAllocation unit = %i.\nStats:\n"
 	 , testSizes[size], fixedSizeAllocationUnit);
   clock_t begin = clock();
   
   for(int iter = 0; iter < testSizes[size]; ++iter)
     {			// Make n allocations.
-      allocs[iter] = alloc(1);
+      allocs[iter] = alloc(fixedSizeAllocationUnit);
       *(char *)(allocs[iter]) = iter;
     }
 
@@ -156,14 +163,13 @@ void sequentialFixedSizeAllocationAndReverseDeallocation(const int size)
 
 void interleavedFixedSizeAllocationAndDeallocation(const int size)
 {
-  const int fixedSizeAllocationUnit = 1;
   printf("In interleavedFixedSizeAllocationAndDeallocation():\nTest size = %i,\nAllocation unit = %i.\nStats:\n"
 	 , testSizes[size], fixedSizeAllocationUnit);
   clock_t begin = clock();
   
   for(int iter = 0; iter < testSizes[size]; ++iter)
     {			// Make n allocations.
-      allocs[iter] = alloc(1);
+      allocs[iter] = alloc(fixedSizeAllocationUnit);
       *(char *)(allocs[iter]) = iter;
       dealloc(allocs[iter]);
     }
@@ -176,19 +182,49 @@ void interleavedFixedSizeAllocationAndDeallocation(const int size)
 
 void randomFixedSizeAllocationsAndDeallocations(const int size)
 {
-  int allocOrder[10 * 2];
-  int deallocOrder[10 * 2];
+  const int allocSize = 2, deallocSize = 3;
+  const int fillVar = -1;		/* Fill ararys with this value initially. */
+  int allocOrder[size * allocSize];
+  int deallocOrder[size * deallocSize];
+  void * allocs[size * allocSize]; /* Store pointers returned from actual allocation. */
 
-  for(int iter = 0; iter < (10 * 2); ++iter)
-    {				/* Mark elements with known value. */
-      allocOrder[iter] = -1;
-      deallocOrder[iter] = -1;
+  fillArray(allocOrder, size * allocSize, fillVar); /* Fill arrays with known value */
+  fillArray(deallocOrder, size * deallocSize, fillVar);
+
+  populateAllocOrder(allocOrder, size); /* Setup allocation order */
+  populateDeallocOrder(allocOrder, deallocOrder, size, allocSize, deallocSize); /* Setup deallocation order */
+
+  for(int iter; iter < deallocSize; ++iter)
+    {
+      if(iter < (size * allocSize))
+	{			/* Perform allocation. */
+	  if(allocOrder[iter] == fillVar)
+	    {
+	      allocs[iter] = alloc(fixedSizeAllocationUnit);
+	    }
+	}
+      if(deallocationOrder[iter] != fillVar
     }
+}
 
-  /* Time steps are discrete and relate directly to indexes into allocOrder and deallocOrder. */
-  {				/* Populate allocOrder with random allocations. */
+
+void fillArray(int * arr, const int size, const int fill)
+{
+  for(int iter = 0; iter < size; ++iter)
+    {
+      arr[iter] = fill;
+    }
+}
+
+
+/* We think that this function is not actually nessecary after all and we could do away with allocOrder.
+   However we have already written it and choose to continue to use it (for now.) */
+void populateAllocOrder(int * allocOrder, const int size)
+{
+  /* Time steps are discrete and relate directly to indexes into allocOrder and deallocOrder.
+     Populate allocOrder with random allocations. */
     int i = 0, allocs = 0; /* How many future allocations have we assigned so far. */
-    while(allocs < 10)
+    while(allocs < size)
       {
 	if((rand() % 3) == 0)
 	  {
@@ -200,74 +236,57 @@ void randomFixedSizeAllocationsAndDeallocations(const int size)
 	  }
 	
 	++i;
-	if(i == (10 * 2))
+	if(i == (size * 2))
 	  i = 0;		/* Cycle back around to the first index. */
       }
-  }
-  {				/* Populate deallocOrder with random deallocations (with the restriction that each
-				   dealloction must follow it's corresponding allocation in allocOrder and no two
-				   deallocations can refere to the same allocation. */
-    int i = 0, deallocs = 0;
-    while(deallocs < 10)
-      {
-      asdf:
-	if((rand() % 3) == 0)
-	  {
-	    if(deallocOrder[i] == -1)
-	      {
-		  while(true)
+}
+
+
+void  populateDeallocOrder(int * allocOrder, int * deallocOrder, const int size, const int allocSize,
+			   const int deallocSize)
+{
+  /* Populate deallocOrder with random deallocations (with the restriction that each
+     dealloction must follow it's corresponding allocation in allocOrder and no two
+     deallocations can refere to the same allocation. */
+  int i = 0, deallocs = 0;
+  while(deallocs < size)
+    {
+    asdf:
+      if((rand() % 3) == 0)
+	{
+	  if(deallocOrder[i] == -1)
+	    {
+	      while(true)
+		{
+		  int index = abs(rand()) % (size * allocSize);
+		  if(index > i || allocOrder[index] == -1)
 		    {
-		      int index = abs(rand()) % (10 * 2);
-		      if(index > i || allocOrder[index] == -1)
-			goto asdf;
-
-		      bool alreadyAllocated = false;
-		      for(int iter = 0; iter < (10 * 2) && !alreadyAllocated; ++iter)
-			{
-			  if(deallocOrder[iter] == index)
-			    alreadyAllocated = true;
-			}
-		      if(alreadyAllocated)
-			continue;
-
-		      deallocOrder[i] = index;
-		      break;
+		      //			  printf("index = %i\ti = %i\n", index, i);
+		      goto asdf;
 		    }
-		++deallocs;
-	      }
-	  }
 
-	++i;
-	if(i == (10 * 2))
-	  i = 0;		/* Cycle back around to the first index. */
-      }
-  }
+		  bool alreadyAllocated = false;
+		  for(int iter = 0; iter < (size * deallocSize) && !alreadyAllocated; ++iter)
+		    {
+		      if(deallocOrder[iter] == index)
+			alreadyAllocated = true;
+		    }
+		  if(alreadyAllocated)
+		    {
+		      //			  printf("already allocated\n");
+		      continue;
+		    }
 
-
-    for(int iter = 0; iter < (10 * 2); ++iter)
-    {				/* Mark elements with known value. */
-      printf("alloc = %i, dealloc = %i\n", allocOrder[iter], deallocOrder[iter]);
+		  deallocOrder[i] = index;
+		  break;
+		}
+	      ++deallocs;
+	    }
+	}
+      ++i;
+      if(i == (size * deallocSize))
+	i = 0;		/* Cycle back around to the first index. */
     }
-    printf("\n");
-    for(int iter = 0; iter < (10 * 2); ++iter)
-    {				/* Mark elements with known value. */
-      if(deallocOrder[iter] != -1)
-	printf("alloc (indexed by dealloc) = %i\n", allocOrder[deallocOrder[iter]]);
-    }
-
-  
-  
-  /* 
-     const int maxPolicyNum = 2;	// There are only three policies
-     // Number of allocations to make for tests. (Maximum is less for veriable sized allocation tests because of memory
-     //   constraints.)
-     const int testSizes[] = {1024*1, 1024*4, 1024*16, 1024*64, 1024*256, 1024*1024, 1024*4096};
-     const int fixedSizeAllocationUnit = 1; // For tests with fixed alloction unit size.
-     // We don't want to allow test sizes of more then this index because we only have so much time and memory.
-     const int veriableAllocationUnitTestSizesSaturationIndex = 4;
-     // Ranges for test with veriable allocation unit sizes.
-     const int allocationUnitMin = 1, allocationUnitMax[] = {1024*1, 1024*4, 1024*16, 1024*64, 1024*256};
-  */
 }
 
 
@@ -361,7 +380,7 @@ void interleavedAllocationAndDeallocation(int size)
 
   for(int iter = 0; iter < testSizes[size]; ++iter)
     {			// Make n allocations.
-      allocs[iter] = alloc(1);
+      allocs[iter] = alloc(abs(rand() % (allocationUnitMax[allocationUnitMaxIndex])) + allocationUnitMin);
       *(char *)(allocs[iter]) = iter;
       dealloc(allocs[iter]);
     }
