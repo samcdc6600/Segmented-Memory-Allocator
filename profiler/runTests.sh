@@ -183,11 +183,11 @@
 
 # Test 7
 #	Policy 0
-./profiler 0 7 0 0 > testresults/7/noStats/0500 
-./profiler 0 7 1 0 > testresults/7/noStats/0510 
-./profiler 0 7 2 0 > testresults/7/noStats/0520 
-./profiler 0 7 3 0 > testresults/7/noStats/0530 
-./profiler 0 7 4 0 > testresults/7/noStats/0540 
+./profiler 0 7 0 0 > testresults/7/noStats/0700 
+./profiler 0 7 1 0 > testresults/7/noStats/0710 
+./profiler 0 7 2 0 > testresults/7/noStats/0720 
+./profiler 0 7 3 0 > testresults/7/noStats/0730 
+./profiler 0 7 4 0 > testresults/7/noStats/0740 
 #./profiler 0 7 5 0 > testresults/7/noStats/0550 
 #./profiler 0 7 6 0 > testresults/7/noStats/0560 
 #	Policy 1 

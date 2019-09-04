@@ -132,7 +132,7 @@ void * _worstFit(const size_t chunk_size)
 			}
 		      else
 			{
-			  foundWorstFit = true;			  
+			  foundWorstFit = true;
 			  worstFit = candidate;
 			}
 		    }
