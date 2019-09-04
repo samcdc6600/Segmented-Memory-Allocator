@@ -128,12 +128,12 @@ void * _worstFit(const size_t chunk_size)
 		      if(foundWorstFit)
 			{
 			  worstFit = (((*std::next(candidate))->size) > (*worstFit)->size) ?
-			    std::next(candidate): worstFit;
+			    candidate: worstFit;
 			}
 		      else
 			{
-			  foundWorstFit = true;
-			  worstFit = std::next(candidate);
+			  foundWorstFit = true;			  
+			  worstFit = candidate;
 			}
 		    }
 		}
