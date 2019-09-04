@@ -353,3 +353,39 @@ bool setAllocationAlgorithm(const allocationAlgorithm algo)
     }
   return true;
 }
+
+
+void printStats()
+{
+  using namespace mmState;
+
+  if(podChecked)
+    {
+  int inUseSz {}, holesSz {};
+  double avgHoleSz {}, agvInUseSz {};
+
+  for(auto hole {holes.begin()}; hole != holes.cend(); ++hole)
+    {
+      ++holesSz;
+      avgHoleSz += (*hole)->size;
+    }
+  avgHoleSz /= holesSz;
+    for(auto chunkUsing {inUse.begin()}; chunkUsing != inUse.cend(); ++chunkUsing)
+    {
+      ++inUseSz;
+      agvInUseSz += (*chunkUsing)->size;
+    }
+    agvInUseSz /= inUseSz;
+
+    std::cout<<"--------------------------------\n\tChunks in \"in use\" list: "
+	     <<inUseSz<<"\n\tChunks in \"holes\" list: "<<holesSz
+	     <<"\n\t\tAverage size of chunks in \"in use\" list: "<<agvInUseSz
+	     <<"\n\t\tAverage size of chunks in holes list: "<<avgHoleSz<<'\n';
+	     
+    }
+  else
+    {
+      checkPODProper();
+      printStats();
+    }
+}
