@@ -1,0 +1,112 @@
+Using first fit.
+In sequentialAllocationAndDeallocation():
+Test size = 4096,
+Allocation unit = 65536.
+Stats:
+--------------------------------
+	Chunks in "in use" list: 1
+	Chunks in "holes" list: 0
+		Average size of chunks in "in use" list: 35661
+		Average size of chunks in holes list: -nan
+--------------------------------
+	Chunks in "in use" list: 456
+	Chunks in "holes" list: 0
+		Average size of chunks in "in use" list: 31316.6
+		Average size of chunks in holes list: -nan
+--------------------------------
+	Chunks in "in use" list: 911
+	Chunks in "holes" list: 0
+		Average size of chunks in "in use" list: 31433.4
+		Average size of chunks in holes list: -nan
+--------------------------------
+	Chunks in "in use" list: 1366
+	Chunks in "holes" list: 0
+		Average size of chunks in "in use" list: 32113.3
+		Average size of chunks in holes list: -nan
+--------------------------------
+	Chunks in "in use" list: 1821
+	Chunks in "holes" list: 0
+		Average size of chunks in "in use" list: 32431.5
+		Average size of chunks in holes list: -nan
+--------------------------------
+	Chunks in "in use" list: 2276
+	Chunks in "holes" list: 0
+		Average size of chunks in "in use" list: 32744.5
+		Average size of chunks in holes list: -nan
+--------------------------------
+	Chunks in "in use" list: 2731
+	Chunks in "holes" list: 0
+		Average size of chunks in "in use" list: 32619.5
+		Average size of chunks in holes list: -nan
+--------------------------------
+	Chunks in "in use" list: 3186
+	Chunks in "holes" list: 0
+		Average size of chunks in "in use" list: 32597.6
+		Average size of chunks in holes list: -nan
+--------------------------------
+	Chunks in "in use" list: 3641
+	Chunks in "holes" list: 0
+		Average size of chunks in "in use" list: 32610.7
+		Average size of chunks in holes list: -nan
+--------------------------------
+	Chunks in "in use" list: 4096
+	Chunks in "holes" list: 0
+		Average size of chunks in "in use" list: 32676.8
+		Average size of chunks in holes list: -nan
+
+	Allocation time = 0.006235
+
+--------------------------------
+	Chunks in "in use" list: 4095
+	Chunks in "holes" list: 1
+		Average size of chunks in "in use" list: 32676.1
+		Average size of chunks in holes list: 35661
+--------------------------------
+	Chunks in "in use" list: 3640
+	Chunks in "holes" list: 1
+		Average size of chunks in "in use" list: 32847.3
+		Average size of chunks in holes list: 1.42876e+07
+--------------------------------
+	Chunks in "in use" list: 3185
+	Chunks in "holes" list: 1
+		Average size of chunks in "in use" list: 33032.5
+		Average size of chunks in holes list: 2.86504e+07
+--------------------------------
+	Chunks in "in use" list: 2730
+	Chunks in "holes" list: 1
+		Average size of chunks in "in use" list: 32958.8
+		Average size of chunks in holes list: 4.38886e+07
+--------------------------------
+	Chunks in "in use" list: 2275
+	Chunks in "holes" list: 2
+		Average size of chunks in "in use" list: 32873.2
+		Average size of chunks in holes list: 2.95434e+07
+--------------------------------
+	Chunks in "in use" list: 1820
+	Chunks in "holes" list: 2
+		Average size of chunks in "in use" list: 32592.2
+		Average size of chunks in holes list: 3.72815e+07
+--------------------------------
+	Chunks in "in use" list: 1365
+	Chunks in "holes" list: 2
+		Average size of chunks in "in use" list: 32791.5
+		Average size of chunks in holes list: 4.45638e+07
+--------------------------------
+	Chunks in "in use" list: 910
+	Chunks in "holes" list: 2
+		Average size of chunks in "in use" list: 32954.1
+		Average size of chunks in holes list: 5.19535e+07
+--------------------------------
+	Chunks in "in use" list: 455
+	Chunks in "holes" list: 2
+		Average size of chunks in "in use" list: 33206.2
+		Average size of chunks in holes list: 5.93969e+07
+--------------------------------
+	Chunks in "in use" list: 0
+	Chunks in "holes" list: 2
+		Average size of chunks in "in use" list: -nan
+		Average size of chunks in holes list: 6.69549e+07
+
+	Deallocation time = 0.080832
+	Total time = 0.087067
+

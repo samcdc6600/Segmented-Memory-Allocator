@@ -74,12 +74,12 @@ void * _bestFit(const size_t chunk_size)
 		      if(foundBestFit)
 			{
 			  bestFit = (((*std::next(candidate))->size) < (*bestFit)->size) ?
-			    std::next(candidate): bestFit;
+			    candidate: bestFit;
 			}
 		      else
 			{
 			  foundBestFit = true;
-			  bestFit = std::next(candidate);
+			  bestFit = candidate;
 			}
 		    }
 		}

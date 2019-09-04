@@ -4,9 +4,9 @@ Test size = 1024,
 Allocation unit = 1.
 Stats:
 
-	Allocation time = 0.000251
+	Allocation time = 0.000264
 
 
-	Deallocation time = 0.000855
-	Total time = 0.001106
+	Deallocation time = 0.000902
+	Total time = 0.001166
 

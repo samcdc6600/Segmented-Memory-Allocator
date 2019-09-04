@@ -1,0 +1,8 @@
+Using first fit.
+In interleavedAllocationAndDeallocation():
+Test size = 262144,
+Allocation unit = 1024.
+Stats:
+
+	Total time = 0.022523
+

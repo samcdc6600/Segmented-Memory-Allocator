@@ -1,0 +1,112 @@
+Using worst fit.
+In sequentialAllocationAndDeallocation():
+Test size = 4096,
+Allocation unit = 65536.
+Stats:
+--------------------------------
+	Chunks in "in use" list: 1
+	Chunks in "holes" list: 0
+		Average size of chunks in "in use" list: 63504
+		Average size of chunks in holes list: -nan
+--------------------------------
+	Chunks in "in use" list: 456
+	Chunks in "holes" list: 0
+		Average size of chunks in "in use" list: 32841.1
+		Average size of chunks in holes list: -nan
+--------------------------------
+	Chunks in "in use" list: 911
+	Chunks in "holes" list: 0
+		Average size of chunks in "in use" list: 33130.2
+		Average size of chunks in holes list: -nan
+--------------------------------
+	Chunks in "in use" list: 1366
+	Chunks in "holes" list: 0
+		Average size of chunks in "in use" list: 32922.8
+		Average size of chunks in holes list: -nan
+--------------------------------
+	Chunks in "in use" list: 1821
+	Chunks in "holes" list: 0
+		Average size of chunks in "in use" list: 32630.8
+		Average size of chunks in holes list: -nan
+--------------------------------
+	Chunks in "in use" list: 2276
+	Chunks in "holes" list: 0
+		Average size of chunks in "in use" list: 32432.5
+		Average size of chunks in holes list: -nan
+--------------------------------
+	Chunks in "in use" list: 2731
+	Chunks in "holes" list: 0
+		Average size of chunks in "in use" list: 32499.5
+		Average size of chunks in holes list: -nan
+--------------------------------
+	Chunks in "in use" list: 3186
+	Chunks in "holes" list: 0
+		Average size of chunks in "in use" list: 32434
+		Average size of chunks in holes list: -nan
+--------------------------------
+	Chunks in "in use" list: 3641
+	Chunks in "holes" list: 0
+		Average size of chunks in "in use" list: 32550.5
+		Average size of chunks in holes list: -nan
+--------------------------------
+	Chunks in "in use" list: 4096
+	Chunks in "holes" list: 0
+		Average size of chunks in "in use" list: 32505.2
+		Average size of chunks in holes list: -nan
+
+	Allocation time = 0.006202
+
+--------------------------------
+	Chunks in "in use" list: 4095
+	Chunks in "holes" list: 1
+		Average size of chunks in "in use" list: 32497.6
+		Average size of chunks in holes list: 63504
+--------------------------------
+	Chunks in "in use" list: 3640
+	Chunks in "holes" list: 1
+		Average size of chunks in "in use" list: 32463.1
+		Average size of chunks in holes list: 1.49828e+07
+--------------------------------
+	Chunks in "in use" list: 3185
+	Chunks in "holes" list: 1
+		Average size of chunks in "in use" list: 32326.4
+		Average size of chunks in holes list: 3.01962e+07
+--------------------------------
+	Chunks in "in use" list: 2730
+	Chunks in "holes" list: 1
+		Average size of chunks in "in use" list: 32296.2
+		Average size of chunks in holes list: 4.49943e+07
+--------------------------------
+	Chunks in "in use" list: 2275
+	Chunks in "holes" list: 2
+		Average size of chunks in "in use" list: 32404.6
+		Average size of chunks in holes list: 2.97249e+07
+--------------------------------
+	Chunks in "in use" list: 1820
+	Chunks in "holes" list: 2
+		Average size of chunks in "in use" list: 32596
+		Average size of chunks in holes list: 3.69264e+07
+--------------------------------
+	Chunks in "in use" list: 1365
+	Chunks in "holes" list: 2
+		Average size of chunks in "in use" list: 32516.5
+		Average size of chunks in holes list: 4.43999e+07
+--------------------------------
+	Chunks in "in use" list: 910
+	Chunks in "holes" list: 2
+		Average size of chunks in "in use" list: 32754.3
+		Average size of chunks in holes list: 5.16928e+07
+--------------------------------
+	Chunks in "in use" list: 455
+	Chunks in "holes" list: 2
+		Average size of chunks in "in use" list: 32142.1
+		Average size of chunks in holes list: 5.92874e+07
+--------------------------------
+	Chunks in "in use" list: 0
+	Chunks in "holes" list: 2
+		Average size of chunks in "in use" list: -nan
+		Average size of chunks in holes list: 6.66033e+07
+
+	Deallocation time = 0.080562
+	Total time = 0.086764
+

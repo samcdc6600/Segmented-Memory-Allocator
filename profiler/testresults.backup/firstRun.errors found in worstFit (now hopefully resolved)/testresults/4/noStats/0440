@@ -1,0 +1,12 @@
+Using first fit.
+In sequentialAllocationAndDeallocation():
+Test size = 262144,
+Allocation unit = 1024.
+Stats:
+
+	Allocation time = 0.105966
+
+
+	Deallocation time = 283.605529
+	Total time = 283.711495
+

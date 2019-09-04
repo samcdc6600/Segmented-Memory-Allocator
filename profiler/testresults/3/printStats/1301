@@ -1,0 +1,150 @@
+Using best fit.
+In randomFixedSizeAllocationsAndDeallocations():
+Test size = 1024,
+Allocation unit = 1.
+Calculating random allocation and deallocation sequence...
+Done! Running test.
+Stats:
+--------------------------------
+	Chunks in "in use" list: 0
+	Chunks in "holes" list: 0
+		Average size of chunks in "in use" list: -nan
+		Average size of chunks in holes list: -nan
+--------------------------------
+	Chunks in "in use" list: 71
+	Chunks in "holes" list: 1
+		Average size of chunks in "in use" list: 1
+		Average size of chunks in holes list: 1
+--------------------------------
+	Chunks in "in use" list: 140
+	Chunks in "holes" list: 0
+		Average size of chunks in "in use" list: 1
+		Average size of chunks in holes list: -nan
+--------------------------------
+	Chunks in "in use" list: 195
+	Chunks in "holes" list: 1
+		Average size of chunks in "in use" list: 1
+		Average size of chunks in holes list: 1
+--------------------------------
+	Chunks in "in use" list: 246
+	Chunks in "holes" list: 0
+		Average size of chunks in "in use" list: 1
+		Average size of chunks in holes list: -nan
+--------------------------------
+	Chunks in "in use" list: 302
+	Chunks in "holes" list: 0
+		Average size of chunks in "in use" list: 1
+		Average size of chunks in holes list: -nan
+--------------------------------
+	Chunks in "in use" list: 356
+	Chunks in "holes" list: 1
+		Average size of chunks in "in use" list: 1
+		Average size of chunks in holes list: 1
+--------------------------------
+	Chunks in "in use" list: 404
+	Chunks in "holes" list: 0
+		Average size of chunks in "in use" list: 1
+		Average size of chunks in holes list: -nan
+--------------------------------
+	Chunks in "in use" list: 440
+	Chunks in "holes" list: 3
+		Average size of chunks in "in use" list: 1
+		Average size of chunks in holes list: 1
+--------------------------------
+	Chunks in "in use" list: 473
+	Chunks in "holes" list: 1
+		Average size of chunks in "in use" list: 1
+		Average size of chunks in holes list: 18
+--------------------------------
+	Chunks in "in use" list: 500
+	Chunks in "holes" list: 0
+		Average size of chunks in "in use" list: 1
+		Average size of chunks in holes list: -nan
+--------------------------------
+	Chunks in "in use" list: 518
+	Chunks in "holes" list: 1
+		Average size of chunks in "in use" list: 1
+		Average size of chunks in holes list: 1
+--------------------------------
+	Chunks in "in use" list: 539
+	Chunks in "holes" list: 3
+		Average size of chunks in "in use" list: 1
+		Average size of chunks in holes list: 1
+--------------------------------
+	Chunks in "in use" list: 550
+	Chunks in "holes" list: 4
+		Average size of chunks in "in use" list: 1
+		Average size of chunks in holes list: 1
+--------------------------------
+	Chunks in "in use" list: 546
+	Chunks in "holes" list: 7
+		Average size of chunks in "in use" list: 1
+		Average size of chunks in holes list: 3.42857
+--------------------------------
+	Chunks in "in use" list: 546
+	Chunks in "holes" list: 7
+		Average size of chunks in "in use" list: 1
+		Average size of chunks in holes list: 3.42857
+--------------------------------
+	Chunks in "in use" list: 544
+	Chunks in "holes" list: 6
+		Average size of chunks in "in use" list: 1
+		Average size of chunks in holes list: 12.3333
+--------------------------------
+	Chunks in "in use" list: 516
+	Chunks in "holes" list: 31
+		Average size of chunks in "in use" list: 1
+		Average size of chunks in holes list: 4.83871
+--------------------------------
+	Chunks in "in use" list: 488
+	Chunks in "holes" list: 54
+		Average size of chunks in "in use" list: 1
+		Average size of chunks in holes list: 4.77778
+--------------------------------
+	Chunks in "in use" list: 430
+	Chunks in "holes" list: 100
+		Average size of chunks in "in use" list: 1
+		Average size of chunks in holes list: 5.08
+--------------------------------
+	Chunks in "in use" list: 378
+	Chunks in "holes" list: 125
+		Average size of chunks in "in use" list: 1
+		Average size of chunks in holes list: 7.936
+--------------------------------
+	Chunks in "in use" list: 328
+	Chunks in "holes" list: 136
+		Average size of chunks in "in use" list: 1
+		Average size of chunks in holes list: 12.25
+--------------------------------
+	Chunks in "in use" list: 272
+	Chunks in "holes" list: 149
+		Average size of chunks in "in use" list: 1
+		Average size of chunks in holes list: 16.1745
+--------------------------------
+	Chunks in "in use" list: 217
+	Chunks in "holes" list: 137
+		Average size of chunks in "in use" list: 1
+		Average size of chunks in holes list: 25.8175
+--------------------------------
+	Chunks in "in use" list: 165
+	Chunks in "holes" list: 119
+		Average size of chunks in "in use" list: 1
+		Average size of chunks in holes list: 39.5714
+--------------------------------
+	Chunks in "in use" list: 114
+	Chunks in "holes" list: 88
+		Average size of chunks in "in use" list: 1
+		Average size of chunks in holes list: 69
+--------------------------------
+	Chunks in "in use" list: 62
+	Chunks in "holes" list: 57
+		Average size of chunks in "in use" list: 1
+		Average size of chunks in holes list: 130.737
+--------------------------------
+	Chunks in "in use" list: 11
+	Chunks in "holes" list: 11
+		Average size of chunks in "in use" list: 1
+		Average size of chunks in holes list: 823.182
+
+	Total time = 0.002228
+

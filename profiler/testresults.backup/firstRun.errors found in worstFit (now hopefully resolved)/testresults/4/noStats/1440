@@ -1,0 +1,12 @@
+Using best fit.
+In sequentialAllocationAndDeallocation():
+Test size = 262144,
+Allocation unit = 1024.
+Stats:
+
+	Allocation time = 0.114492
+
+
+	Deallocation time = 291.591096
+	Total time = 291.705588
+

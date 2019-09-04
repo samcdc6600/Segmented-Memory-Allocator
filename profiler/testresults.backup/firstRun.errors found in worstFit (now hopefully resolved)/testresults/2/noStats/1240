@@ -1,0 +1,8 @@
+Using best fit.
+In interleavedFixedSizeAllocationAndDeallocation():
+Test size = 262144,
+Allocation unit = 1.
+Stats:
+
+	Total time = 0.012983
+

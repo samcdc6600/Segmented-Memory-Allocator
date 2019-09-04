@@ -1,0 +1,112 @@
+Using best fit.
+In sequentialAllocationAndDeallocation():
+Test size = 16384,
+Allocation unit = 16384.
+Stats:
+--------------------------------
+	Chunks in "in use" list: 1
+	Chunks in "holes" list: 0
+		Average size of chunks in "in use" list: 11456
+		Average size of chunks in holes list: -nan
+--------------------------------
+	Chunks in "in use" list: 1821
+	Chunks in "holes" list: 0
+		Average size of chunks in "in use" list: 8262.45
+		Average size of chunks in holes list: -nan
+--------------------------------
+	Chunks in "in use" list: 3641
+	Chunks in "holes" list: 0
+		Average size of chunks in "in use" list: 8122.37
+		Average size of chunks in holes list: -nan
+--------------------------------
+	Chunks in "in use" list: 5461
+	Chunks in "holes" list: 0
+		Average size of chunks in "in use" list: 8114.52
+		Average size of chunks in holes list: -nan
+--------------------------------
+	Chunks in "in use" list: 7281
+	Chunks in "holes" list: 0
+		Average size of chunks in "in use" list: 8144.32
+		Average size of chunks in holes list: -nan
+--------------------------------
+	Chunks in "in use" list: 9101
+	Chunks in "holes" list: 0
+		Average size of chunks in "in use" list: 8147.27
+		Average size of chunks in holes list: -nan
+--------------------------------
+	Chunks in "in use" list: 10921
+	Chunks in "holes" list: 0
+		Average size of chunks in "in use" list: 8152.77
+		Average size of chunks in holes list: -nan
+--------------------------------
+	Chunks in "in use" list: 12741
+	Chunks in "holes" list: 0
+		Average size of chunks in "in use" list: 8150.33
+		Average size of chunks in holes list: -nan
+--------------------------------
+	Chunks in "in use" list: 14561
+	Chunks in "holes" list: 0
+		Average size of chunks in "in use" list: 8150.12
+		Average size of chunks in holes list: -nan
+--------------------------------
+	Chunks in "in use" list: 16381
+	Chunks in "holes" list: 0
+		Average size of chunks in "in use" list: 8138.69
+		Average size of chunks in holes list: -nan
+
+	Allocation time = 0.023657
+
+--------------------------------
+	Chunks in "in use" list: 16383
+	Chunks in "holes" list: 1
+		Average size of chunks in "in use" list: 8138.54
+		Average size of chunks in holes list: 11456
+--------------------------------
+	Chunks in "in use" list: 14563
+	Chunks in "holes" list: 2
+		Average size of chunks in "in use" list: 8123.27
+		Average size of chunks in holes list: 7.53751e+06
+--------------------------------
+	Chunks in "in use" list: 12743
+	Chunks in "holes" list: 2
+		Average size of chunks in "in use" list: 8143.42
+		Average size of chunks in holes list: 1.48159e+07
+--------------------------------
+	Chunks in "in use" list: 10923
+	Chunks in "holes" list: 2
+		Average size of chunks in "in use" list: 8150.85
+		Average size of chunks in holes list: 2.22004e+07
+--------------------------------
+	Chunks in "in use" list: 9103
+	Chunks in "holes" list: 3
+		Average size of chunks in "in use" list: 8134.28
+		Average size of chunks in holes list: 1.98051e+07
+--------------------------------
+	Chunks in "in use" list: 7283
+	Chunks in "holes" list: 3
+		Average size of chunks in "in use" list: 8128.08
+		Average size of chunks in holes list: 2.47646e+07
+--------------------------------
+	Chunks in "in use" list: 5463
+	Chunks in "holes" list: 4
+		Average size of chunks in "in use" list: 8110.69
+		Average size of chunks in holes list: 2.23028e+07
+--------------------------------
+	Chunks in "in use" list: 3643
+	Chunks in "holes" list: 4
+		Average size of chunks in "in use" list: 8098.2
+		Average size of chunks in holes list: 2.60118e+07
+--------------------------------
+	Chunks in "in use" list: 1823
+	Chunks in "holes" list: 4
+		Average size of chunks in "in use" list: 8047.89
+		Average size of chunks in holes list: 2.97267e+07
+--------------------------------
+	Chunks in "in use" list: 3
+	Chunks in "holes" list: 5
+		Average size of chunks in "in use" list: 8417.33
+		Average size of chunks in holes list: 2.67164e+07
+
+	Deallocation time = 1.021954
+	Total time = 1.045611
+

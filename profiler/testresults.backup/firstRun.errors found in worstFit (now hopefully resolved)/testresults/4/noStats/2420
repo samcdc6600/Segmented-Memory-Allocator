@@ -1,0 +1,12 @@
+Using worst fit.
+In sequentialAllocationAndDeallocation():
+Test size = 16384,
+Allocation unit = 16384.
+Stats:
+
+	Allocation time = 0.022117
+
+
+	Deallocation time = 1.027553
+	Total time = 1.049670
+

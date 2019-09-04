@@ -1,0 +1,8 @@
+Using worst fit.
+In interleavedFixedSizeAllocationAndDeallocation():
+Test size = 65536,
+Allocation unit = 1.
+Stats:
+
+	Total time = 0.003409
+

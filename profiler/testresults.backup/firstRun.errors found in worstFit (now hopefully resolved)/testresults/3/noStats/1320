@@ -1,0 +1,10 @@
+Using best fit.
+In randomFixedSizeAllocationsAndDeallocations():
+Test size = 16384,
+Allocation unit = 1.
+Calculating random allocation and deallocation sequence...
+Done! Running test.
+Stats:
+
+	Total time = 1.946138
+
