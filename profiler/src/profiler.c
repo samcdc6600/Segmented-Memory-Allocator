@@ -13,6 +13,13 @@ const int fixedSizeAllocationUnit = 1; /* For tests with fixed alloction unit si
 const int veriableAllocationUnitTestSizesSaturationIndex = 4;
 /* Ranges for test with veriable allocation unit sizes. */
 const int allocationUnitMin = 1, allocationUnitMax[] = {1024*1, 1024*4, 1024*16, 1024*64, 1024*256};
+/* AllocSize, deallocSize, allocOrder and deallocOrder are all used by the functions 
+   randomFixedSizeAllocationsAndDeallocations() and randomAllocationsAndDeallocations() */
+const int allocSize = 2, deallocSize = 3;
+int allocOrder[1024*4096 * 2];
+int deallocOrder[1024*4096 * 3];
+/* Used by all tests */
+void * allocs[1024*4096 * 2]; /* Store pointers returned from actual allocation. */
 
 
 void printArgumentErrorMsg(const int testNum);
@@ -99,9 +106,6 @@ void printArgumentErrorMsg(const int testNum)
 }
 
 
-/* Causes seg faults when allocated declared in a func and alloc() used after it. Maybe something to do with stack
-   limit's. But it seems odd because we only get the seg faults when alloc is called in the same func. */
-void * allocs[4096*16*16*16*16];
 void sequentialFixedSizeAllocationAndDeallocation(const int size)
 {
   printf("In sequentialFixedSizeAllocationAndDeallocation():\nTest size = %i,\nAllocation unit = %i.\nStats:\n"
@@ -179,15 +183,11 @@ void interleavedFixedSizeAllocationAndDeallocation(const int size)
   printf("\tTotal time = %f\n", time);
 }
 
-
 void randomFixedSizeAllocationsAndDeallocations(const int size)
 {
-  const int allocSize = 2, deallocSize = 3;
+  
   const int fillVar = -1;		/* Fill ararys with this value initially. */
   const int allocOrderInUseVar = 1;		/* AllocOrder indices that are in use equal this. */
-  int allocOrder[testSizes[size] * allocSize];
-  int deallocOrder[testSizes[size] * deallocSize];
-  void * allocs[testSizes[size] * allocSize]; /* Store pointers returned from actual allocation. */
 
   printf("In randomFixedSizeAllocationsAndDeallocations():\nTest size = %i,\nAllocation unit = %i.\n"
 	 , testSizes[size], fixedSizeAllocationUnit);
@@ -409,12 +409,8 @@ void interleavedAllocationAndDeallocation(int size)
 
 void randomAllocationsAndDeallocations(int size)
 {
-  const int allocSize = 2, deallocSize = 3;
   const int fillVar = -1;		/* Fill ararys with this value initially. */
   const int allocOrderInUseVar = 1;		/* AllocOrder indices that are in use equal this. */
-  int allocOrder[testSizes[size] * allocSize];
-  int deallocOrder[testSizes[size] * deallocSize];
-  void * allocs[testSizes[size] * allocSize]; /* Store pointers returned from actual allocation. */
 
 
   if(size > veriableAllocationUnitTestSizesSaturationIndex)
