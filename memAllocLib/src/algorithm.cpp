@@ -157,9 +157,9 @@ void * _worstFit(const size_t chunk_size)
 	    }
 	  if(foundWorstFit)
 	    {		// A best fit (not exact size) was found.
-	      //	      std::cout<<"foundWorstFit\n";
+	      std::cout<<"foundWorstFit\n";
 	      //	      tmpCheck();
-	      return useChunkFromHoles(worstFit);
+	      return splitChunkFromHoles(chunk_size, worstFit);
 	    }
 	  else
 	    if(equal != holes.before_begin())
