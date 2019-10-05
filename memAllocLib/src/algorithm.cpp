@@ -29,31 +29,10 @@ void * (* allocAlgo)(const size_t chunk_size) {_firstFit};
 
 void * _firstFit(const size_t chunk_size)
 {
-  /*  using namespace mmState;
-
-  checkZeroChunkSize(chunk_size);
-  
-  for(auto candidate {holes.before_begin()};
-      std::next(candidate) != holes.cend(); ++candidate)
-    {*/ /* We will need to add new accounting info when we split the chunk so it
-	 must have space for it. */
-      /*      if(((*std::next(candidate))->size) >= (chunk_size + chunkAccountingSize))
-	{	*/		/* We have found a chunk but it is too big.
-				   There is more work to be done :'(. */
-	  /*	  return splitChunkFromHoles(chunk_size, candidate);
-	}
-      else
-	{	*/		/* We dont split the chunk if it is equal in
-				   size so we don't need any extra space. */
-	  /*	  if(((*std::next(candidate))->size) == chunk_size)
-	    {			// The chunk is exactly the right size :).
-	      return useChunkFromHoles(candidate);
-	    }
-	}
+  using namespace mmState;
+  for(t: threadPool)
+    {
     }
-
-  // Holes was empty or we didn't find a large enough chunk
-  return getNewChunkFromSystem(chunk_size);*/
 }
 
 void * _bestFit(const size_t chunk_size)

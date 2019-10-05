@@ -7,17 +7,11 @@ template <typename T> class Threads
 {				// Where TI should be an iterator of T.
 private:
   size_t threadPoolSize;
-  std::vector<size_t> inUseSizes;
-  std::vector<T> inUse;
-  std::vector<size_t> holesSizes;
-  std::vector<T> holes;
+  std::vector<pthread_t> tids;
   
 public:
   Threads(const size_t tPS) : threadPoolSize (tPS),
-			      inUseSizes (threadPoolSize, 0),
-			      inUse (threadPoolSize),
-			      holesSizes (threadPoolSize, 0),
-			      holes (threadPoolSize)
+			      tids (tPS, 0),
   {
     if(tPS < 1)
       {
@@ -30,4 +24,6 @@ public:
   {
     //    return threadPoolSize;
   }
+
+  
 };
