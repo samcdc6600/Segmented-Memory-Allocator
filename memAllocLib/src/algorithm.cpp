@@ -6,18 +6,15 @@
 #include "include/mm.hpp"
 #include "include/algorithm.hpp"
 #include "include/threads.hpp"
+#include "include/error.hpp"
 
 
 namespace mmState
 {
-  std::forward_list<chunk *> inUse {};
-  std::forward_list<chunk *> holes {};
-  /*  Threads<decltype(inUse), decltype(inUse.cbefore_begin())> threadPool {1,
-      inUse, holes};*/
-  /*  Threads<std::forward_list<chunk *>, std::forward_list<chunk *>> threadPool {1,
-      inUse, holes};*/
-    Threads<std::forward_list<chunk *>, std::forward_list<chunk *>::iterator > threadPool {1,
-      inUse, holes};
+  //  std::forward_list<chunk *> inUse {};
+  //  std::forward_list<chunk *> holes {};
+  typedef std::forward_list<chunk *> chunkList;
+  Threads<chunkList > * threadPool;
   
 }
 
@@ -33,23 +30,23 @@ void * (* allocAlgo)(const size_t chunk_size) {_firstFit};
 
 void * _firstFit(const size_t chunk_size)
 {
-  using namespace mmState;
+  /*  using namespace mmState;
 
   checkZeroChunkSize(chunk_size);
   
   for(auto candidate {holes.before_begin()};
       std::next(candidate) != holes.cend(); ++candidate)
-    { /* We will need to add new accounting info when we split the chunk so it
+    {*/ /* We will need to add new accounting info when we split the chunk so it
 	 must have space for it. */
-      if(((*std::next(candidate))->size) >= (chunk_size + chunkAccountingSize))
-	{			/* We have found a chunk but it is too big.
+      /*      if(((*std::next(candidate))->size) >= (chunk_size + chunkAccountingSize))
+	{	*/		/* We have found a chunk but it is too big.
 				   There is more work to be done :'(. */
-	  return splitChunkFromHoles(chunk_size, candidate);
+	  /*	  return splitChunkFromHoles(chunk_size, candidate);
 	}
       else
-	{			/* We dont split the chunk if it is equal in
+	{	*/		/* We dont split the chunk if it is equal in
 				   size so we don't need any extra space. */
-	  if(((*std::next(candidate))->size) == chunk_size)
+	  /*	  if(((*std::next(candidate))->size) == chunk_size)
 	    {			// The chunk is exactly the right size :).
 	      return useChunkFromHoles(candidate);
 	    }
@@ -57,12 +54,12 @@ void * _firstFit(const size_t chunk_size)
     }
 
   // Holes was empty or we didn't find a large enough chunk
-  return getNewChunkFromSystem(chunk_size);
+  return getNewChunkFromSystem(chunk_size);*/
 }
 
 void * _bestFit(const size_t chunk_size)
 {
-  using namespace mmState;
+  /*  using namespace mmState;
 
   checkZeroChunkSize(chunk_size);
   
@@ -111,14 +108,14 @@ void * _bestFit(const size_t chunk_size)
 	}
     }
   // Holes was empty or no hole of large enough size was found.
-  return getNewChunkFromSystem(chunk_size);
+  return getNewChunkFromSystem(chunk_size);*/
 }
 
 
 void * _worstFit(const size_t chunk_size)
 {
   using namespace mmState;
-
+  /*
   checkZeroChunkSize(chunk_size);
 
   if(!holes.empty())
@@ -131,10 +128,10 @@ void * _worstFit(const size_t chunk_size)
 	}
       else
 	{
-	  auto worstFit {holes.before_begin()};
+	  auto worstFit {holes.before_begin()};*/
 	  /* When we don't find a worst fit (we use + chunkAccountingSize) we
 	     may use equal. */
-	  auto equal {holes.before_begin()};
+	  /*	  auto equal {holes.before_begin()};
 	  bool foundWorstFit {false};
 	  for(auto candidate {holes.before_begin()};
 	      std::next(candidate) != holes.cend(); ++candidate)
@@ -176,7 +173,7 @@ void * _worstFit(const size_t chunk_size)
     }
 
   // Holes was empty or no hole of large enough size was found.
-  return getNewChunkFromSystem(chunk_size);
+  return getNewChunkFromSystem(chunk_size);*/
 }
 
 
@@ -192,33 +189,33 @@ inline void checkZeroChunkSize(const size_t chunk_size)
 
 inline void * handleOneHole(const size_t chunk_size)
 {
-  using namespace mmState;
+  /*  using namespace mmState;
   if(((*holes.begin())->size) >= (chunk_size + chunkAccountingSize))
-    {		/* We have found a chunk but it is too big. There is more work
+  {*/		/* We have found a chunk but it is too big. There is more work
 		   to be done. */
-      return splitChunkFromHoles(chunk_size, holes.before_begin());
+  /*      return splitChunkFromHoles(chunk_size, holes.before_begin());
     }
   if(((*holes.begin())->size) == chunk_size)
     {		// The chunk is exactly the right size :).
       return useChunkFromHoles(holes.before_begin());
     }
 
-  return nullptr;
+    return nullptr;*/
 }
 
 
 template <typename T> inline void * splitChunkFromHoles(const size_t chunk_size,
 							T candidate)
 {
-  using namespace mmState;
+  /*  using namespace mmState;
   // Base address of chunk to be returned.
   auto ret = (*std::next(candidate))->base;
   // CALCULATE FOR NEW HOLES CHUNK----------------------------------------------
   {						// New chunk.
     // Base address of new chunk to be put in holes.
-    auto newBase ((char *)(ret) + chunk_size + chunkAccountingSize);
+    auto newBase ((char *)(ret) + chunk_size + chunkAccountingSize);*/
     /* Set new chunk's base address accounting info to the base address of new
-       chunk. */
+       chunk. *//*
     ((chunk *)((char *)(ret) + chunk_size))->base = newBase;
     // Set new chunk's size accounting info to the the size of the new chunk.
     ((chunk *)((char *)(ret) + chunk_size))->size =
@@ -235,18 +232,18 @@ template <typename T> inline void * splitChunkFromHoles(const size_t chunk_size,
   // Add new hole to holes list.
   holes.push_front((chunk *)((char*)ret + chunk_size));
   
-  return ret;
+  return ret;*/
 }
 
 
 template <typename T> inline void * useChunkFromHoles(T candidate)
 {
   using namespace mmState;
-  auto ret = (*std::next(candidate))->base;
+  /*  auto ret = (*std::next(candidate))->base;
   inUse.push_front(*std::next(candidate));
   holes.erase_after(candidate);
   
-  return ret;
+  return ret;*/
 }
 
 
@@ -254,7 +251,7 @@ inline void * getNewChunkFromSystem(const size_t chunk_size)
 {
   using namespace mmState;
     // Get new chunk (plus memory for accounting.)
-  address virtualChunk {address(sbrk(chunk_size + chunkAccountingSize))};
+  /*  address virtualChunk {address(sbrk(chunk_size + chunkAccountingSize))};
   
   if(virtualChunk == (address)(error::SBRK))
     {				// The allocation wasn't successfull :'(.
@@ -268,15 +265,15 @@ inline void * getNewChunkFromSystem(const size_t chunk_size)
   ((chunk *)(virtualChunk))->size = chunk_size;
   // Put new chunk accounting info on the inUse list.
   inUse.push_front((chunk *)(virtualChunk));
-  
-  return ((chunk *)(virtualChunk))->base;
+  */
+  //  return ((chunk *)(virtualChunk))->base;
 }
 
 
 void free(const void * chunk)
 {
   using namespace mmState;
-    
+  /*    
   for(auto candidate {inUse.before_begin()};
       std::next(candidate) != inUse.cend(); ++candidate)
     {
@@ -289,7 +286,7 @@ void free(const void * chunk)
 	  
 	  return;
 	}
-    }
+	}*/
 
   /* We do this here and not in dealloc for perfomance reasons (we would have to
   have a separate test in dealloc.) */
@@ -304,7 +301,7 @@ inline void mergeHoles()
   using namespace mmState;
   /* We must make sure that holes is sorted (it may be more efficient to do this
      differently.) */
-  holes.sort(holeComp);
+  /*  holes.sort(holeComp);
   
   if(std::next(holes.begin()) == holes.cend())
     return;			// There is only one hole in the list.
@@ -318,15 +315,15 @@ inline void mergeHoles()
 	      (*candidate)->size +=
 		((*std::next(candidate))->size + chunkAccountingSize);
 	      // Remove higher hole from holes list :).
-	      candidate = holes.erase_after(candidate);
+	      candidate = holes.erase_after(candidate);*/
 	      /* A merge should only be possible after inserting a new node, so
 		 no more then two merges should even need to be done (i.e.
 		 mergeHoles() should be called twice.) */
-	      break;
+  /*	      break;
 	    }
 	  ++candidate;
 	}
-    }
+	}*/
 }
 
 
@@ -346,7 +343,7 @@ inline bool holeAbuttedAgainstHole(mmState::chunk * a, mmState::chunk * b)
 
 void setThreadPoolSize(const size_t tPS)
 {
-  mmState::threadPool.setPoolSize(tPS);
+  mmState::threadPool = new Threads<mmState::chunkList> {tPS};
 }
 
 

@@ -2,42 +2,23 @@
 #include <vector>
 #include <iostream>
 
-template <typename T, typename TI> class Threads
+template <typename T> class Threads
 {				// Where TI should be an iterator of T.
 private:
-  bool setTPSTwice {false};
-  size_t threadPoolSize {1};
+  size_t threadPoolSize;
   std::vector<size_t> inUseSizes {threadPoolSize, 0};
-  std::vector<TI> inUse;
+  std::vector<T> inUse {threadPoolSize};
   std::vector<size_t> holesSizes {threadPoolSize, 0};
-  std::vector<TI> holes;
+  std::vector<T> holes {threadPoolSize};
   
 public:
-  Threads(const size_t tPS, const T inUse, const T holes) :
-    inUse {threadPoolSize, inUse.before_begin()}
+  Threads(const size_t tPS) : threadPoolSize (tPS)
   {
-    if(tPS > 0)
+    if(tPS < 1)
       {
-	threadPoolSize = tPS;
-	//	this->inUse.resize(threadPoolSize);
-	//	this->inUse[0] = inUse.cbefore_begin();
+	std::cerr<<"Error (in Threads() in threads.hpp): tPS < 1.\n";
+	//	exit();
       }
-  }
-
-  void setPoolSize(const size_t tPS)
-  {
-    /*    if(!setTPSTwice)
-      {
-	setTPSTwice = true;
-	threadPoolSize = tPS;
-      }
-    else
-      {
-	std::cerr<<"Error (in threads.hpp in setPoolSize()): setPoolSize() "
-	  "called more then once (note it is also an error to call "
-	  "setPoolSize() after any calls to alloc() or dealloc() have occured."
-	  " No warning will be issued for this error!)";
-	  }*/
   }
 
   size_t getThreadPoolSize()
