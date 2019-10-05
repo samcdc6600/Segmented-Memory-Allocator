@@ -55,8 +55,6 @@ inline void mergeHoles();
 inline bool holeComp(mmState::chunk * a, mmState::chunk * b);
 // Returns true if chunk a is adjacent to chunk b. Returns false otherwise.
 inline bool holeAbuttedAgainstHole(mmState::chunk * a, mmState::chunk * b);
-void * _checkPOD(const size_t chunk); // Calls checkPODProper() and then calls _firstFit().
-inline void checkPODProper();	// Does the actual POD checking. Exits if the struct "chunk" is not a POD.
 
 
 #endif

@@ -13,8 +13,11 @@ namespace mmState
 }
 
 
+static_assert(std::is_pod<mmState::chunk>::value, "Fatal error: Struct \"chunk\" was found not to be a POD\n");
+
+
 constexpr size_t chunkAccountingSize {sizeof(mmState::chunk)};
-void * (* allocAlgo)(const size_t chunk_size) {_checkPOD}; // First things first we must make sure "chunk" is a POD!
+void * (* allocAlgo)(const size_t chunk_size) {_firstFit}; // First things first we must make sure "chunk" is a POD!
 
 
 void * _firstFit(const size_t chunk_size)
@@ -305,53 +308,23 @@ inline bool holeAbuttedAgainstHole(mmState::chunk * a, mmState::chunk * b)
 }
 
 
-/* We put these definitions that are below this point so that they are the only ones that may see podChecked since it
-   is global and only they need see it. */
-// Have we made sure that "chunk" is a POD (and therefore it is safe to not use new and delete with it?)
-static bool podChecked {false};	// Only visible after this point
-void * _checkPOD(const size_t chunk)
-{
-  checkPODProper();
-  allocAlgo = _firstFit;
-  return allocAlgo(chunk);
-}
-
-
-inline void checkPODProper()
-{
-  if(!std::is_pod<mmState::chunk>::value)
-    {
-      std::cerr<<"Fatal error: Struct \"check\" was found not to be a POD\n";
-      exit(error::POD);
-    }
-  podChecked = true;
-}
-
-
 bool setAllocationAlgorithm(const allocationAlgorithm algo)
 {
-  if(podChecked)
+  switch(algo)
     {
-      switch(algo)
-	{
-	case firstFit:
-	  allocAlgo = _firstFit;
-	  break;
-	case bestFit:
-	  allocAlgo = _bestFit;
-	  break;
-	case worstFit:
-	  allocAlgo = _worstFit;
-	  break;
-	default:
-	  return false;		// algo out of range :'(.
-	}
+    case firstFit:
+      allocAlgo = _firstFit;
+      break;
+    case bestFit:
+      allocAlgo = _bestFit;
+      break;
+    case worstFit:
+      allocAlgo = _worstFit;
+      break;
+    default:
+      return false;		// algo out of range :'(.
     }
-  else
-    {
-      checkPODProper();
-      return setAllocationAlgorithm(algo);
-    }
+      
   return true;
 }
 
@@ -360,8 +333,6 @@ void printStats()
 {
   using namespace mmState;
 
-  if(podChecked)
-    {
   int inUseSz {}, holesSz {};
   double avgHoleSz {}, avgInUseSz {};
 
@@ -371,22 +342,15 @@ void printStats()
       avgHoleSz += (*hole)->size;
     }
   avgHoleSz /= holesSz;
-    for(auto chunkUsing {inUse.begin()}; chunkUsing != inUse.cend(); ++chunkUsing)
+  for(auto chunkUsing {inUse.begin()}; chunkUsing != inUse.cend(); ++chunkUsing)
     {
       ++inUseSz;
       avgInUseSz += (*chunkUsing)->size;
     }
-    avgInUseSz /= inUseSz;
+  avgInUseSz /= inUseSz;
 
-    std::cout<<"--------------------------------\n\tChunks in \"in use\" list: "
-	     <<inUseSz<<"\n\tChunks in \"holes\" list: "<<holesSz
-	     <<"\n\t\tAverage size of chunks in \"in use\" list: "<<avgInUseSz
-	     <<"\n\t\tAverage size of chunks in holes list: "<<avgHoleSz<<'\n';
-	     
-    }
-  else
-    {
-      checkPODProper();
-      printStats();
-    }
+  std::cout<<"--------------------------------\n\tChunks in \"in use\" list: "
+	   <<inUseSz<<"\n\tChunks in \"holes\" list: "<<holesSz
+	   <<"\n\t\tAverage size of chunks in \"in use\" list: "<<avgInUseSz
+	   <<"\n\t\tAverage size of chunks in holes list: "<<avgHoleSz<<'\n';
 }
