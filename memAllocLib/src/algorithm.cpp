@@ -13,11 +13,13 @@ namespace mmState
 }
 
 
-static_assert(std::is_pod<mmState::chunk>::value, "Fatal error: Struct \"chunk\" was found not to be a POD\n");
+static_assert(std::is_pod<mmState::chunk>::value, "Fatal error: Struct \"chunk"
+	      "\" was found not to be a POD\n");
 
 
 constexpr size_t chunkAccountingSize {sizeof(mmState::chunk)};
-void * (* allocAlgo)(const size_t chunk_size) {_firstFit}; // First things first we must make sure "chunk" is a POD!
+// First things first we must make sure "chunk" is a POD!
+void * (* allocAlgo)(const size_t chunk_size) {_firstFit};
 
 
 void * _firstFit(const size_t chunk_size)
@@ -26,14 +28,18 @@ void * _firstFit(const size_t chunk_size)
 
   checkZeroChunkSize(chunk_size);
   
-  for(auto candidate {holes.before_begin()}; std::next(candidate) != holes.cend(); ++candidate)
-    { /* We will need to add new accounting info when we split the chunk so it must have space for it. */
+  for(auto candidate {holes.before_begin()};
+      std::next(candidate) != holes.cend(); ++candidate)
+    { /* We will need to add new accounting info when we split the chunk so it
+	 must have space for it. */
       if(((*std::next(candidate))->size) >= (chunk_size + chunkAccountingSize))
-	{			// We have found a chunk but it is too big. There is more work to be done :'(.
+	{			/* We have found a chunk but it is too big.
+				   There is more work to be done :'(. */
 	  return splitChunkFromHoles(chunk_size, candidate);
 	}
       else
-	{			// We dont split the chunk if it is equal in size so we don't need any extra space.
+	{			/* We dont split the chunk if it is equal in
+				   size so we don't need any extra space. */
 	  if(((*std::next(candidate))->size) == chunk_size)
 	    {			// The chunk is exactly the right size :).
 	      return useChunkFromHoles(candidate);
@@ -64,7 +70,8 @@ void * _bestFit(const size_t chunk_size)
 	{
 	  auto bestFit {holes.before_begin()};
 	  bool foundBestFit {false};
-	  for(auto candidate {holes.before_begin()}; std::next(candidate) != holes.cend(); ++candidate)
+	  for(auto candidate {holes.before_begin()};
+	      std::next(candidate) != holes.cend(); ++candidate)
 	    {
 	      if(((*std::next(candidate))->size) == chunk_size)
 		{		// Must be best fit.
@@ -72,11 +79,13 @@ void * _bestFit(const size_t chunk_size)
 		}
 	      else
 		{
-		  if(((*std::next(candidate))->size) >= (chunk_size + chunkAccountingSize))
+		  if(((*std::next(candidate))->size) >=
+		     (chunk_size + chunkAccountingSize))
 		    {	// We have found a hole large enough.
 		      if(foundBestFit)
 			{
-			  bestFit = (((*std::next(candidate))->size) < (*bestFit)->size) ?
+			  bestFit = (((*std::next(candidate))->size) <
+				     (*bestFit)->size) ?
 			    candidate: bestFit;
 			}
 		      else
@@ -115,22 +124,27 @@ void * _worstFit(const size_t chunk_size)
       else
 	{
 	  auto worstFit {holes.before_begin()};
-	  // When we don't find a worst fit (we use + chunkAccountingSize) we may use equal.
+	  /* When we don't find a worst fit (we use + chunkAccountingSize) we
+	     may use equal. */
 	  auto equal {holes.before_begin()};
 	  bool foundWorstFit {false};
-	  for(auto candidate {holes.before_begin()}; std::next(candidate) != holes.cend(); ++candidate)
+	  for(auto candidate {holes.before_begin()};
+	      std::next(candidate) != holes.cend(); ++candidate)
 	    {
-	      if(((*std::next(candidate))->size) == chunk_size && equal == holes.before_begin())
+	      if(((*std::next(candidate))->size) == chunk_size && equal ==
+		 holes.before_begin())
 		{		// Must be best fit.
 		  equal = candidate;
 		}
 	      else
 		{
-		  if(((*std::next(candidate))->size) >= (chunk_size + chunkAccountingSize))
+		  if(((*std::next(candidate))->size) >=
+		     (chunk_size + chunkAccountingSize))
 		    {	// We have found a hole large enough.
 		      if(foundWorstFit)
 			{
-			  worstFit = (((*std::next(candidate))->size) > (*worstFit)->size) ?
+			  worstFit = (((*std::next(candidate))->size) >
+				      (*worstFit)->size) ?
 			    candidate: worstFit;
 			}
 		      else
@@ -172,7 +186,8 @@ inline void * handleOneHole(const size_t chunk_size)
 {
   using namespace mmState;
   if(((*holes.begin())->size) >= (chunk_size + chunkAccountingSize))
-    {		// We have found a chunk but it is too big. There is more work to be done.
+    {		/* We have found a chunk but it is too big. There is more work
+		   to be done. */
       return splitChunkFromHoles(chunk_size, holes.before_begin());
     }
   if(((*holes.begin())->size) == chunk_size)
@@ -184,23 +199,25 @@ inline void * handleOneHole(const size_t chunk_size)
 }
 
 
-template <typename T> inline void * splitChunkFromHoles(const size_t chunk_size, T candidate)
+template <typename T> inline void * splitChunkFromHoles(const size_t chunk_size,
+							T candidate)
 {
   using namespace mmState;
-  
-  auto ret = (*std::next(candidate))->base; // Base address of chunk to be returned.
-  // CALCULATE FOR NEW HOLES CHUNK---------------------------------------------------------------
+  // Base address of chunk to be returned.
+  auto ret = (*std::next(candidate))->base;
+  // CALCULATE FOR NEW HOLES CHUNK----------------------------------------------
   {						// New chunk.
     // Base address of new chunk to be put in holes.
     auto newBase ((char *)(ret) + chunk_size + chunkAccountingSize);
-    // Set new chunk's base address accounting info to the base address of new chunk.
+    /* Set new chunk's base address accounting info to the base address of new
+       chunk. */
     ((chunk *)((char *)(ret) + chunk_size))->base = newBase;
     // Set new chunk's size accounting info to the the size of the new chunk.
     ((chunk *)((char *)(ret) + chunk_size))->size =
       (*std::next(candidate))->size - (chunkAccountingSize + chunk_size);
   }
 
-  // UPDATE HOLES AND INUSE--------------------------------------------------------------------
+  // UPDATE HOLES AND INUSE-----------------------------------------------------
   // Set new size of chunk to be returned.
   (*std::next(candidate))->size = chunk_size;
   // Push new hole onto inUse list.
@@ -237,9 +254,12 @@ inline void * getNewChunkFromSystem(const size_t chunk_size)
       throw std::bad_alloc();
     }
   // Store base address of virtual chunk.
-  ((chunk *)(virtualChunk))->base = ((char *)virtualChunk + chunkAccountingSize);
-  ((chunk *)(virtualChunk))->size = chunk_size;			  // Store length of virtual chunk.
-  inUse.push_front((chunk *)(virtualChunk));			  // Put new chunk accounting info on the inUse list.
+  ((chunk *)(virtualChunk))->base =
+    ((char *)virtualChunk + chunkAccountingSize);
+  // Store length of virtual chunk.
+  ((chunk *)(virtualChunk))->size = chunk_size;
+  // Put new chunk accounting info on the inUse list.
+  inUse.push_front((chunk *)(virtualChunk));
   
   return ((chunk *)(virtualChunk))->base;
 }
@@ -249,7 +269,8 @@ void free(const void * chunk)
 {
   using namespace mmState;
     
-  for(auto candidate {inUse.before_begin()}; std::next(candidate) != inUse.cend(); ++candidate)
+  for(auto candidate {inUse.before_begin()};
+      std::next(candidate) != inUse.cend(); ++candidate)
     {
       if((*std::next(candidate))->base == chunk)
 	{
@@ -262,8 +283,10 @@ void free(const void * chunk)
 	}
     }
 
-  // We do this here and not in dealloc for perfomance reasons (we would have to have a separate test in dealloc.)
-  std::cerr<<"Fatal error: invalid address ("<<chunk<<") passed to free() (via dealloc.)\n";
+  /* We do this here and not in dealloc for perfomance reasons (we would have to
+  have a separate test in dealloc.) */
+  std::cerr<<"Fatal error: invalid address ("<<chunk<<") passed to free() (via "
+    "dealloc.)\n";
   exit(error::FREE);
 }
 
@@ -271,22 +294,26 @@ void free(const void * chunk)
 inline void mergeHoles()
 {
   using namespace mmState;
-  // We must make sure that holes is sorted (it may be more efficient to do this differently.)
+  /* We must make sure that holes is sorted (it may be more efficient to do this
+     differently.) */
   holes.sort(holeComp);
   
   if(std::next(holes.begin()) == holes.cend())
     return;			// There is only one hole in the list.
   else
     {
-      for(auto candidate {holes.begin()}; std::next(candidate) != holes.cend(); )
+      for(auto candidate {holes.begin()};
+	  std::next(candidate) != holes.cend(); )
 	{
 	  if(holeAbuttedAgainstHole(*candidate, *std::next(candidate)))
 	    {			// Resize lower hole.
-	      (*candidate)->size += ((*std::next(candidate))->size + chunkAccountingSize);
+	      (*candidate)->size +=
+		((*std::next(candidate))->size + chunkAccountingSize);
 	      // Remove higher hole from holes list :).
 	      candidate = holes.erase_after(candidate);
-	      /* A merge should only be possible after inserting a new node, so no more then two merges should
-	      even need to be done (i.e. mergeHoles() should be called twice.) */
+	      /* A merge should only be possible after inserting a new node, so
+		 no more then two merges should even need to be done (i.e.
+		 mergeHoles() should be called twice.) */
 	      break;
 	    }
 	  ++candidate;
@@ -304,7 +331,8 @@ inline bool holeComp(mmState::chunk * a, mmState::chunk * b)
 
 inline bool holeAbuttedAgainstHole(mmState::chunk * a, mmState::chunk * b)
 {
-  return (((char *)(a->base) + a->size) == ((char *)(b->base) - chunkAccountingSize)) ? true : false;
+  return (((char *)(a->base) + a->size) ==
+	  ((char *)(b->base) - chunkAccountingSize)) ? true : false;
 }
 
 
