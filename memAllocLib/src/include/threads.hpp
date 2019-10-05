@@ -7,13 +7,17 @@ template <typename T> class Threads
 {				// Where TI should be an iterator of T.
 private:
   size_t threadPoolSize;
-  std::vector<size_t> inUseSizes {threadPoolSize, 0};
-  std::vector<T> inUse {threadPoolSize};
-  std::vector<size_t> holesSizes {threadPoolSize, 0};
-  std::vector<T> holes {threadPoolSize};
+  std::vector<size_t> inUseSizes;
+  std::vector<T> inUse;
+  std::vector<size_t> holesSizes;
+  std::vector<T> holes;
   
 public:
-  Threads(const size_t tPS) : threadPoolSize (tPS)
+  Threads(const size_t tPS) : threadPoolSize (tPS),
+			      inUseSizes (threadPoolSize, 0),
+			      inUse (threadPoolSize),
+			      holesSizes (threadPoolSize, 0),
+			      holes (threadPoolSize)
   {
     if(tPS < 1)
       {
