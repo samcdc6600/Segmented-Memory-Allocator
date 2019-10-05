@@ -15,7 +15,6 @@ namespace mmState
   //  std::forward_list<chunk *> holes {};
   typedef std::forward_list<chunk *> chunkList;
   Threads<chunkList > * threadPool;
-  
 }
 
 
@@ -371,7 +370,7 @@ bool setAllocationAlgorithm(const allocationAlgorithm algo)
 void printStats()
 {
   using namespace mmState;
-
+  /*
   int inUseSz {}, holesSz {};
   double avgHoleSz {}, avgInUseSz {};
 
@@ -391,5 +390,5 @@ void printStats()
   std::cout<<"--------------------------------\n\tChunks in \"in use\" list: "
 	   <<inUseSz<<"\n\tChunks in \"holes\" list: "<<holesSz
 	   <<"\n\t\tAverage size of chunks in \"in use\" list: "<<avgInUseSz
-	   <<"\n\t\tAverage size of chunks in holes list: "<<avgHoleSz<<'\n';
+	   <<"\n\t\tAverage size of chunks in holes list: "<<avgHoleSz<<'\n';*/
 }

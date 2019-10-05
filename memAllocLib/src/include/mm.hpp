@@ -23,8 +23,8 @@ enum allocationAlgorithm
 
 extern "C"			// ([-{REMOVE--ME}-])
 {	// ([-{REMOVE--ME}-])
-  /* Changes the thread pool size. This function must be called before any calls
-     to alloc() or dealloc()! */
+  /* Instanciates and initializes Thread object and sets threadPool to point to
+     it. THIS FUNCTION MUST BE CALLED BEFORE ALLOC AND DEALLOC!*/
   void setThreadPoolSize(const size_t tPS);
   /* When called with an element from allocationAlgorithm sets the function
      pointer allocAlgo (decleared in algorithm.hpp) to the corresponding
