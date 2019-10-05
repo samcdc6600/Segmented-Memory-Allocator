@@ -95,23 +95,6 @@ void * _bestFit(const size_t chunk_size)
 }
 
 
-void tmpCheck()
-{
-  using namespace mmState;
-  size_t inUseSz {}, agvInUseSz {};
-  for(auto chunkUsing {inUse.begin()}; chunkUsing != inUse.cend(); ++chunkUsing)
-    {
-      ++inUseSz;
-      agvInUseSz += (*chunkUsing)->size;
-    }
-  agvInUseSz /= inUseSz;
-
-  if(agvInUseSz != 1)
-    std::cout<<"\t\t\tNo equal to 1!\n";
-  return;
-}
-
-
 void * _worstFit(const size_t chunk_size)
 {
   using namespace mmState;
