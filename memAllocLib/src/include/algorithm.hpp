@@ -34,9 +34,17 @@ namespace mmState
 
 extern void * (* allocAlgo)(const size_t chunk_size);
 
+/* Spins off a number of threads with _firstFitPropper(), giving appropritate
+   iterators for it's start and end values. */
 void * _firstFit(const size_t chunk_size);
 void * _bestFit(const size_t chunk_size);
 void * _worstFit(const size_t chunk_size);
+/* Performs first fit in the range (start, end). May be stopped part way through
+   if another thread finds a fit first. */
+template <typename T> inline void _firstFitProper(const size_t chunk_size,
+						  T start, T end)
+{
+}
 /* Exit's if chunk_size is zero. It doesn't make sense to return a brk value
 since there may be holes. */
 inline void checkZeroChunkSize(const size_t chunk_size);

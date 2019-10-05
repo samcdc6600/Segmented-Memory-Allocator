@@ -21,6 +21,11 @@ enum allocationAlgorithm
   };
 
 
+  /* Calls setThreadPoolSize on an instance of Threads (declared in
+     threads.hpp.) This dictates the number of threads to be used by the
+     allocation algorithms. This function must be called before calling the
+     alloc() and dealloc() functions. */
+  //  void initialize(const int size_t);
   /* When called with an element from allocationAlgorithm sets the function
      pointer allocAlgo (decleared in algorithm.hpp) to the corresponding
      function and returns true. If the argument is not valid return's false. */

@@ -2,6 +2,8 @@
 #include <sstream>
 #include <unistd.h>		// For brk and sbrk.
 #include <type_traits>
+#include <pthread.h>
+#include <vector>		// Maybe not needed?
 #include "include/mm.hpp"
 #include "include/algorithm.hpp"
 
@@ -50,7 +52,6 @@ void * _firstFit(const size_t chunk_size)
   // Holes was empty or we didn't find a large enough chunk
   return getNewChunkFromSystem(chunk_size);
 }
-
 
 void * _bestFit(const size_t chunk_size)
 {
@@ -334,6 +335,11 @@ inline bool holeAbuttedAgainstHole(mmState::chunk * a, mmState::chunk * b)
   return (((char *)(a->base) + a->size) ==
 	  ((char *)(b->base) - chunkAccountingSize)) ? true : false;
 }
+
+
+/*void initialize(const int size_t)
+{
+}*/
 
 
 bool setAllocationAlgorithm(const allocationAlgorithm algo)
