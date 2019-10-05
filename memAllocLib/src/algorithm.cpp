@@ -157,21 +157,16 @@ void * _worstFit(const size_t chunk_size)
 	    }
 	  if(foundWorstFit)
 	    {		// A best fit (not exact size) was found.
-	      std::cout<<"foundWorstFit\n";
-	      //	      tmpCheck();
 	      return splitChunkFromHoles(chunk_size, worstFit);
 	    }
 	  else
 	    if(equal != holes.before_begin())
 	      {
-		//		std::cout<<"found equal\n";
-		//		tmpCheck();
 		return useChunkFromHoles(equal);
 	      }
 	}
     }
-  //  std::cout<<"getting new chunk\n";
-  //  tmpCheck();
+
   // Holes was empty or no hole of large enough size was found.
   return getNewChunkFromSystem(chunk_size);
 }
