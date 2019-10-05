@@ -86,12 +86,29 @@ void * _bestFit(const size_t chunk_size)
 	    }
 	  if(foundBestFit)
 	    {		// A best fit (not exact size) was found.
-	      return useChunkFromHoles(bestFit);
+	      return splitChunkFromHoles(chunk_size, bestFit);
 	    }
 	}
     }
   // Holes was empty or no hole of large enough size was found.
   return getNewChunkFromSystem(chunk_size);
+}
+
+
+void tmpCheck()
+{
+  using namespace mmState;
+  size_t inUseSz {}, agvInUseSz {};
+  for(auto chunkUsing {inUse.begin()}; chunkUsing != inUse.cend(); ++chunkUsing)
+    {
+      ++inUseSz;
+      agvInUseSz += (*chunkUsing)->size;
+    }
+  agvInUseSz /= inUseSz;
+
+  if(agvInUseSz != 1)
+    std::cout<<"\t\t\tNo equal to 1!\n";
+  return;
 }
 
 
@@ -140,15 +157,21 @@ void * _worstFit(const size_t chunk_size)
 	    }
 	  if(foundWorstFit)
 	    {		// A best fit (not exact size) was found.
+	      //	      std::cout<<"foundWorstFit\n";
+	      //	      tmpCheck();
 	      return useChunkFromHoles(worstFit);
 	    }
 	  else
 	    if(equal != holes.before_begin())
 	      {
+		//		std::cout<<"found equal\n";
+		//		tmpCheck();
 		return useChunkFromHoles(equal);
 	      }
 	}
     }
+  //  std::cout<<"getting new chunk\n";
+  //  tmpCheck();
   // Holes was empty or no hole of large enough size was found.
   return getNewChunkFromSystem(chunk_size);
 }
@@ -362,7 +385,7 @@ void printStats()
   if(podChecked)
     {
   int inUseSz {}, holesSz {};
-  double avgHoleSz {}, agvInUseSz {};
+  double avgHoleSz {}, avgInUseSz {};
 
   for(auto hole {holes.begin()}; hole != holes.cend(); ++hole)
     {
@@ -373,13 +396,13 @@ void printStats()
     for(auto chunkUsing {inUse.begin()}; chunkUsing != inUse.cend(); ++chunkUsing)
     {
       ++inUseSz;
-      agvInUseSz += (*chunkUsing)->size;
+      avgInUseSz += (*chunkUsing)->size;
     }
-    agvInUseSz /= inUseSz;
+    avgInUseSz /= inUseSz;
 
     std::cout<<"--------------------------------\n\tChunks in \"in use\" list: "
 	     <<inUseSz<<"\n\tChunks in \"holes\" list: "<<holesSz
-	     <<"\n\t\tAverage size of chunks in \"in use\" list: "<<agvInUseSz
+	     <<"\n\t\tAverage size of chunks in \"in use\" list: "<<avgInUseSz
 	     <<"\n\t\tAverage size of chunks in holes list: "<<avgHoleSz<<'\n';
 	     
     }
