@@ -1,6 +1,7 @@
 #include <cstddef>
 #include <vector>
 #include <iostream>
+#include "error.hpp"
 
 template <typename T> class Threads
 {				// Where TI should be an iterator of T.
@@ -17,7 +18,7 @@ public:
     if(tPS < 1)
       {
 	std::cerr<<"Error (in Threads() in threads.hpp): tPS < 1.\n";
-	//	exit();
+	exit(error::RANGE);
       }
   }
 

@@ -1,3 +1,8 @@
+#ifndef ERROR_HPP_
+#define ERROR_HPP_
+#include <climits>
+
+
 namespace error
 {
   enum _error
@@ -9,3 +14,6 @@ namespace error
       SBRK = -1
     };
 }
+
+
+#endif
