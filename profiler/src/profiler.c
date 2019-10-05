@@ -463,7 +463,7 @@ void randomAllocationsAndDeallocations(int size, const bool listStat)
   
 
   printf("In randomAllocationsAndDeallocations():\nTest size = %i,\nAllocation unit = %i.\n"
-	 , testSizes[size], fixedSizeAllocationUnit);
+	 , testSizes[size], allocationUnitMax[allocationUnitMaxIndex]);
   printf("Calculating random allocation and deallocation sequence...\n");
 
   fillArray(allocOrder, testSizes[size] * allocSize, fillVar); // Fill arrays with known value
