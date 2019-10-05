@@ -2,16 +2,23 @@
 #include <sstream>
 #include <unistd.h>		// For brk and sbrk.
 #include <type_traits>
-#include <pthread.h>
-#include <vector>		// Maybe not needed?
+#include <iterator>
 #include "include/mm.hpp"
 #include "include/algorithm.hpp"
+#include "include/threads.hpp"
 
 
 namespace mmState
 {
   std::forward_list<chunk *> inUse {};
   std::forward_list<chunk *> holes {};
+  /*  Threads<decltype(inUse), decltype(inUse.cbefore_begin())> threadPool {1,
+      inUse, holes};*/
+  /*  Threads<std::forward_list<chunk *>, std::forward_list<chunk *>> threadPool {1,
+      inUse, holes};*/
+    Threads<std::forward_list<chunk *>, std::forward_list<chunk *>::iterator > threadPool {1,
+      inUse, holes};
+  
 }
 
 
@@ -337,9 +344,10 @@ inline bool holeAbuttedAgainstHole(mmState::chunk * a, mmState::chunk * b)
 }
 
 
-/*void initialize(const int size_t)
+void setThreadPoolSize(const size_t tPS)
 {
-}*/
+  mmState::threadPool.setPoolSize(tPS);
+}
 
 
 bool setAllocationAlgorithm(const allocationAlgorithm algo)

@@ -1,53 +1,9 @@
-I am using c++11 so the scl enable devtoolset-8 bash command must be run.
-To build run ./build. As explained below I do have make files!!!
-Also there are a couple of warnings about profiler.c. I haven't implemented those functions yet.
-
-I have written the allocator and profiler as two seperate programs. The memeory manager is not stand alone however as
-it does not have a main function. Each of these programs has an associated make file. The make file for the
-memory manager produces a static library "libMM.a". The make file for the profiler links "libMM.a" with the profiler
-(as well as doing other things of course.)
-
-I have written the memory manager in C++ (I have not used new however, only sbrk.) I've used a struct in the memory
-manager but it has no constructor or destructor (so the use of new and delete should not be required with it.) There
-is also a function "checkPODProper()" that is run upon the first call to setAllocationAlgorithm() or alloc()
-(whichever is called first) that checks whether or not the struct "chunk" is a POD (plain old data) and therefore
-whether it is safe to use with C (although it is not used with C directly we do not use new and delete with it.).
-The program exits if it is not a POD. I would have liked this check to be done at compile time but I did not know
-how to do such a thing.
-
-The profiler is written in C. There is a script "build.sh" that runs the make file for the memory manager, copies
-over the newly built "libMM.a", copies over "mm.hpp", renames "mm.hpp" to "mm.h", uses sed to remove the line
-containing "extern "C" and the associated curly braces from "mm.h" (used to change the function name mangling) and
-finally runs the make file from the profiler.
-
-I have not overloaded new in the memory manager as the only time I do anything with the memory returned from sbrk
-is when I cast it to "chunk" and as mentioned "chunk" is garunteed to be a POD i.e. C compatible and the profiler is
-written in C so I don't need to overload new or delete for it.
-
-Also you can't mark me down for long functions because I'm doing it puerly for efficiency reasons ;) (don't want too
-many of those expensive function calls.) Also don't worry about the fact that it's probably all wildly nonoptimal
-anyway (especially mergeHoles()) ;)
-
-I have made the decision not to focust on populating the memory allocated in the tests because that seems like a
-test of they memory and caching subsystems of my mahcine rather then a test of the allocator and would acctually just
-make it harder to see discrepancies in the timings. Once the allocator has returned a pointer it is not involved
-untill that pointer is passed back to it for deallocation. So populating the memory that the pointer points to should
-have nothing to do with the performance of the allocator, because the allocator is not involved.
-
-Also I have not finished writing all the test's yet. Specifically the randomFixedSizeAllocationsAndDeallocations()
-and the randomAllocationsAndDeallocations() functions, as I have yet to figoure out how to write the code to perform
-random deallocations but only for already allocated memory. And of course I may tweak these functions if I think of
-anything new or notice any problems when writing my report.
-
-I might also implement some testing functions that use getrusage() to test things such as page faults.
-I don't see the point in testing memory usage at the moment though (since the allocator only uses 16 bytes for each
-chunk allocated (excluding the memory used by forward_list, however)). Maybe we will test this if we have time.
-We don't know how memory hungery forward_list is but we suspet it's not more then a few pointers.
-
-If you want to know exactly what the arguments to the profiler do you'll have to look at the code because I haven't
-Implemented any sort of help switch.
-
-The reason I used C++ for the memory manager was mostly down to being more familiar with it and also the nice
-forward_list<> type :).
-
-Also I still need to tweek the values for veriable allocation's to allow for longer runs.
+Each algorithm compares the current iterator agains end() and not the start of
+the next subsection of the list that is handled by the next thread (if any)
+because the complexity for relational operators on forward_list is "Up to
+linear in the size of lhs and rhs." and we think that maybe comparisons agains
+end() would be more efficient if end() returned a null pointer. However we think
+this is not the case and it actually just returns a pointer one past the end of
+the container. In any case we decide to leave it like this because it is less
+complex and hopefully should somehow be faster. Also it must be noted that it
+should not matter because this is only done for read operations.
