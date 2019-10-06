@@ -11,29 +11,57 @@
 
 namespace mmState
 {
-  //  std::forward_list<chunk *> inUse {};
-  //  std::forward_list<chunk *> holes {};
-  typedef std::forward_list<chunk *> chunkList;
-  Threads<chunkList > * threadPool;
+  Threads<mmDefs::chunkList, mmDefs::threadFuncArg> * threadPool;
 }
 
 
-static_assert(std::is_pod<mmState::chunk>::value, "Fatal error: Struct \"chunk"
+static_assert(std::is_pod<mmDefs::chunk>::value, "Fatal error: Struct \"chunk"
 	      "\" was found not to be a POD\n");
 
 
-constexpr size_t chunkAccountingSize {sizeof(mmState::chunk)};
+constexpr size_t chunkAccountingSize {sizeof(mmDefs::chunk)};
 // First things first we must make sure "chunk" is a POD!
 void * (* allocAlgo)(const size_t chunk_size) {_firstFit};
 
 
 void * _firstFit(const size_t chunk_size)
 {
-  using namespace mmState;
-  for(t: threadPool)
-    {
-    }
+  
 }
+
+
+/* Performs first fit in on start and returns base addres of chunk allocated.
+   May be stopped part way through if another thread finds a fit first, in this
+   case returns nullptr. */
+void * _firstFitProper(const size_t chunk_size, mmDefs::chunkList start)
+{
+  /*  using namespace mmState;
+
+      checkZeroChunkSize(chunk_size);
+  
+      for(auto candidate {holes.before_begin()};
+      std::next(candidate) != holes.cend(); ++candidate)
+      {*/ /* We will need to add new accounting info when we split the chunk so it
+	     must have space for it. */
+  /*      if(((*std::next(candidate))->size) >= (chunk_size + chunkAccountingSize))
+	  {	*/		/* We have found a chunk but it is too big.
+				   There is more work to be done :'(. */
+  /*	  return splitChunkFromHoles(chunk_size, candidate);
+	  }
+	  else
+	  {	*/		/* We dont split the chunk if it is equal in
+				   size so we don't need any extra space. */
+  /*	  if(((*std::next(candidate))->size) == chunk_size)
+	  {			// The chunk is exactly the right size :).
+	  return useChunkFromHoles(candidate);
+	  }
+	  }
+	  }
+
+	  // Holes was empty or we didn't find a large enough chunk
+	  return getNewChunkFromSystem(chunk_size);*/
+}
+
 
 void * _bestFit(const size_t chunk_size)
 {
@@ -306,13 +334,13 @@ inline void mergeHoles()
 
 
 
-inline bool holeComp(mmState::chunk * a, mmState::chunk * b)
+inline bool holeComp(mmDefs::chunk * a, mmDefs::chunk * b)
 {				// Sort from low to high.
   return a->base < b->base ? true : false;
 }
 
 
-inline bool holeAbuttedAgainstHole(mmState::chunk * a, mmState::chunk * b)
+inline bool holeAbuttedAgainstHole(mmDefs::chunk * a, mmDefs::chunk * b)
 {
   return (((char *)(a->base) + a->size) ==
 	  ((char *)(b->base) - chunkAccountingSize)) ? true : false;
@@ -321,7 +349,8 @@ inline bool holeAbuttedAgainstHole(mmState::chunk * a, mmState::chunk * b)
 
 void setThreadPoolSize(const size_t tPS)
 {
-  mmState::threadPool = new Threads<mmState::chunkList> {tPS};
+  mmState::threadPool = new Threads<mmDefs::chunkList,
+				    mmDefs::threadFuncArg> {tPS};
 }
 
 

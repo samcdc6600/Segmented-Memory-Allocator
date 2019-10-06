@@ -8,7 +8,7 @@
 
 void * alloc(const size_t chunk_size)
 {
-  mmState::address ret;
+  mmDefs::address ret;
   try
     {
       ret = allocAlgo(chunk_size);

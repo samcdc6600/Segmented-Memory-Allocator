@@ -11,11 +11,9 @@ private:
   std::vector<T> holes;
 public:
   ChunkLists(const size_t tPS) :
-    inUseSizes (tPS, 0),
-    inUse (tPS),
-    holesSizes (tPS, 0),
-    holes (tPS)
-  {}
+    inUseSizes (tPS, 0), inUse (tPS), holesSizes (tPS, 0), holes (tPS)
+  {
+  }
 };
 
 
