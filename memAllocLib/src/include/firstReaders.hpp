@@ -62,6 +62,9 @@ public:
     sem_destroy(&mutex);
   }
 
+  // TMP========================================================================
+  bool inCritical {false};
+  // TMP========================================================================
   
   void enterCritical()
   {
@@ -72,9 +75,9 @@ public:
 	       "enterCritical() failed!\n");
 
     
-    pthread_mutex_lock(&tmpMutex);
+    //    pthread_mutex_lock(&tmpMutex);
     //    std::cout<<"\tEntering critical section for reader. read count = "<<readCount<<std::endl;
-    pthread_mutex_unlock(&tmpMutex);
+    //    pthread_mutex_unlock(&tmpMutex);
 
     
     ++readCount;
@@ -85,6 +88,11 @@ public:
     if(sem_post(&mutex))
       genError("Error (in firstReaders.hpp): call to sem_Post(mutex) in "
 	       "enterCritical() failed!\n");
+
+
+    // TMP======================================================================
+    inCritical = true;
+    // TMP======================================================================
       
   }
   
@@ -102,6 +110,10 @@ public:
     //    std::cout<<"\tExiting critical section for reader. read count = "<<readCount<<std::endl;
     pthread_mutex_unlock(&tmpMutex);
 
+
+        // TMP======================================================================
+    inCritical = false;
+    // TMP======================================================================
     
     --readCount;
     if(readCount == 0)

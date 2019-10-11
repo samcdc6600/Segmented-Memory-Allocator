@@ -231,7 +231,15 @@ template <typename T> inline void * splitChunkFromHoles(const size_t chunk_size,
     readers.exitCritical();	// =============================================
     sem_wait(&rwMutex::rwMutex); // ============================================
     //      std::cout<<"\t\tEntering critical section for writer"<<std::endl;
-    
+
+    // TMP======================================================================
+    if(readers.inCritical == true)
+      {
+	std::cout<<"================Error in both (splitChunkFromHoles)!\n===="
+		 <<std::endl;
+	exit(-1);
+      }
+        // TMP======================================================================
     /* Set new chunk's base address accounting info to the base address of new
        chunk. */
     ((chunk *)((char *)(ret) + chunk_size))->base = newBase;
@@ -270,12 +278,20 @@ template <typename T> inline void * useChunkFromHoles(T candidate)
 
   readers.exitCritical();	// =============================================
   sem_wait(&rwMutex::rwMutex);
-  std::cout<<"\t\tEntering critical section for writer"<<std::endl;
+  //  std::cout<<"\t\tEntering critical section for writer"<<std::endl;
+      // TMP======================================================================
+      if(readers.inCritical == true)
+      {
+	std::cout<<"================Error in both (useChunkFromHoles)!\n===="
+		 <<std::endl;
+	exit(-1);
+      }
+          // TMP======================================================================
   
   inUse.push_front(*std::next(candidate));
   holes.erase_after(candidate);
 
-    std::cout<<"\t\txiting critical section for writer"<<std::endl;
+  //    std::cout<<"\t\txiting critical section for writer"<<std::endl;
   sem_post(&rwMutex::rwMutex);
   
   return ret;
@@ -303,7 +319,16 @@ inline void * getNewChunkFromSystem(const size_t chunk_size)
 
 
   sem_wait(&rwMutex::rwMutex);	// =============================================
-    std::cout<<"\t\tEntering critical section for writer"<<std::endl;
+  //    std::cout<<"\t\tEntering critical section for writer"<<std::endl;
+
+        // TMP======================================================================
+      if(readers.inCritical == true)
+      {
+	std::cout<<"================Error in both (getNewChunkFromSystem)!\n===="
+		 <<std::endl;
+	exit(-1);
+      }
+          // TMP======================================================================
   
   // Store base address of virtual chunk.
   ((chunk *)(virtualChunk))->base =
@@ -314,7 +339,7 @@ inline void * getNewChunkFromSystem(const size_t chunk_size)
   inUse.push_front((chunk *)(virtualChunk));
 
 
-    std::cout<<"\t\txiting critical section for writer"<<std::endl;
+  //    std::cout<<"\t\txiting critical section for writer"<<std::endl;
   sem_post(&rwMutex::rwMutex);	// =============================================
 
   
@@ -339,12 +364,20 @@ void free(const void * chunk)
 
 	  readers.exitCritical(); // ===========================================
 	  sem_wait(&rwMutex::rwMutex); // ======================================
-	    std::cout<<"\t\tEntering critical section for writer"<<std::endl;
+	  //	    std::cout<<"\t\tEntering critical section for writer"<<std::endl;
+	        // TMP======================================================================
+      if(readers.inCritical == true)
+      {
+	std::cout<<"================Error in both (free)!\n===="
+		 <<std::endl;
+	exit(-1);
+      }
+          // TMP======================================================================
 	  
 	  mergeHoles();
 	  mergeHoles();
 
-	    std::cout<<"\t\txiting critical section for writer"<<std::endl;
+	  //	    std::cout<<"\t\txiting critical section for writer"<<std::endl;
 	  sem_post(&rwMutex::rwMutex); // ======================================
 	  
 	  return;

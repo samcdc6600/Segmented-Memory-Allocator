@@ -41,7 +41,9 @@ int main(const int argc, const char **argv)
 	  bool listStat = false;
 	  if(atoi(argv[argListStat]) == listStatTrue)
 	    listStat = true;
+	  
 	  initMM();		/* Initialize MM data structures. */
+	  
 	switch(atoi(argv[argPolicy]))
 	  {
 	  case 0:
@@ -136,7 +138,7 @@ void initSequentialThreadNum(struct FuncArgs * args)
   else
     {
       initialized = true;
-      args->sequentialThreadNum = 0;
+      args->sequentialThreadNum = -1; /* We index from 0. */
     }
 }
 
@@ -292,6 +294,7 @@ int setAllocationUnitMaxIndex(const int size)
 void * sequentialFixedSizeAllocationAndDeallocation(void * args)
 {
   incSequentialThreadNum(args(args));
+  printf("SequentialThreadNum = %lu\n", getSequentialThreadNum(args(args)));
   printf("In sequentialFixedSizeAllocationAndDeallocation():\nTest size = %i,\n"
 	 "Allocation unit = %i.\nStats:\n", testSizes[args(args)->size],
 	 fixedSizeAllocationUnit);
