@@ -64,14 +64,15 @@ int main(const int argc, const char **argv)
       }
       else
 	{
-	  printf("Error malformed arguments, policy and or testNum and "
-		 "orsizeNum and or listStat not in range.\n");
-	  printArgumentErrorMsg(testNum, maxThreadCount, maxThreadCount);
+	  printf("Error:\tmalformed arguments, policy and or testNum and or\n\t"
+		 "sizeNum and or explicitConcurrencyNumber and or listStat\n\t"
+		 "not in range.\n");
+	  printArgumentErrorMsg(testNum, minThreadCount, maxThreadCount);
 	}
     }
   else
     {
-      printArgumentErrorMsg(testNum, maxThreadCount, maxThreadCount);
+      printArgumentErrorMsg(testNum, minThreadCount, maxThreadCount);
     }
 }
 
@@ -79,18 +80,19 @@ int main(const int argc, const char **argv)
 void printArgumentErrorMsg(const int testNum, const size_t minThreadCount,
 			   const size_t maxThreadCount)
 {
-  printf("Error malformed arguments, the format is:\n\t\"command policy testNum"
-	 "sizeNum explicitConcurrencyNumber listStat\"\nWhere command is the "
-	 "name of the program, policy is the memory allocation policy\n(the "
-	 "range is [0, %i]), testNum is the number of the test (the range is "
-	 "[0,%i]),\nsizeNum is the number of allocations to perform in the test"
-	 " (the range is [0,%lu])\n, explicitConcurrencyNumber is the number of"
-	 "threads the test will be run in (the range is [%lu, %lu]) and "
-	 "listStat is a value of '1' or '0', where '1' will cause the program "
-	 "to output\nextra information about the \"inUse\" and \"holes\" lists "
-	 "at the cost of the accuracy\nof the other timing measurments. A value"
-	 " of '0' will cause the program to run as\nusual without outputting "
-	 "extra info about the lists and without the loss in accuracy.\n",
+  printf("Error:\tmalformed arguments, the format is:\n\t\"command policy "
+	 "testNum sizeNum explicitConcurrencyNumber listStat\"\n\tWhere command"
+	 " is the name of the program, policy is the memory allocation policy\n"
+	 "\t(the range is [0, %i]), testNum is the number of the test (the "
+	 "range is [0,%i]),\n\tsizeNum is the number of allocations to perform "
+	 "in the test (the range is [0,%lu]),\n\texplicitConcurrencyNumber is "
+	 "the number of threads the test will be run in (the\n\trange is [%lu, "
+	 "%lu]) and listStat is a value of '1' or '0', where '1' will cause\n\t"
+	 "the program to output extra information about the \"inUse\" and \""
+	 "holes\" lists at\n\tthe cost of the accuracy of the other timing "
+	 "measurments. A value of '0' will\n\tcause the program to run as usual"
+	 " without outputting extra info about the lists\n\tand without the "
+	 "loss in accuracy.\n",
 	 maxPolicyNum, testNum -1, (sizeof(testSizes) / sizeof(int)) -1,
 	 minThreadCount, maxThreadCount);
 }
