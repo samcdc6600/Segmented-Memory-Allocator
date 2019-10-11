@@ -14,11 +14,7 @@ int main(const int argc, const char **argv)
   const int argPolicy = 1, argTestNum = 2, argTestSize = 3,
     argExplicitConcurrencyN = 4, argListStat = 5;
   const int listStatFalse = 0, listStatTrue = 1;
-  /* Maximum number of threads that will be created (this does not include the
-     initial thread.) */
-  const size_t maxThreadCount = 4096, minThreadCount = 1; /* We always spin off
-							     at least one
-							     thread... */
+
   void * (*test[])(void *) = {
     sequentialFixedSizeAllocationAndDeallocation,
     sequentialAllocationAndDeallocation,
@@ -63,6 +59,7 @@ int main(const int argc, const char **argv)
 	  }
 
 	pthread_t tids[maxThreadCount]; /* Store TIds here for join. */
+	initSequentialThreadNum(&funcArgs);
 	
 	for(int iter = 0; iter < atoi(argv[argExplicitConcurrencyN]); ++iter)
 	  {
@@ -81,7 +78,7 @@ int main(const int argc, const char **argv)
 		fprintf(stderr, "Error:\tFailed to create thread: %i, "
 			"aboring!\n", pthreadRet);
 		pthread_mutex_unlock(&messageLock);
-		
+		exit(ERROR_THREAD_CREATION);
 	      }
 	  }
 	for(int iter = 0; iter < atoi(argv[argExplicitConcurrencyN]); ++iter)
@@ -97,18 +94,17 @@ int main(const int argc, const char **argv)
 	  printf("Error:\tmalformed arguments, policy and or testNum and or\n\t"
 		 "sizeNum and or explicitConcurrencyNumber and or listStat\n\t"
 		 "not in range.\n");
-	  printArgumentErrorMsg(testNum, minThreadCount, maxThreadCount);
+	  printArgumentErrorMsg(testNum);
 	}
     }
   else
     {
-      printArgumentErrorMsg(testNum, minThreadCount, maxThreadCount);
+      printArgumentErrorMsg(testNum);
     }
 }
 
 
-void printArgumentErrorMsg(const int testNum, const size_t minThreadCount,
-			   const size_t maxThreadCount)
+void printArgumentErrorMsg(const int testNum)
 {
   printf("Error:\tmalformed arguments, the format is:\n\t\"command policy "
 	 "testNum sizeNum explicitConcurrencyNumber listStat\"\n\tWhere command"
@@ -116,8 +112,8 @@ void printArgumentErrorMsg(const int testNum, const size_t minThreadCount,
 	 "\t(the range is [0, %i]), testNum is the number of the test (the "
 	 "range is [0,%i]),\n\tsizeNum is the number of allocations to perform "
 	 "in the test (the range is [0,%lu]),\n\texplicitConcurrencyNumber is "
-	 "the number of threads the test will be run in (the\n\trange is [%lu, "
-	 "%lu]) and listStat is a value of '1' or '0', where '1' will cause\n\t"
+	 "the number of threads the test will be run in (the\n\trange is [%i, "
+	 "%i]) and listStat is a value of '1' or '0', where '1' will cause\n\t"
 	 "the program to output extra information about the \"inUse\" and \""
 	 "holes\" lists at\n\tthe cost of the accuracy of the other timing "
 	 "measurments. A value of '0' will\n\tcause the program to run as usual"
@@ -125,6 +121,43 @@ void printArgumentErrorMsg(const int testNum, const size_t minThreadCount,
 	 "loss in accuracy.\n",
 	 maxPolicyNum, testNum -1, (sizeof(testSizes) / sizeof(int)) -1,
 	 minThreadCount, maxThreadCount);
+}
+
+
+void initSequentialThreadNum(struct FuncArgs * args)
+{
+  static bool initialized = false;
+  if(initialized == true)
+    {
+      fprintf(stderr, "Error: initSequentialThreadNum() called more then once, "
+	      "exiting!\n");
+      exit(ERROR_THREAD_INIT);
+    }
+  else
+    {
+      initialized = true;
+      args->sequentialThreadNum = 0;
+    }
+}
+
+
+void incSequentialThreadNum(struct FuncArgs * args)
+{
+  pthread_mutex_lock(&args->sequentialThreadNumMutex);
+  args->sequentialThreadNum++;
+  pthread_mutex_unlock(&args->sequentialThreadNumMutex);
+}
+
+
+size_t getSequentialThreadNum(struct FuncArgs * args)
+{
+  size_t ret;
+  
+  pthread_mutex_lock(&args->sequentialThreadNumMutex);
+  ret = args->sequentialThreadNum;
+  pthread_mutex_unlock(&args->sequentialThreadNumMutex);
+  
+  return ret;
 }
 
 
@@ -258,6 +291,7 @@ int setAllocationUnitMaxIndex(const int size)
 
 void * sequentialFixedSizeAllocationAndDeallocation(void * args)
 {
+  incSequentialThreadNum(args(args));
   printf("In sequentialFixedSizeAllocationAndDeallocation():\nTest size = %i,\n"
 	 "Allocation unit = %i.\nStats:\n", testSizes[args(args)->size],
 	 fixedSizeAllocationUnit);
@@ -265,10 +299,10 @@ void * sequentialFixedSizeAllocationAndDeallocation(void * args)
   
   for(int iter = 0; iter < testSizes[args(args)->size]; ++iter)
     {			// Make n allocations.
-      allocs[iter] = alloc(fixedSizeAllocationUnit);
+      allocs[getSequentialThreadNum(args(args))][iter] = alloc(fixedSizeAllocationUnit);
       /* Some dummy data to make sure the compiler is not doing anything tricky
 	 idk (although I highly doubt it.) */
-      *(char *)(allocs[iter]) = iter;
+      *(char *)(allocs[getSequentialThreadNum(args(args))][iter]) = iter;
       listStatOut(args(args)->size, args(args)->listStat, iter);
     }
   
@@ -279,7 +313,7 @@ void * sequentialFixedSizeAllocationAndDeallocation(void * args)
   
   for(int iter = 0; iter < testSizes[args(args)->size]; ++iter)
     {			// Make n deallocations.
-      dealloc(allocs[iter]);
+      dealloc(allocs[getSequentialThreadNum(args(args))][iter]);
       listStatOut(args(args)->size, args(args)->listStat, iter);
     }
 
@@ -310,10 +344,10 @@ void * sequentialAllocationAndDeallocation(void * args)
   
   for(int iter = 0; iter < testSizes[size]; ++iter)
     {			// Make n allocations.
-      allocs[iter] = alloc(abs(rand() %
+      allocs[getSequentialThreadNum(args(args))][iter] = alloc(abs(rand() %
 			       (allocationUnitMax[allocationUnitMaxIndex])) +
 			   allocationUnitMin);
-      *(char *)(allocs[iter]) = iter;
+      *(char *)(allocs[getSequentialThreadNum(args(args))][iter]) = iter;
       listStatOut(size, args(args)->listStat, iter);
     }
   
@@ -324,7 +358,7 @@ void * sequentialAllocationAndDeallocation(void * args)
   
   for(int iter = 0; iter < testSizes[size]; ++iter)
     {			// Make n deallocations.
-      dealloc(allocs[iter]);
+      dealloc(allocs[getSequentialThreadNum(args(args))][iter]);
       listStatOut(size, args(args)->listStat, iter);
     }
 
@@ -346,8 +380,8 @@ void * sequentialFixedSizeAllocationAndReverseDeallocation(void * args)
   
   for(int iter = 0; iter < testSizes[args(args)->size]; ++iter)
     {			// Make n allocations.
-      allocs[iter] = alloc(fixedSizeAllocationUnit);
-      *(char *)(allocs[iter]) = iter;
+      allocs[getSequentialThreadNum(args(args))][iter] = alloc(fixedSizeAllocationUnit);
+      *(char *)(allocs[getSequentialThreadNum(args(args))][iter]) = iter;
       listStatOut(args(args)->size, args(args)->listStat, iter);
     }
 
@@ -358,7 +392,7 @@ void * sequentialFixedSizeAllocationAndReverseDeallocation(void * args)
   
   for(int iter = (testSizes[args(args)->size] -1); iter >= 0; --iter)
     {			// Make n deallocations.
-      dealloc(allocs[iter]);
+      dealloc(allocs[getSequentialThreadNum(args(args))][iter]);
       listStatOut(args(args)->size, args(args)->listStat, iter);
     }
 
@@ -389,10 +423,10 @@ void * sequentialAllocationAndReverseDeallocation(void * args)
   
   for(int iter = 0; iter < testSizes[size]; ++iter)
     {			// Make n allocations.
-      allocs[iter] = alloc(abs(rand() %
+      allocs[getSequentialThreadNum(args(args))][iter] = alloc(abs(rand() %
 			       (allocationUnitMax[allocationUnitMaxIndex])) +
 			   allocationUnitMin);
-      *(char *)(allocs[iter]) = iter;
+      *(char *)(allocs[getSequentialThreadNum(args(args))][iter]) = iter;
       listStatOut(size, args(args)->listStat, iter);
     }
   
@@ -403,7 +437,7 @@ void * sequentialAllocationAndReverseDeallocation(void * args)
   
   for(int iter = (testSizes[size] -1); iter >= 0 ; --iter)
     {			// Make n deallocations.
-      dealloc(allocs[iter]);
+      dealloc(allocs[getSequentialThreadNum(args(args))][iter]);
       listStatOut(size, args(args)->listStat, iter);
     }
 
@@ -425,9 +459,9 @@ void * interleavedFixedSizeAllocationAndDeallocation(void * args)
   
   for(int iter = 0; iter < testSizes[args(args)->size]; ++iter)
     {			// Make n allocations.
-      allocs[iter] = alloc(fixedSizeAllocationUnit);
-      *(char *)(allocs[iter]) = iter;
-      dealloc(allocs[iter]);
+      allocs[getSequentialThreadNum(args(args))][iter] = alloc(fixedSizeAllocationUnit);
+      *(char *)(allocs[getSequentialThreadNum(args(args))][iter]) = iter;
+      dealloc(allocs[getSequentialThreadNum(args(args))][iter]);
       listStatOut(args(args)->size, args(args)->listStat, iter);
     }
 
@@ -457,11 +491,11 @@ void * interleavedAllocationAndDeallocation(void * args)
 
   for(int iter = 0; iter < testSizes[size]; ++iter)
     {			// Make n allocations.
-      allocs[iter] = alloc(abs(rand() %
+      allocs[getSequentialThreadNum(args(args))][iter] = alloc(abs(rand() %
 			       (allocationUnitMax[allocationUnitMaxIndex])) +
 			   allocationUnitMin);
-      *(char *)(allocs[iter]) = iter;
-      dealloc(allocs[iter]);
+      *(char *)(allocs[getSequentialThreadNum(args(args))][iter]) = iter;
+      dealloc(allocs[getSequentialThreadNum(args(args))][iter]);
       listStatOut(size, args(args)->listStat, iter);
     }
 
@@ -504,8 +538,8 @@ void * randomFixedSizeAllocationsAndDeallocations(void * args)
 	{			// Perform allocation.
 	  if(allocOrder[iter] == allocOrderInUseVar)
 	    {
-	      allocs[iter] = alloc(fixedSizeAllocationUnit);
-	      //	      printf("allocated %p\n", allocs[iter]);
+	      allocs[getSequentialThreadNum(args(args))][iter] = alloc(fixedSizeAllocationUnit);
+	      //	      printf("allocated %p\n", allocs[getSequentialThreadNum(args(args))][iter]);
 	    }
 	}
       if(deallocOrder[iter] != fillVar)
@@ -566,7 +600,7 @@ void * randomAllocationsAndDeallocations(void * args)
 	{			// Perform allocation.
 	  if(allocOrder[iter] == allocOrderInUseVar)
 	    {
-	      allocs[iter] = alloc(abs(rand() %
+	      allocs[getSequentialThreadNum(args(args))][iter] = alloc(abs(rand() %
 				       (allocationUnitMax[allocationUnitMaxIndex])) +
 				   allocationUnitMin);
 	    }

@@ -19,6 +19,7 @@ private:
   const int pshared {0};
   const int mInitVal {1};
 
+  pthread_mutex_t tmpMutex;
   
 public:
   Readers()
@@ -69,6 +70,13 @@ public:
     if(sem_wait(&mutex))
       genError("Error (in firstReaders.hpp): call to sem_wait(mutex) in "
 	       "enterCritical() failed!\n");
+
+    
+    pthread_mutex_lock(&tmpMutex);
+    //    std::cout<<"\tEntering critical section for reader. read count = "<<readCount<<std::endl;
+    pthread_mutex_unlock(&tmpMutex);
+
+    
     ++readCount;
     if(readCount == 1)
       if(sem_wait(rwMutex))
@@ -88,6 +96,13 @@ public:
     if(sem_wait(&mutex))
       genError("Error (in firstReaders.hpp): call to sem_wait(mutex) in "
 	       "exitCritical() failed!\n");
+
+
+    pthread_mutex_lock(&tmpMutex);
+    //    std::cout<<"\tExiting critical section for reader. read count = "<<readCount<<std::endl;
+    pthread_mutex_unlock(&tmpMutex);
+
+    
     --readCount;
     if(readCount == 0)
       if(sem_post(rwMutex))

@@ -39,6 +39,7 @@ void * _firstFit(const size_t chunk_size)
 
   /* Note that there are multiple exit points for this critical section where
      readers.exitCritical() is called.  */
+  std::cout<<"in _firstFit()"<<std::endl;
   readers.enterCritical();
   checkZeroChunkSize(chunk_size);
   
@@ -217,12 +218,20 @@ template <typename T> inline void * splitChunkFromHoles(const size_t chunk_size,
 							T candidate)
 {
   using namespace mmState;
+
+  std::cout<<"in splitChunkFromHoles()\n";
+  
   // Base address of chunk to be returned.
   auto ret = (*std::next(candidate))->base;
   // CALCULATE FOR NEW HOLES CHUNK----------------------------------------------
   {						// New chunk.
     // Base address of new chunk to be put in holes.
     auto newBase ((char *)(ret) + chunk_size + chunkAccountingSize);
+
+    readers.exitCritical();	// =============================================
+    sem_wait(&rwMutex::rwMutex); // ============================================
+    //      std::cout<<"\t\tEntering critical section for writer"<<std::endl;
+    
     /* Set new chunk's base address accounting info to the base address of new
        chunk. */
     ((chunk *)((char *)(ret) + chunk_size))->base = newBase;
@@ -232,7 +241,7 @@ template <typename T> inline void * splitChunkFromHoles(const size_t chunk_size,
   }
 
 
-  sem_wait(&rwMutex::rwMutex);
+  
   // UPDATE HOLES AND INUSE-----------------------------------------------------
   // Set new size of chunk to be returned.
   (*std::next(candidate))->size = chunk_size;
@@ -243,8 +252,9 @@ template <typename T> inline void * splitChunkFromHoles(const size_t chunk_size,
   // Add new hole to holes list.
   holes.push_front((chunk *)((char*)ret + chunk_size));
 
-  sem_post(&rwMutex::rwMutex);
-  readers.exitCritical();
+  //  std::cout<<"\t\txiting critical section for writer"<<std::endl;
+  sem_post(&rwMutex::rwMutex);	// =============================================
+  
   
   return ret;
 }
@@ -253,11 +263,20 @@ template <typename T> inline void * splitChunkFromHoles(const size_t chunk_size,
 template <typename T> inline void * useChunkFromHoles(T candidate)
 {
   using namespace mmState;
+
+  std::cout<<"in useChunkFromHoles()\n";
+  
   auto ret = (*std::next(candidate))->base;
+
+  readers.exitCritical();	// =============================================
+  sem_wait(&rwMutex::rwMutex);
+  std::cout<<"\t\tEntering critical section for writer"<<std::endl;
+  
   inUse.push_front(*std::next(candidate));
   holes.erase_after(candidate);
 
-  readers.exitCritical();
+    std::cout<<"\t\txiting critical section for writer"<<std::endl;
+  sem_post(&rwMutex::rwMutex);
   
   return ret;
 }
@@ -266,6 +285,13 @@ template <typename T> inline void * useChunkFromHoles(T candidate)
 inline void * getNewChunkFromSystem(const size_t chunk_size)
 {
   using namespace mmState;
+
+
+  std::cout<<"in getNewChunkFromSystem()\n";
+
+
+  readers.exitCritical();	// =============================================
+  
     // Get new chunk (plus memory for accounting.)
   address virtualChunk {address(sbrk(chunk_size + chunkAccountingSize))};
   
@@ -274,6 +300,11 @@ inline void * getNewChunkFromSystem(const size_t chunk_size)
       std::cerr<<"Error in _firstFit: ";
       throw std::bad_alloc();
     }
+
+
+  sem_wait(&rwMutex::rwMutex);	// =============================================
+    std::cout<<"\t\tEntering critical section for writer"<<std::endl;
+  
   // Store base address of virtual chunk.
   ((chunk *)(virtualChunk))->base =
     ((char *)virtualChunk + chunkAccountingSize);
@@ -282,7 +313,10 @@ inline void * getNewChunkFromSystem(const size_t chunk_size)
   // Put new chunk accounting info on the inUse list.
   inUse.push_front((chunk *)(virtualChunk));
 
-  readers.exitCritical();	// Exit critical section for readers.
+
+    std::cout<<"\t\txiting critical section for writer"<<std::endl;
+  sem_post(&rwMutex::rwMutex);	// =============================================
+
   
   return ((chunk *)(virtualChunk))->base;
 }
@@ -291,6 +325,9 @@ inline void * getNewChunkFromSystem(const size_t chunk_size)
 void free(const void * chunk)
 {
   using namespace mmState;
+
+  std::cout<<"in free()"<<std::endl;
+  readers.enterCritical();	// =============================================
     
   for(auto candidate {inUse.before_begin()};
       std::next(candidate) != inUse.cend(); ++candidate)
@@ -299,8 +336,16 @@ void free(const void * chunk)
 	{
 	  holes.push_front(*std::next(candidate));
 	  inUse.erase_after(candidate);
+
+	  readers.exitCritical(); // ===========================================
+	  sem_wait(&rwMutex::rwMutex); // ======================================
+	    std::cout<<"\t\tEntering critical section for writer"<<std::endl;
+	  
 	  mergeHoles();
 	  mergeHoles();
+
+	    std::cout<<"\t\txiting critical section for writer"<<std::endl;
+	  sem_post(&rwMutex::rwMutex); // ======================================
 	  
 	  return;
 	}
@@ -317,6 +362,9 @@ void free(const void * chunk)
 inline void mergeHoles()
 {
   using namespace mmState;
+
+  std::cout<<"in mergeHoles\n";
+  
   /* We must make sure that holes is sorted (it may be more efficient to do this
      differently.) */
   holes.sort(holeComp);
