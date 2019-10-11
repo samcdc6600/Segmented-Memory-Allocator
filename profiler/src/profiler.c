@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>		/* srand, rand */
 #include <time.h>
+#include <pthread.h>
 #include "include/mm.h"
 #include "include/profiler.h"
 
@@ -18,7 +19,7 @@ int main(const int argc, const char **argv)
   const size_t maxThreadCount = 4096, minThreadCount = 1; /* We always spin off
 							     at least one
 							     thread... */
-  void (*test[])(const int size, const bool listStat) = {
+  void * (*test[])(void *) = {
     sequentialFixedSizeAllocationAndDeallocation,
     sequentialAllocationAndDeallocation,
     sequentialFixedSizeAllocationAndReverseDeallocation,
@@ -36,9 +37,9 @@ int main(const int argc, const char **argv)
 	 (atoi(argv[argTestNum]) >= 0  && atoi(argv[argTestNum]) < testNum) &&
 	 (atoi(argv[argTestSize]) >= 0 && (unsigned)atoi(argv[argTestSize]) <
 	  (sizeof(testSizes) / sizeof(int))) &&
+	 (atoi(argv[argExplicitConcurrencyN]) >= (long)minThreadCount &&
+	  atoi(argv[argExplicitConcurrencyN]) <= (long)maxThreadCount) &&
 	 (atoi(argv[argListStat]) == listStatFalse ||
-	  (atoi(argv[argExplicitConcurrencyN]) >= (long)minThreadCount &&
-	   atoi(argv[argExplicitConcurrencyN]) <= (long)maxThreadCount) ||
 	  atoi(argv[argListStat]) == listStatTrue))
 	{
 	  bool listStat = false;
@@ -60,7 +61,36 @@ int main(const int argc, const char **argv)
 	    setAllocationAlgorithm(worstFit);
 	    break;
 	  }
-	test[atoi(argv[argTestNum])](atoi(argv[argTestSize]), listStat);
+
+	pthread_t tids[maxThreadCount]; /* Store TIds here for join. */
+	
+	for(int iter = 0; iter < atoi(argv[argExplicitConcurrencyN]); ++iter)
+	  {
+	    funcArgs.size = atoi(argv[argTestSize]);
+	    funcArgs.listStat = listStat;
+	    
+	    int pthreadRet;
+	    pthread_mutex_t messageLock;
+	    
+	    pthreadRet = pthread_create(&tids[iter], NULL,
+					test[atoi(argv[argTestNum])],
+					&funcArgs);
+	    if(pthreadRet)
+	      {
+		pthread_mutex_lock(&messageLock);
+		fprintf(stderr, "Error:\tFailed to create thread: %i, "
+			"aboring!\n", pthreadRet);
+		pthread_mutex_unlock(&messageLock);
+		
+	      }
+	  }
+	for(int iter = 0; iter < atoi(argv[argExplicitConcurrencyN]); ++iter)
+	  {
+	    int joinRet;
+	    int * pJoinRet = &joinRet;
+	    pthread_join(tids[iter], (void **)(&pJoinRet));
+	    /* Compile results here? */
+	  }
       }
       else
 	{
@@ -226,21 +256,20 @@ int setAllocationUnitMaxIndex(const int size)
 }
 
 
-void sequentialFixedSizeAllocationAndDeallocation(const int size,
-						  const bool listStat)
+void * sequentialFixedSizeAllocationAndDeallocation(void * args)
 {
   printf("In sequentialFixedSizeAllocationAndDeallocation():\nTest size = %i,\n"
-	 "Allocation unit = %i.\nStats:\n", testSizes[size],
+	 "Allocation unit = %i.\nStats:\n", testSizes[args(args)->size],
 	 fixedSizeAllocationUnit);
   clock_t begin = clock();
   
-  for(int iter = 0; iter < testSizes[size]; ++iter)
+  for(int iter = 0; iter < testSizes[args(args)->size]; ++iter)
     {			// Make n allocations.
       allocs[iter] = alloc(fixedSizeAllocationUnit);
       /* Some dummy data to make sure the compiler is not doing anything tricky
 	 idk (although I highly doubt it.) */
       *(char *)(allocs[iter]) = iter;
-      listStatOut(size, listStat, iter);
+      listStatOut(args(args)->size, args(args)->listStat, iter);
     }
   
   clock_t end = clock();
@@ -248,21 +277,24 @@ void sequentialFixedSizeAllocationAndDeallocation(const int size,
   printf("\n\tAllocation time = %f\n\n", timeAlloc);
   begin = clock();
   
-  for(int iter = 0; iter < testSizes[size]; ++iter)
+  for(int iter = 0; iter < testSizes[args(args)->size]; ++iter)
     {			// Make n deallocations.
       dealloc(allocs[iter]);
-      listStatOut(size, listStat, iter);
+      listStatOut(args(args)->size, args(args)->listStat, iter);
     }
 
   end = clock();
   double timeDealloc = (double)(end - begin) / CLOCKS_PER_SEC;
   printf("\n\tDeallocation time = %f\n", timeDealloc);
   printf("\tTotal time = %f\n\n", timeAlloc + timeDealloc);
+
+  return NULL;
 }
 
 
-void sequentialAllocationAndDeallocation(int size, const bool listStat)
+void * sequentialAllocationAndDeallocation(void * args)
 {
+  int size = args(args)->size;
   if(size > veriableAllocationUnitTestSizesSaturationIndex)
     { /* We don't want to wast all of our time and memory. */
       size = veriableAllocationUnitTestSizesSaturationIndex;
@@ -282,7 +314,7 @@ void sequentialAllocationAndDeallocation(int size, const bool listStat)
 			       (allocationUnitMax[allocationUnitMaxIndex])) +
 			   allocationUnitMin);
       *(char *)(allocs[iter]) = iter;
-      listStatOut(size, listStat, iter);
+      listStatOut(size, args(args)->listStat, iter);
     }
   
   clock_t end = clock();
@@ -293,29 +325,30 @@ void sequentialAllocationAndDeallocation(int size, const bool listStat)
   for(int iter = 0; iter < testSizes[size]; ++iter)
     {			// Make n deallocations.
       dealloc(allocs[iter]);
-      listStatOut(size, listStat, iter);
+      listStatOut(size, args(args)->listStat, iter);
     }
 
   end = clock();
   double timeDealloc = (double)(end - begin) / CLOCKS_PER_SEC;
   printf("\n\tDeallocation time = %f\n", timeDealloc);
   printf("\tTotal time = %f\n\n", timeAlloc + timeDealloc);
+
+  return NULL;
 }
 
 
-void sequentialFixedSizeAllocationAndReverseDeallocation(const int size,
-							 const bool listStat)
+void * sequentialFixedSizeAllocationAndReverseDeallocation(void * args)
 {
   printf("In sequentialFixedSizeAllocationAndReverseDeallocation():\nTest size "
-	 "= %i,\nAllocation unit = %i.\nStats:\n", testSizes[size],
+	 "= %i,\nAllocation unit = %i.\nStats:\n", testSizes[args(args)->size],
 	 fixedSizeAllocationUnit);
   clock_t begin = clock();
   
-  for(int iter = 0; iter < testSizes[size]; ++iter)
+  for(int iter = 0; iter < testSizes[args(args)->size]; ++iter)
     {			// Make n allocations.
       allocs[iter] = alloc(fixedSizeAllocationUnit);
       *(char *)(allocs[iter]) = iter;
-      listStatOut(size, listStat, iter);
+      listStatOut(args(args)->size, args(args)->listStat, iter);
     }
 
   clock_t end = clock();
@@ -323,21 +356,24 @@ void sequentialFixedSizeAllocationAndReverseDeallocation(const int size,
   printf("\n\tAllocation time = %f\n\n", timeAlloc);
   begin = clock();
   
-  for(int iter = (testSizes[size] -1); iter >= 0; --iter)
+  for(int iter = (testSizes[args(args)->size] -1); iter >= 0; --iter)
     {			// Make n deallocations.
       dealloc(allocs[iter]);
-      listStatOut(size, listStat, iter);
+      listStatOut(args(args)->size, args(args)->listStat, iter);
     }
 
   end = clock();
   double timeDealloc = (double)(end - begin) / CLOCKS_PER_SEC;
   printf("\n\tDeallocation time = %f\n", timeDealloc);
   printf("\tTotal time = %f\n\n", timeAlloc + timeDealloc);
+
+  return NULL;
 }
 
 
-void sequentialAllocationAndReverseDeallocation(int size, const bool listStat)
+void * sequentialAllocationAndReverseDeallocation(void * args)
 {
+  int size = args(args)->size;
   if(size > veriableAllocationUnitTestSizesSaturationIndex)
     { /* We don't want to wast all of our time and memory. */
       size = veriableAllocationUnitTestSizesSaturationIndex;
@@ -357,7 +393,7 @@ void sequentialAllocationAndReverseDeallocation(int size, const bool listStat)
 			       (allocationUnitMax[allocationUnitMaxIndex])) +
 			   allocationUnitMin);
       *(char *)(allocs[iter]) = iter;
-      listStatOut(size, listStat, iter);
+      listStatOut(size, args(args)->listStat, iter);
     }
   
   clock_t end = clock();
@@ -368,40 +404,44 @@ void sequentialAllocationAndReverseDeallocation(int size, const bool listStat)
   for(int iter = (testSizes[size] -1); iter >= 0 ; --iter)
     {			// Make n deallocations.
       dealloc(allocs[iter]);
-      listStatOut(size, listStat, iter);
+      listStatOut(size, args(args)->listStat, iter);
     }
 
   end = clock();
   double timeDealloc = (double)(end - begin) / CLOCKS_PER_SEC;
   printf("\n\tDeallocation time = %f\n", timeDealloc);
   printf("\tTotal time = %f\n\n", timeAlloc + timeDealloc);
+
+  return NULL;
 }
 
 
-void interleavedFixedSizeAllocationAndDeallocation(const int size,
-						   const bool listStat)
+void * interleavedFixedSizeAllocationAndDeallocation(void * args)
 {
   printf("In interleavedFixedSizeAllocationAndDeallocation():\nTest size = %i,"
-	 "\nAllocation unit = %i.\nStats:\n", testSizes[size],
+	 "\nAllocation unit = %i.\nStats:\n", testSizes[args(args)->size],
 	 fixedSizeAllocationUnit);
   clock_t begin = clock();
   
-  for(int iter = 0; iter < testSizes[size]; ++iter)
+  for(int iter = 0; iter < testSizes[args(args)->size]; ++iter)
     {			// Make n allocations.
       allocs[iter] = alloc(fixedSizeAllocationUnit);
       *(char *)(allocs[iter]) = iter;
       dealloc(allocs[iter]);
-      listStatOut(size, listStat, iter);
+      listStatOut(args(args)->size, args(args)->listStat, iter);
     }
 
   clock_t end = clock();
   double time = (double)(end - begin) / CLOCKS_PER_SEC;
   printf("\n\tTotal time = %f\n\n", time);
+
+  return NULL;
 }
 
 
-void interleavedAllocationAndDeallocation(int size, const bool listStat)
+void * interleavedAllocationAndDeallocation(void * args)
 {
+  int size = args(args)->size;
   if(size > veriableAllocationUnitTestSizesSaturationIndex)
     { /* We don't want to wast all of our time and memory. */
       size = veriableAllocationUnitTestSizesSaturationIndex;
@@ -422,17 +462,18 @@ void interleavedAllocationAndDeallocation(int size, const bool listStat)
 			   allocationUnitMin);
       *(char *)(allocs[iter]) = iter;
       dealloc(allocs[iter]);
-      listStatOut(size, listStat, iter);
+      listStatOut(size, args(args)->listStat, iter);
     }
 
   clock_t end = clock();
   double time = (double)(end - begin) / CLOCKS_PER_SEC;
   printf("\n\tTotal time = %f\n\n", time);
+
+  return NULL;
 }
 
 
-void randomFixedSizeAllocationsAndDeallocations(const int size,
-						const bool listStat)
+void * randomFixedSizeAllocationsAndDeallocations(void * args)
 {
   /* Fill ararys with this value initially. */
   const int fillVar = -1;
@@ -440,26 +481,26 @@ void randomFixedSizeAllocationsAndDeallocations(const int size,
   const int allocOrderInUseVar = 1;
 
   printf("In randomFixedSizeAllocationsAndDeallocations():\nTest size = %i,\n"
-	 "Allocation unit = %i.\n", testSizes[size], fixedSizeAllocationUnit);
+	 "Allocation unit = %i.\n", testSizes[args(args)->size], fixedSizeAllocationUnit);
   printf("Calculating random allocation and deallocation sequence...\n");
   
   // Fill arrays with known value
-  fillArray(allocOrder, testSizes[size] * allocSize, fillVar);
-  fillArray(deallocOrder, testSizes[size] * deallocSize, fillVar);
+  fillArray(allocOrder, testSizes[args(args)->size] * allocSize, fillVar);
+  fillArray(deallocOrder, testSizes[args(args)->size] * deallocSize, fillVar);
 
   // Setup allocation order
-  populateAllocOrder(allocOrder, testSizes[size], allocOrderInUseVar);
+  populateAllocOrder(allocOrder, testSizes[args(args)->size], allocOrderInUseVar);
   // Setup deallocation order.
-  populateDeallocOrder(allocOrder, deallocOrder, testSizes[size], allocSize,
+  populateDeallocOrder(allocOrder, deallocOrder, testSizes[args(args)->size], allocSize,
 		       deallocSize);
 
   printf("Done! Running test.\nStats:\n");
   clock_t begin = clock();
 
 
-  for(int iter = 0; iter < (testSizes[size] * deallocSize); ++iter)
+  for(int iter = 0; iter < (testSizes[args(args)->size] * deallocSize); ++iter)
     {
-      if(iter < (testSizes[size] * allocSize))
+      if(iter < (testSizes[args(args)->size] * allocSize))
 	{			// Perform allocation.
 	  if(allocOrder[iter] == allocOrderInUseVar)
 	    {
@@ -472,17 +513,21 @@ void randomFixedSizeAllocationsAndDeallocations(const int size,
 	  dealloc(allocs[deallocOrder[iter]]);
 	  //	  printf("deallocated %p\n", allocs[deallocOrder[iter]]);
 	}
-      listStatOut(size, listStat, iter);
+      listStatOut(args(args)->size, args(args)->listStat, iter);
     }
 
   clock_t end = clock();
   double time = (double)(end - begin) / CLOCKS_PER_SEC;
   printf("\n\tTotal time = %f\n\n", time);
+
+  return NULL;
 }
 
 
-void randomAllocationsAndDeallocations(int size, const bool listStat)
-{ /* Fill ararys with this value initially. */
+void * randomAllocationsAndDeallocations(void * args)
+{
+  int size = args(args)->size;
+  /* Fill ararys with this value initially. */
   const int fillVar = -1;
   /* AllocOrder indices that are in use equal this. */
   const int allocOrderInUseVar = 1;
@@ -530,10 +575,12 @@ void randomAllocationsAndDeallocations(int size, const bool listStat)
 	{
 	  dealloc(allocs[deallocOrder[iter]]);
 	}
-      listStatOut(size, listStat, iter);
+      listStatOut(size, args(args)->listStat, iter);
     }
 
   clock_t end = clock();
   double time = (double)(end - begin) / CLOCKS_PER_SEC;
   printf("\n\tTotal time = %f\n\n", time);
+
+  return NULL;
 }

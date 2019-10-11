@@ -2,6 +2,11 @@
 #define PROFILER_H_
 
 
+/* Usefull for function pointers passed to new threads with an argument with
+   original type FuncArgs. */
+#define args(X) ((struct FuncArgs * )X)
+
+
 struct FuncArgs
 {
   int size;
@@ -65,24 +70,20 @@ int setAllocationUnitMaxIndex(const int size);
    allocation unit "allocationUnit". All functions without moniker component
    "FixedSize" use random allocation units */
 /* Sequential allocations and deallocations. ================================ */
-void sequentialFixedSizeAllocationAndDeallocation(const int size,
-						  const bool listStat);
-void sequentialAllocationAndDeallocation(int size, const bool listStat);
+void * sequentialFixedSizeAllocationAndDeallocation(void * args);
+void * sequentialAllocationAndDeallocation(void * args);
 /* Sequential allocations and reverse deallocations.========================= */
 /* We think that with a large hols list the order of deallocations will make a
    big difference to performance since we sort holes in mergeHoles() (to make it
    easier to compare addresses.) */
-void sequentialFixedSizeAllocationAndReverseDeallocation(const int size,
-							 const bool listStat);
-void sequentialAllocationAndReverseDeallocation(int size, const bool listStat);
+void * sequentialFixedSizeAllocationAndReverseDeallocation(void * args);
+void * sequentialAllocationAndReverseDeallocation(void * args);
 /* Interleaved allocations and deallocations. =============================== */
-void interleavedFixedSizeAllocationAndDeallocation(const int size,
-						   const bool listStat);
-void interleavedAllocationAndDeallocation(int size, const bool listStat);
+void * interleavedFixedSizeAllocationAndDeallocation(void * args);
+void * interleavedAllocationAndDeallocation(void * args);
 /* Random allocations and deallocations. ==================================== */
-void randomFixedSizeAllocationsAndDeallocations(const int size,
-						const bool listStat);
-void randomAllocationsAndDeallocations(int size, const bool listStat);
+void * randomFixedSizeAllocationsAndDeallocations(void * args);
+void * randomAllocationsAndDeallocations(void * args);
 
 
 #endif
