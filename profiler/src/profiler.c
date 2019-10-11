@@ -105,6 +105,7 @@ int main(const int argc, const char **argv)
 	  bool listStat = false;
 	  if(atoi(argv[argListStat]) == listStatTrue)
 	    listStat = true;
+	  initMM();		/* Initialize MM data structures. */
 	switch(atoi(argv[argPolicy]))
 	  {
 	  case 0:

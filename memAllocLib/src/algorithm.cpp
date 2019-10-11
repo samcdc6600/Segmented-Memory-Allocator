@@ -14,8 +14,9 @@ namespace mmState
   std::forward_list<chunk *> holes {};
   namespace rwMutex
   { /* This semaphore is shared between readers and writers it is initialised
-       and passed to the Readers class in the function init(). It should not be
-       accessed directly in any other function. */
+       and passed to the Readers class in the function init(). It should only
+       be directly accessed in other functions where it is being used for writer
+       code. */
     sem_t rwMutex;
   }
   Readers readers {};
@@ -35,6 +36,10 @@ void * _firstFit(const size_t chunk_size)
 {
   using namespace mmState;
 
+
+  /* Note that there are multiple exit points for this critical section where
+     readers.exitCritical() is called.  */
+  readers.enterCritical();
   checkZeroChunkSize(chunk_size);
   
   for(auto candidate {holes.before_begin()};
@@ -226,6 +231,8 @@ template <typename T> inline void * splitChunkFromHoles(const size_t chunk_size,
       (*std::next(candidate))->size - (chunkAccountingSize + chunk_size);
   }
 
+
+  sem_wait(&rwMutex::rwMutex);
   // UPDATE HOLES AND INUSE-----------------------------------------------------
   // Set new size of chunk to be returned.
   (*std::next(candidate))->size = chunk_size;
@@ -235,6 +242,9 @@ template <typename T> inline void * splitChunkFromHoles(const size_t chunk_size,
   holes.erase_after(candidate);
   // Add new hole to holes list.
   holes.push_front((chunk *)((char*)ret + chunk_size));
+
+  sem_post(&rwMutex::rwMutex);
+  readers.exitCritical();
   
   return ret;
 }
@@ -246,6 +256,8 @@ template <typename T> inline void * useChunkFromHoles(T candidate)
   auto ret = (*std::next(candidate))->base;
   inUse.push_front(*std::next(candidate));
   holes.erase_after(candidate);
+
+  readers.exitCritical();
   
   return ret;
 }
@@ -269,6 +281,8 @@ inline void * getNewChunkFromSystem(const size_t chunk_size)
   ((chunk *)(virtualChunk))->size = chunk_size;
   // Put new chunk accounting info on the inUse list.
   inUse.push_front((chunk *)(virtualChunk));
+
+  readers.exitCritical();	// Exit critical section for readers.
   
   return ((chunk *)(virtualChunk))->base;
 }
@@ -345,7 +359,7 @@ inline bool holeAbuttedAgainstHole(mmState::chunk * a, mmState::chunk * b)
 }
 
 
-void init()
+void initMM()
 {
   using namespace mmState;
   

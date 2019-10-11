@@ -23,7 +23,7 @@ private:
 public:
   Readers()
   {
-    if(!sem_init(&mutex, pshared, mInitVal))
+    if(sem_init(&mutex, pshared, mInitVal))
       genError("Error (in firstReaders.hpp): call to sem_init() failed in call "
 	       "to Readers() on Readers object!\n");
       
@@ -34,7 +34,7 @@ public:
   {
     rwSet = true;
     this->rwMutex = rwMutex;
-    if(!sem_init(&mutex, pshared, mInitVal))
+    if(sem_init(&mutex, pshared, mInitVal))
       genError("Error (in firstReaders.hpp): call to sem_init() failed in call "
 	       "to Readers(sem_t * ) on Readers object!\n");
   }
@@ -66,12 +66,12 @@ public:
   {
     rwSetCheck("Error (in firstReaders.hpp): enterCritical() called on object "
 	       "of type Reader but rwMutex not set!\n");
-    if(!sem_wait(&mutex))
+    if(sem_wait(&mutex))
       genError("Error (in firstReaders.hpp): call to sem_wait(mutex) in "
 	       "enterCritical() failed!\n");
     ++readCount;
     if(readCount == 1)
-      if(!sem_wait(rwMutex))
+      if(sem_wait(rwMutex))
 	genError("Error (in firstReaders.hpp): call to sem_wait(rwMutex) in "
 		 "enterCritical() failed!\n");
     if(sem_post(&mutex))
@@ -85,15 +85,15 @@ public:
   {
     rwSetCheck("Error (in firstReaders.hpp): exitCritical() called on object of"
 	       "type Reader but rwMutex not set!\n");
-    if(!sem_wait(&mutex))
+    if(sem_wait(&mutex))
       genError("Error (in firstReaders.hpp): call to sem_wait(mutex) in "
 	       "exitCritical() failed!\n");
     --readCount;
     if(readCount == 0)
-      if(!sem_post(rwMutex))
+      if(sem_post(rwMutex))
 	genError("Error (in firstReaders.hpp): call to sem_post(rwMutex) in "
 		 "exitCritical() failed!\n");
-    if(!sem_post(&mutex))
+    if(sem_post(&mutex))
       genError("Error (in firstReaders.hpp): call to sem_post(&mutex) in "
 	       "exitCritical() failed!\n");
   }
