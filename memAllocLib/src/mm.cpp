@@ -1,6 +1,7 @@
 #include <iostream>
 #include "include/mm.hpp"
 #include "include/algorithm.hpp"
+#include "include/error.hpp"
 
 
 

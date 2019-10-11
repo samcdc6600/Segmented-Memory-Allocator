@@ -4,12 +4,21 @@
 #include <type_traits>
 #include "include/mm.hpp"
 #include "include/algorithm.hpp"
+#include "include/firstReaders.hpp"
+#include "include/error.hpp"
 
 
 namespace mmState
 {
   std::forward_list<chunk *> inUse {};
   std::forward_list<chunk *> holes {};
+  namespace rwMutex
+  { /* This semaphore is shared between readers and writers it is initialised
+       and passed to the Readers class in the function init(). It should not be
+       accessed directly in any other function. */
+    sem_t rwMutex;
+  }
+  Readers readers {};
 }
 
 
@@ -333,6 +342,16 @@ inline bool holeAbuttedAgainstHole(mmState::chunk * a, mmState::chunk * b)
 {
   return (((char *)(a->base) + a->size) ==
 	  ((char *)(b->base) - chunkAccountingSize)) ? true : false;
+}
+
+
+void init()
+{
+  using namespace mmState;
+  
+  int pshared {}, mInitVal {1};
+  sem_init(&rwMutex::rwMutex, pshared, mInitVal);
+  readers.setRwMutex(&rwMutex::rwMutex);
 }
 
 

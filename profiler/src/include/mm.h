@@ -21,6 +21,9 @@ enum allocationAlgorithm
   };
 
 
+  /* Performs initialization of data structures. Must be called before any other
+     function in this header. */
+  void init();
   /* When called with an element from allocationAlgorithm sets the function
      pointer allocAlgo (decleared in algorithm.hpp) to the corresponding
      function and returns true. If the argument is not valid return's false. */

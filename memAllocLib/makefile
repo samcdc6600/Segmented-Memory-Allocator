@@ -4,6 +4,7 @@ AR	 = ar
 AR_OPS	 = rcs
 #CXXFLAGS = -std=c++14 -Wall -Wpedantic -Wextra -O3
 CXXFLAGS = -std=c++11 -Wall -Wpedantic -Wextra -O3
+LIBS	= -lpthread -lrt
 LIB_NAME = libMM.a
 SRC   = ./src
 IDIR  = $(SRC)/include
@@ -27,7 +28,7 @@ OBJ       = $(patsubst %,$(ODIR)/%,$(OBJ_FILES))
 
 
 $(ODIR)/%.o: $(SRC)/%.cpp $(DEPS)
-	$(CXX) -c -o $@ $< $(CXXFLAGS)
+	$(CXX) -c -o $@ $< $(CXXFLAGS) $(LIBS)
 
 $(LIB_NAME): $(OBJ)
 	$(AR) $(AR_OPS) $@ $^

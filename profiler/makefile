@@ -8,7 +8,7 @@ CFLAGS	= -Wall -std=c11 -Wpedantic -Wextra -O3
 # make file when building the library causing the linker not to
 # be able to fine setAllocationAlgorithm, alloc and dealloc
 # (that took ages to figour out >:'( haha.
-LIBS	= src/include/libMM.a -lstdc++
+LIBS	= src/include/libMM.a -lstdc++ -lpthread -lrt
 BIN_NAME = profiler
 SRC   = ./src
 IDIR  = $(SRC)/include
