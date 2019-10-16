@@ -1,5 +1,5 @@
-#CXX      = clang++
-CXX	 = g++
+CXX      = clang++
+#CXX	 = g++
 AR	 = ar
 AR_OPS	 = rcs
 #CXXFLAGS = -std=c++14 -Wall -Wpedantic -Wextra -O3

@@ -44,20 +44,29 @@ void * _firstFit(const size_t chunk_size)
   std::cout<<"in _firstFit()"<<std::endl;
   readers.enterCritical();
   checkZeroChunkSize(chunk_size);
-  
+
+  std::cout<<"holes.before_begin() = "<<(void *)*holes.before_begin()<<std::endl;
+  //  std::cout<<"holes.cend() = "<<std::endl;
+
+  std::cout<<"sizeof(chunk) = "<<sizeof(chunk)<<std::endl;
+
   for(auto candidate {holes.before_begin()};
       std::next(candidate) != holes.cend(); ++candidate)
     { /* We will need to add new accounting info when we split the chunk so it
 	 must have space for it. */
       if(((*std::next(candidate))->size) >= (chunk_size + chunkAccountingSize))
-	{			/* We have found a chunk but it is too big.
-				   There is more work to be done :'(. */
-	  //	  pthread_mutex_lock(&locking::chunkLock
-
-
-	  sem_wait(&locking::rwMutex); // ============================================
+	{
+	  // Check if chunks we need are free and claim them if so!
+	  if(!tryLockThisAndNext(candidate))
+	    {		  // This chunk and the next are already taken
+	      ++candidate;
+	      continue;
+	    }
+	  
+	  readers.exitCritical();
+	  sem_wait(&locking::rwMutex);
 	  auto ret = splitChunkFromHoles(chunk_size, candidate);
-	  sem_post(&locking::rwMutex);	// =============================================
+	  sem_post(&locking::rwMutex);
 	  return ret;
 	}
       else
@@ -69,9 +78,17 @@ void * _firstFit(const size_t chunk_size)
 	    }
 	}
     }
+  
+  /* Try to lock first chunk of inUse list for push_front() in
+     getNewChunkFromSystem(). */
+  while(!tryLockThis(inUse.begin())) {}
 
   // Holes was empty or we didn't find a large enough chunk
-  return getNewChunkFromSystem(chunk_size);
+  readers.exitCritical();
+  sem_wait(&locking::rwMutex);
+  auto ret = getNewChunkFromSystem(chunk_size);
+  sem_post(&locking::rwMutex);
+  return ret;
 }
 
 
@@ -193,6 +210,31 @@ void * _worstFit(const size_t chunk_size)
   // Holes was empty or no hole of large enough size was found.
   return getNewChunkFromSystem(chunk_size);
 }
+
+
+/*inline bool tryLockThisAndNext(mmState::chunk * thisChunk)
+{
+  bool ret;			// Indicate success / failure.
+  
+  pthread_mutex_lock(&locking::chunkLock);
+  
+  if((*thisChunk)->locked == false &&
+     (*std::next(thisChunk))->locked == false)
+    {			// The chunks we want are free for use.
+      // We claim them.
+      (*thisChunk)->locked = true;
+      (*std::next(thisChunk))->locked = true;
+      ret = true;
+    }
+  else
+    {
+      ret = false;
+    }
+  
+  pthread_mutex_unlock(&locking::chunkLock);
+
+  return ret;
+}*/
 
 
 inline void checkZeroChunkSize(const size_t chunk_size)

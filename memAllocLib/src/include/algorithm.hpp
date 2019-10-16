@@ -4,6 +4,8 @@
 #include <forward_list>
 #include <new>			// For bad_alloc.
 #include <climits>
+#include <semaphore.h>
+
 
 
 namespace mmState
@@ -22,6 +24,15 @@ namespace mmState
   };
   extern std::forward_list<chunk *> inUse;
   extern std::forward_list<chunk *> holes;
+
+  namespace locking
+  {/* This semaphore is shared between readers and writers it is initialised
+      and passed to the Readers class in the function init(). It should only
+      be directly accessed in other functions where it is being used for writer
+      code. */
+    extern sem_t rwMutex;
+    extern pthread_mutex_t chunkLock;
+  }
 }
 
 
@@ -33,6 +44,10 @@ void * _worstFit(const size_t chunk_size);
 /* Exit's if chunk_size is zero. It doesn't make sense to return a brk value
 since there may be holes. */
 inline void checkZeroChunkSize(const size_t chunk_size);
+/* Sets (*thisChunk)->locked to true and (*std::next(thisChunk))->locked to true
+   if they are both false. Thread safe.*/
+template<typename T> inline bool tryLockThisAndNext(T thisChunk);
+//inline bool tryLockThisAndNext(mmState::chunk * thisChunk);
 // If we are allocating and there is only one hole.
 inline void * handleOneHole(const size_t chunk_size);
 /* Splits candidate into  */
@@ -41,6 +56,8 @@ template <typename T> inline void * splitChunkFromHoles(const size_t chunk_size,
 /* Moves candidate from holes to inUse and returns base address of candidate (it
    is assumed that the size of the chunk candidate has already been checked.) */
 template <typename T> inline void * useChunkFromHoles(T candidate);
+/* Sets (*thisChunk)->locked to true if it is false. Thread safe. */
+template<typename T> inline bool tryLockThis(T thisChunk);
 /* Allocates a chunk of chunk_size using sbrk() and put's it on the inUse list
 and then returns base address. */
 inline void * getNewChunkFromSystem(const size_t chunk_size);
@@ -52,6 +69,49 @@ inline void mergeHoles();
 inline bool holeComp(mmState::chunk * a, mmState::chunk * b);
 // Returns true if chunk a is adjacent to chunk b. Returns false otherwise.
 inline bool holeAbuttedAgainstHole(mmState::chunk * a, mmState::chunk * b);
+
+
+template<typename T> inline bool tryLockThisAndNext(T thisChunk)
+{
+  bool ret;                     // Indicate success / failure.
+
+  pthread_mutex_lock(&mmState::locking::chunkLock);
+
+  if((*thisChunk)->locked == false &&
+     (*std::next(thisChunk))->locked == false)
+    {                   // The chunks we want are free for use.
+      // We claim them.
+      (*thisChunk)->locked = true;
+      (*std::next(thisChunk))->locked = true;
+      ret = true;
+    }
+  else
+      ret = false;
+
+  pthread_mutex_unlock(&mmState::locking::chunkLock);
+
+  return ret;
+}
+
+
+template<typename T> inline bool tryLockThis(T thisChunk)
+{
+  bool ret;
+  
+  pthread_mutex_lock(&mmState::locking::chunkLock);
+
+  if((*thisChunk)->locked == false)
+    {
+      (*thisChunk)->locked = true;
+      ret = true;
+    }
+  else
+    ret = false;
+
+  pthread_mutex_unlock(&mmState::locking::chunkLock);
+
+  return ret;
+}
 
 
 #endif
