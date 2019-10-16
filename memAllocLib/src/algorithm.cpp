@@ -19,7 +19,7 @@ namespace mmState
       be directly accessed in other functions where it is being used for writer
       code. */
     sem_t rwMutex;
-    pthread_mutex_t chunkLocked;
+    pthread_mutex_t chunkLock;
   }
   
   Readers readers {};
@@ -39,7 +39,6 @@ void * _firstFit(const size_t chunk_size)
 {
   using namespace mmState;
 
-
   /* Note that there are multiple exit points for this critical section where
      readers.exitCritical() is called.  */
   std::cout<<"in _firstFit()"<<std::endl;
@@ -53,8 +52,9 @@ void * _firstFit(const size_t chunk_size)
       if(((*std::next(candidate))->size) >= (chunk_size + chunkAccountingSize))
 	{			/* We have found a chunk but it is too big.
 				   There is more work to be done :'(. */
-	  
-	  readers.exitCritical();
+	  //	  pthread_mutex_lock(&locking::chunkLock
+
+
 	  sem_wait(&locking::rwMutex); // ============================================
 	  auto ret = splitChunkFromHoles(chunk_size, candidate);
 	  sem_post(&locking::rwMutex);	// =============================================
@@ -199,8 +199,7 @@ inline void checkZeroChunkSize(const size_t chunk_size)
 {
   if(chunk_size == 0)
     {
-      std::cerr<<"Fatal error: can't allocate 0 bytes.\n";
-      exit(error::ALLOC);
+      error::genError(error::ALLOC, "Fatal error: can't allocate 0 bytes.\n");
     }
 }
 
@@ -324,9 +323,8 @@ void free(const void * chunk)
 
   /* We do this here and not in dealloc for perfomance reasons (we would have to
   have a separate test in dealloc.) */
-  std::cerr<<"Fatal error: invalid address ("<<chunk<<") passed to free() (via "
-    "dealloc.)\n";
-  exit(error::FREE);
+  error::genError(error::FREE, "Fatal error: invalid address (", chunk, ") "
+		  "passed to free() (via dealloc.)\n");
 }
 
 
@@ -383,13 +381,16 @@ void initMM()
   using namespace mmState;
   
   int pshared {}, mInitVal {1};
-  sem_init(&locking::rwMutex, pshared, mInitVal);
+  if(sem_init(&locking::rwMutex, pshared, mInitVal) != 0)
+  {
+    error::genError(error::INIT, "Error (in intMM()) in algorithm.cpp): "
+		    "initialisation of rwMutex failed.\n");
+  }
   readers.setRwMutex(&locking::rwMutex);
-  if(pthread_mutex_init(&locking::chunkLocked, NULL) != 0)
+  if(pthread_mutex_init(&locking::chunkLock, NULL) != 0)
     {
-      std::cout<<"Error (in initMM() in algorithm.cpp): initialistion of "
-	"chunkLocked failed.\n";
-      exit(error::INIT);
+      error::genError(error::INIT, "Error (in initMM() in algorithm.cpp): "
+		      "initialistion of chunkLock failed.\n");
     }
 }
 
