@@ -13,6 +13,12 @@ namespace mmState
   {
     address base;
     size_t size;
+    /* This variable is used to signify that this chunk is being used
+       exclusively by a writer in the memory manager. While we think it is
+       somewhat wastfull to store an extra byte for each chunk for this purpose
+       we choose to do so because it seems to be the simplest way to implement
+       it. */
+    bool locked;
   };
   extern std::forward_list<chunk *> inUse;
   extern std::forward_list<chunk *> holes;

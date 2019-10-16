@@ -335,6 +335,8 @@ inline void * getNewChunkFromSystem(const size_t chunk_size)
     ((char *)virtualChunk + chunkAccountingSize);
   // Store length of virtual chunk.
   ((chunk *)(virtualChunk))->size = chunk_size;
+  // Set the lock condition to false.
+  ((chunk *)(virtualChunk))->locked = false;
   // Put new chunk accounting info on the inUse list.
   inUse.push_front((chunk *)(virtualChunk));
 
