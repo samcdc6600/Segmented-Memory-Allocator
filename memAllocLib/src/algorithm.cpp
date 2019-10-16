@@ -12,13 +12,16 @@ namespace mmState
 {
   std::forward_list<chunk *> inUse {};
   std::forward_list<chunk *> holes {};
-  namespace rwMutex
-  { /* This semaphore is shared between readers and writers it is initialised
-       and passed to the Readers class in the function init(). It should only
-       be directly accessed in other functions where it is being used for writer
-       code. */
+  
+  namespace locking
+  {/* This semaphore is shared between readers and writers it is initialised
+      and passed to the Readers class in the function init(). It should only
+      be directly accessed in other functions where it is being used for writer
+      code. */
     sem_t rwMutex;
+    pthread_mutex_t chunkLocked;
   }
+  
   Readers readers {};
 }
 
@@ -50,7 +53,12 @@ void * _firstFit(const size_t chunk_size)
       if(((*std::next(candidate))->size) >= (chunk_size + chunkAccountingSize))
 	{			/* We have found a chunk but it is too big.
 				   There is more work to be done :'(. */
-	  return splitChunkFromHoles(chunk_size, candidate);
+	  
+	  readers.exitCritical();
+	  sem_wait(&locking::rwMutex); // ============================================
+	  auto ret = splitChunkFromHoles(chunk_size, candidate);
+	  sem_post(&locking::rwMutex);	// =============================================
+	  return ret;
 	}
       else
 	{			/* We dont split the chunk if it is equal in
@@ -228,18 +236,6 @@ template <typename T> inline void * splitChunkFromHoles(const size_t chunk_size,
     // Base address of new chunk to be put in holes.
     auto newBase ((char *)(ret) + chunk_size + chunkAccountingSize);
 
-    readers.exitCritical();	// =============================================
-    sem_wait(&rwMutex::rwMutex); // ============================================
-    //      std::cout<<"\t\tEntering critical section for writer"<<std::endl;
-
-    // TMP======================================================================
-    if(readers.inCritical == true)
-      {
-	std::cout<<"================Error in both (splitChunkFromHoles)!\n===="
-		 <<std::endl;
-	exit(-1);
-      }
-        // TMP======================================================================
     /* Set new chunk's base address accounting info to the base address of new
        chunk. */
     ((chunk *)((char *)(ret) + chunk_size))->base = newBase;
@@ -248,8 +244,6 @@ template <typename T> inline void * splitChunkFromHoles(const size_t chunk_size,
       (*std::next(candidate))->size - (chunkAccountingSize + chunk_size);
   }
 
-
-  
   // UPDATE HOLES AND INUSE-----------------------------------------------------
   // Set new size of chunk to be returned.
   (*std::next(candidate))->size = chunk_size;
@@ -259,10 +253,6 @@ template <typename T> inline void * splitChunkFromHoles(const size_t chunk_size,
   holes.erase_after(candidate);
   // Add new hole to holes list.
   holes.push_front((chunk *)((char*)ret + chunk_size));
-
-  //  std::cout<<"\t\txiting critical section for writer"<<std::endl;
-  sem_post(&rwMutex::rwMutex);	// =============================================
-  
   
   return ret;
 }
@@ -275,24 +265,9 @@ template <typename T> inline void * useChunkFromHoles(T candidate)
   std::cout<<"in useChunkFromHoles()\n";
   
   auto ret = (*std::next(candidate))->base;
-
-  readers.exitCritical();	// =============================================
-  sem_wait(&rwMutex::rwMutex);
-  //  std::cout<<"\t\tEntering critical section for writer"<<std::endl;
-      // TMP======================================================================
-      if(readers.inCritical == true)
-      {
-	std::cout<<"================Error in both (useChunkFromHoles)!\n===="
-		 <<std::endl;
-	exit(-1);
-      }
-          // TMP======================================================================
   
   inUse.push_front(*std::next(candidate));
   holes.erase_after(candidate);
-
-  //    std::cout<<"\t\txiting critical section for writer"<<std::endl;
-  sem_post(&rwMutex::rwMutex);
   
   return ret;
 }
@@ -305,10 +280,7 @@ inline void * getNewChunkFromSystem(const size_t chunk_size)
 
   std::cout<<"in getNewChunkFromSystem()\n";
 
-
-  readers.exitCritical();	// =============================================
-  
-    // Get new chunk (plus memory for accounting.)
+  // Get new chunk (plus memory for accounting.)
   address virtualChunk {address(sbrk(chunk_size + chunkAccountingSize))};
   
   if(virtualChunk == (address)(error::SBRK))
@@ -316,19 +288,6 @@ inline void * getNewChunkFromSystem(const size_t chunk_size)
       std::cerr<<"Error in _firstFit: ";
       throw std::bad_alloc();
     }
-
-
-  sem_wait(&rwMutex::rwMutex);	// =============================================
-  //    std::cout<<"\t\tEntering critical section for writer"<<std::endl;
-
-        // TMP======================================================================
-      if(readers.inCritical == true)
-      {
-	std::cout<<"================Error in both (getNewChunkFromSystem)!\n===="
-		 <<std::endl;
-	exit(-1);
-      }
-          // TMP======================================================================
   
   // Store base address of virtual chunk.
   ((chunk *)(virtualChunk))->base =
@@ -339,11 +298,6 @@ inline void * getNewChunkFromSystem(const size_t chunk_size)
   ((chunk *)(virtualChunk))->locked = false;
   // Put new chunk accounting info on the inUse list.
   inUse.push_front((chunk *)(virtualChunk));
-
-
-  //    std::cout<<"\t\txiting critical section for writer"<<std::endl;
-  sem_post(&rwMutex::rwMutex);	// =============================================
-
   
   return ((chunk *)(virtualChunk))->base;
 }
@@ -352,9 +306,6 @@ inline void * getNewChunkFromSystem(const size_t chunk_size)
 void free(const void * chunk)
 {
   using namespace mmState;
-
-  std::cout<<"in free()"<<std::endl;
-  readers.enterCritical();	// =============================================
     
   for(auto candidate {inUse.before_begin()};
       std::next(candidate) != inUse.cend(); ++candidate)
@@ -363,24 +314,9 @@ void free(const void * chunk)
 	{
 	  holes.push_front(*std::next(candidate));
 	  inUse.erase_after(candidate);
-
-	  readers.exitCritical(); // ===========================================
-	  sem_wait(&rwMutex::rwMutex); // ======================================
-	  //	    std::cout<<"\t\tEntering critical section for writer"<<std::endl;
-	        // TMP======================================================================
-      if(readers.inCritical == true)
-      {
-	std::cout<<"================Error in both (free)!\n===="
-		 <<std::endl;
-	exit(-1);
-      }
-          // TMP======================================================================
 	  
 	  mergeHoles();
 	  mergeHoles();
-
-	  //	    std::cout<<"\t\txiting critical section for writer"<<std::endl;
-	  sem_post(&rwMutex::rwMutex); // ======================================
 	  
 	  return;
 	}
@@ -447,8 +383,14 @@ void initMM()
   using namespace mmState;
   
   int pshared {}, mInitVal {1};
-  sem_init(&rwMutex::rwMutex, pshared, mInitVal);
-  readers.setRwMutex(&rwMutex::rwMutex);
+  sem_init(&locking::rwMutex, pshared, mInitVal);
+  readers.setRwMutex(&locking::rwMutex);
+  if(pthread_mutex_init(&locking::chunkLocked, NULL) != 0)
+    {
+      std::cout<<"Error (in initMM() in algorithm.cpp): initialistion of "
+	"chunkLocked failed.\n";
+      exit(error::INIT);
+    }
 }
 
 
