@@ -40,7 +40,8 @@ struct FuncArgs
 
 const int maxPolicyNum = 2;	/* There are only three policies */
 /* Number of allocations to make for tests. (Maximum is less for veriable sized
-   allocation tests because of memory constraints.) */
+   allocation tests because of memory constraints.) The minimum testSize should
+   always be greater then saveStatOutputFrequency. */
 const int testSizes[] = {1024*1, 1024*4, 1024*16, 1024*64, 1024*256, 1024*1024,
 			 1024*4096};
 const int fixedSizeAllocationUnit = 1; /* For tests with fixed alloction unit
@@ -151,9 +152,8 @@ int setAllocationUnitMaxIndex(const int size);
 /* Call pthread_join on all threads started in startThreads. */
 void waitForThreads(const size_t threadCount, const pthread_t tids[]);
 /* Prints results stored in 2nd and 3rd argument (indexed by first argument.) */
-void printResults(const int testNum, const int testSize,
-		  const int allocAndDeallocTest, const size_t threadCount,
-		  const double allocationTime[],
+void printResults(const int testNum, const int allocAndDeallocTest,
+		  const size_t threadCount, const double allocationTime[],
 		  const double deallocationTime[], const int listStats,
 		  const struct Stats * stats);
 void printTotalTime(const double totalTime);

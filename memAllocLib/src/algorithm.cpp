@@ -483,6 +483,7 @@ void getStats(double * chunksInInUseListP, double * chunksInHolesListP,
     {
       ++holesSz;
       totalHoleSz += (*hole)->size;
+      std::cout<<"(*hole)->size = "<<(*hole)->size<<'\n';
     }
   *chunksInHolesListP = holesSz; // Save current size of holes list.
   // Save current average size of holes on holes list.
@@ -491,9 +492,13 @@ void getStats(double * chunksInInUseListP, double * chunksInHolesListP,
     {
       ++inUseSz;
       totalInUseSz += (*chunkUsing)->size;
-      std::cout<<"(*chunkUsing)->size = "<<(*chunkUsing)->size<<'\n';
     }
   *chunksInInUseListP = inUseSz; // Save current size of inUse list.
   // Save current average size of chunks on inUse list.
   *avgInUseSzP = totalInUseSz /= inUseSz;
+  std::cout<<"*avgInUseSzP = "<<*avgInUseSzP<<'\n';
+  std::cout<<"totalInUseSz /= inUseSz = "<<(totalInUseSz /= inUseSz)<<'\n';
+
+  std::cout<<"*avgHoleSzP = "<<*avgHoleSzP<<'\n';
+  std::cout<<"totalHoleSz /= holesSz = "<<(totalHoleSz /= holesSz)<<'\n';
 }

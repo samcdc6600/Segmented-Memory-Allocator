@@ -91,10 +91,9 @@ int main(const int argc, const char **argv)
 	      }
 	  }
 	waitForThreads(atoi(argv[argExplicitConcurrencyN]), tids);
-	printResults(atoi(argv[argTestNum]), atoi(argv[argTestSize]),
-		     allocAndDeallocTest, atoi(argv[argExplicitConcurrencyN]),
-		     allocationTime, deallocationTime, atoi(argv[argListStat]),
-		     &stats);
+	printResults(atoi(argv[argTestNum]), allocAndDeallocTest,
+		     atoi(argv[argExplicitConcurrencyN]), allocationTime,
+		     deallocationTime, atoi(argv[argListStat]), &stats);
       }
       else
 	{
@@ -219,28 +218,15 @@ inline void saveStat(const int size, const bool listStat, const int iter,
 			double avgHoleSzP[])
 {
   if(listStat)
-    {
-      /*      if((testSizes[size] / saveStatOutputFrequency) == 0)
-	      {*/			/* Don't want to divide by 0. testSizes[size] is
-				   less then saveStateOutputFrequency and so we
-				   call getStats() for every value of iter*/
-      /*	  printf("\t\t\tHello\n");
-	  const int index = iter + indexOffset;
+    { 
+      if(iter % (testSizes[size] / saveStatOutputFrequency) == 0)
+	{
+	  printf("\t\tHey\n");
+	  const int index = iter / (testSizes[size] /
+				    saveStatOutputFrequency) + indexOffset;
 	  getStats(&chunksInInUseListP[index], &chunksInHolesListP[index],
 		   &avgInUseSzP[index], &avgHoleSzP[index]);
 	}
-      else
-	{
-      */  
-	  if(iter % (testSizes[size] / saveStatOutputFrequency) == 0)
-	    {
-	      printf("\t\tHey\n");
-	      const int index = iter / (testSizes[size] /
-					saveStatOutputFrequency) + indexOffset;
-	      getStats(&chunksInInUseListP[index], &chunksInHolesListP[index],
-		       &avgInUseSzP[index], &avgHoleSzP[index]);
-	    }
-	  //	}
     }
 }
 
@@ -373,9 +359,8 @@ void waitForThreads(const size_t threadCount, const pthread_t tids[])
 }
 
 
-void printResults(const int testNum, const int testSize,
-		  const int allocAndDeallocTest, const size_t threadCount,
-		  const double allocationTime[],
+void printResults(const int testNum, const int allocAndDeallocTest,
+		  const size_t threadCount, const double allocationTime[],
 		  const double deallocationTime[], const int listStats,
 		  const struct Stats * stats)
 {
@@ -407,27 +392,13 @@ void printResults(const int testNum, const int testSize,
 	    case 0:
 	    case 1:
 	    case 2:
-	    case 3:		/* If  testSizes[testSize] <
-				   saveStatOutputFrequency we output less. (they
-				   should both be greather then -1)*/
-	      /*(testSizes[testSize] < saveStatOutputFrequency) ?
-		(statPrintIndexLimit = firstOutputSize * testSizes[testSize] +
-		 firstOutputMagic) :
-	      (statPrintIndexLimit = firstOutputSize *
-	       saveStatOutputFrequency + firstOutputMagic);*/
-
+	    case 3:
 	      statPrintIndexLimit = firstOutputSize * saveStatOutputFrequency +
 		firstOutputMagic;
 	      break;
 	      /* The 4th and 5th tests call saveStat() once. */
 	    case 4:
 	    case 5:
-	      /*(testSizes[testSize] < saveStatOutputFrequency) ?
-		(statPrintIndexLimit = secondOutputSize * testSizes[testSize] +
-		 normalOutputMagic) :
-	      (statPrintIndexLimit = secondOutputSize *
-	       saveStatOutputFrequency + normalOutputMagic);*/
-
 	      statPrintIndexLimit = secondOutputSize * saveStatOutputFrequency +
 		normalOutputMagic;
 	      break;
@@ -435,12 +406,6 @@ void printResults(const int testNum, const int testSize,
 		 the granularity (aka 3 times as much.) */
 	    case 6:
 	    case 7:
-	      /*(testSizes[testSize] < saveStatOutputFrequency) ?
-		(statPrintIndexLimit = thirdOutputSize * testSizes[testSize] +
-		 normalOutputMagic) :
-	      (statPrintIndexLimit = thirdOutputSize * saveStatOutputFrequency +
-	      normalOutputMagic);*/
-
 	      statPrintIndexLimit = thirdOutputSize * saveStatOutputFrequency +
 		normalOutputMagic;
 	      break;
