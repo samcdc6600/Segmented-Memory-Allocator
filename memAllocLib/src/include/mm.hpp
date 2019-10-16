@@ -31,7 +31,8 @@ extern "C"			// ([-{REMOVE--ME}-])
      function and returns true. If the argument is not valid return's false. */
   bool setAllocationAlgorithm(const enum allocationAlgorithm algo);
   // This function is for testing purposes only.
-  void printStats();
+  void getStats(double * chunksInInUseListP, double * chunksInHolesListP,
+		double * avgInUseSzP, double * avgHoleSzP);
   /* Checks for a chunk (big enough to meet the allocation request) in holes
      (based on the currently set allocation strategy. The default being first
      fit.) If a chunk large enough is found and it is larger than what is

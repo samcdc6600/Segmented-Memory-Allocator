@@ -471,7 +471,7 @@ bool setAllocationAlgorithm(const allocationAlgorithm algo)
 }
 
 
-void printStats()
+/*void printStats()
 {
   using namespace mmState;
 
@@ -495,4 +495,31 @@ void printStats()
 	   <<inUseSz<<"\n\tChunks in \"holes\" list: "<<holesSz
 	   <<"\n\t\tAverage size of chunks in \"in use\" list: "<<avgInUseSz
 	   <<"\n\t\tAverage size of chunks in holes list: "<<avgHoleSz<<'\n';
+}*/
+
+
+void getStats(double * chunksInInUseListP, double * chunksInHolesListP,
+	      double * avgInUseSzP, double * avgHoleSzP)
+{
+  using namespace mmState;
+
+  int inUseSz {}, holesSz {};
+  double avgHoleSz {}, avgInUseSz {};
+
+  for(auto hole {holes.begin()}; hole != holes.cend(); ++hole)
+    {
+      ++holesSz;
+      avgHoleSz += (*hole)->size;
+    }
+  *chunksInHolesListP = holesSz; // Save current size of holes list.
+  // Save current average size of holes on holes list.
+  *avgHoleSzP = avgHoleSz /= holesSz;
+  for(auto chunkUsing {inUse.begin()}; chunkUsing != inUse.cend(); ++chunkUsing)
+    {
+      ++inUseSz;
+      avgInUseSz += (*chunkUsing)->size;
+    }
+  *chunksInInUseListP = inUseSz; // Save current size of inUse list.
+  // Save current average size of chunks on inUse list.
+  *avgInUseSzP = avgInUseSz /= inUseSz;
 }
