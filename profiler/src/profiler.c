@@ -57,14 +57,16 @@ int main(const int argc, const char **argv)
 	    setAllocationAlgorithm(worstFit);
 	    break;
 	  }
-
-	pthread_t tids[maxThreadCount]; /* Store TIds here for join. */
-	initSequentialThreadNum(&funcArgs);
-
+	/* Print info about test to be run. */
 	printTestName(atoi(argv[argExplicitConcurrencyN]),
 		      atoi(argv[argTestNum]));
 	printTestSize(atoi(argv[argTestNum]), atoi(argv[argTestSize]),
 		      testSizes, fixedSizeAllocationUnit);
+
+	pthread_t tids[maxThreadCount]; /* Store TIds here for join. */
+	initSequentialThreadNum(&funcArgs);
+	/* Perform initial initialisation before using the memory manager. */
+	initMM();
 	
 	for(int iter = 0; iter < atoi(argv[argExplicitConcurrencyN]); ++iter)
 	  {			/* Spin off new threads */
@@ -75,10 +77,10 @@ int main(const int argc, const char **argv)
 	    pthread_mutex_t messageLock;
 
 	    
-	    test[atoi(argv[argTestNum])](&funcArgs);
-	    /*	    pthreadRet = pthread_create(&tids[iter], NULL,
+	    //	    test[atoi(argv[argTestNum])](&funcArgs);
+	    pthreadRet = pthread_create(&tids[iter], NULL,
 					test[atoi(argv[argTestNum])],
-					&funcArgs);*/
+					&funcArgs);
 	    if(pthreadRet)
 	      {
 		pthread_mutex_lock(&messageLock);
@@ -218,16 +220,18 @@ inline void saveStat(const int size, const bool listStat, const int iter,
 {
   if(listStat)
     {
-      if((testSizes[size] / saveStatOutputFrequency) == 0)
-	{			/* Don't want to divide by 0. testSizes[size] is
+      /*      if((testSizes[size] / saveStatOutputFrequency) == 0)
+	      {*/			/* Don't want to divide by 0. testSizes[size] is
 				   less then saveStateOutputFrequency and so we
 				   call getStats() for every value of iter*/
+      /*	  printf("\t\t\tHello\n");
 	  const int index = iter + indexOffset;
 	  getStats(&chunksInInUseListP[index], &chunksInHolesListP[index],
 		   &avgInUseSzP[index], &avgHoleSzP[index]);
 	}
       else
 	{
+      */  
 	  if(iter % (testSizes[size] / saveStatOutputFrequency) == 0)
 	    {
 	      printf("\t\tHey\n");
@@ -236,7 +240,7 @@ inline void saveStat(const int size, const bool listStat, const int iter,
 	      getStats(&chunksInInUseListP[index], &chunksInHolesListP[index],
 		       &avgInUseSzP[index], &avgHoleSzP[index]);
 	    }
-	}
+	  //	}
     }
 }
 
@@ -406,30 +410,39 @@ void printResults(const int testNum, const int testSize,
 	    case 3:		/* If  testSizes[testSize] <
 				   saveStatOutputFrequency we output less. (they
 				   should both be greather then -1)*/
-	      (testSizes[testSize] / saveStatOutputFrequency) == 0 ?
+	      /*(testSizes[testSize] < saveStatOutputFrequency) ?
 		(statPrintIndexLimit = firstOutputSize * testSizes[testSize] +
 		 firstOutputMagic) :
 	      (statPrintIndexLimit = firstOutputSize *
-	       saveStatOutputFrequency + firstOutputMagic);
+	       saveStatOutputFrequency + firstOutputMagic);*/
+
+	      statPrintIndexLimit = firstOutputSize * saveStatOutputFrequency +
+		firstOutputMagic;
 	      break;
 	      /* The 4th and 5th tests call saveStat() once. */
 	    case 4:
 	    case 5:
-	      (testSizes[testSize] / saveStatOutputFrequency) == 0 ?
+	      /*(testSizes[testSize] < saveStatOutputFrequency) ?
 		(statPrintIndexLimit = secondOutputSize * testSizes[testSize] +
 		 normalOutputMagic) :
 	      (statPrintIndexLimit = secondOutputSize *
-	       saveStatOutputFrequency + normalOutputMagic);
+	       saveStatOutputFrequency + normalOutputMagic);*/
+
+	      statPrintIndexLimit = secondOutputSize * saveStatOutputFrequency +
+		normalOutputMagic;
 	      break;
 	      /* Finaly the 6th and 7th tests call saveStat once but at 3 times
 		 the granularity (aka 3 times as much.) */
 	    case 6:
 	    case 7:
-	      (testSizes[testSize] / saveStatOutputFrequency) == 0 ?
+	      /*(testSizes[testSize] < saveStatOutputFrequency) ?
 		(statPrintIndexLimit = thirdOutputSize * testSizes[testSize] +
 		 normalOutputMagic) :
 	      (statPrintIndexLimit = thirdOutputSize * saveStatOutputFrequency +
-	       normalOutputMagic);
+	      normalOutputMagic);*/
+
+	      statPrintIndexLimit = thirdOutputSize * saveStatOutputFrequency +
+		normalOutputMagic;
 	      break;
 	      /* We should never reach this point because the value of testNum
 		 should have already been validated! */
@@ -438,7 +451,8 @@ void printResults(const int testNum, const int testSize,
 		      "out of range (%i), aborting!\n", testNum);
 	      exit(ERROR_RANGE);
 	    }
-	
+
+	  printf("statPrintIndexLimit = %i\n", statPrintIndexLimit);
 	  printListStats(stats->chunksInInUseList[iter],
 			 stats->chunksInHolesList[iter],
 			 stats->avgInUseSz[iter], stats->avgHoleSz[iter],

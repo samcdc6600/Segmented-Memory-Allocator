@@ -41,7 +41,7 @@ struct FuncArgs
 const int maxPolicyNum = 2;	/* There are only three policies */
 /* Number of allocations to make for tests. (Maximum is less for veriable sized
    allocation tests because of memory constraints.) */
-const int testSizes[] = {4*1, 1024*4, 1024*16, 1024*64, 1024*256, 1024*1024,
+const int testSizes[] = {1024*1, 1024*4, 1024*16, 1024*64, 1024*256, 1024*1024,
 			 1024*4096};
 const int fixedSizeAllocationUnit = 1; /* For tests with fixed alloction unit
 					  size. */
