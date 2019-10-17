@@ -55,10 +55,12 @@ void * _worstFit(const size_t chunk_size);
 /* Exit's if chunk_size is zero. It doesn't make sense to return a brk value
 since there may be holes. */
 inline void checkZeroChunkSize(const size_t chunk_size);
-inline bool tryFreeingLockPostAndUnlockTheseAddresses(const mmState::address
+/*inline bool tryFreeingLockPostAndUnlockTheseAddresses(const mmState::address
 						      addressLocked1,
 						      const mmState::address
-						      addressLocked2);
+						      addressLocked2);*/
+inline bool tryFreeingLockPostAndUnlockThisAddress(const mmState::address
+						      addressLocked);
 inline bool tryFreeingLockPost();
 /* Executes "chunksLocked.push_back((*thisChunk)->base)" and
    "chunksLocked.push_back((*std::next(thisChunk))->base)" if neither of them
@@ -123,7 +125,7 @@ inline bool tryLockThisAndNextAddress(T thisChunk, mmState::address &lockedRet1,
       mmState::locking::chunksLocked.push_back((*thisChunk)->base);
       mmState::locking::chunksLocked.push_back((*std::next(thisChunk))->base);
     }
-
+  
   pthread_mutex_unlock(&mmState::locking::chunkLock);
 
   lockedRet1 = (*thisChunk)->base;
