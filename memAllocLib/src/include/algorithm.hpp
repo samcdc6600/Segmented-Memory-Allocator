@@ -36,13 +36,12 @@ namespace mmState
     extern sem_t rwMutex;
     extern pthread_mutex_t chunkLock;
     extern std::vector<address> chunksLocked;
-    // Used when performing R/W ops on freeing.
-    extern pthread_mutex_t freeingLock;
     /* Since free calls mergeHoles() which calls holes.sort() all iteraters to
        holes may be invalidated. Therfore we need some way of letting other
        threads know that we are in free. (It is unfortunate to have such a
        costly section of code locked exclusively. However we think it would be a
        lot of work to come up with and implement a better solution.)*/
+    extern pthread_mutex_t freeingLock;
     extern bool freeing;
   }
 }

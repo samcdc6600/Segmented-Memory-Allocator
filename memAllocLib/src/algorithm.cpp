@@ -22,7 +22,6 @@ namespace mmState
     pthread_mutex_t chunkLock;
     std::vector<address> chunksLocked {};
     pthread_mutex_t freeingLock;
-    bool freeing = false;
   }
   
   Readers readers {};
@@ -44,7 +43,9 @@ void * _firstFit(const size_t chunk_size)
 
   /* Note that there are multiple exit points for this critical section where
      readers.exitCritical() is called.  */
-  std::cout<<"in _firstFit()"<<std::endl;
+  std::cout<<"in _firstFit() "<<pthread_self()<<std::endl;
+
+ TRY_AGAIN:
   readers.enterCritical();
   
   checkZeroChunkSize(chunk_size);
@@ -57,17 +58,28 @@ void * _firstFit(const size_t chunk_size)
       if(((*std::next(candidate))->size) >= (chunk_size + chunkAccountingSize))
 	{
 	  mmState::address addressLocked;
-	  if(!tryLockThisAddress(std::next(candidate), holes.cend(), addressLocked))
+	  if(!tryLockThisAddress(std::next(candidate), holes.cend(),
+				 addressLocked))
 	    {		  // This chunk is already locked.
 	      ++candidate;
 	      continue;
 	    }
 
-	  std::cout<<"\tin first if\n";
+	  std::cout<<"\tin first if\t"<<pthread_self()<<std::endl;
 	  readers.exitCritical();
 	  sem_wait(&locking::rwMutex); // Enter critical region for writer.
+	  if(pthread_mutex_trylock(&locking::freeingLock) != 0)
+	    {			// free() is in it's writer critical section.
+	      sem_post(&locking::rwMutex);
+	      unlockThisAddress(addressLocked);
+	      goto TRY_AGAIN;	/* Keep trying, free() will (should ;) ) leave
+				   it's critical section evenutally. */
+	    }
+	  
 	  auto ret = splitChunkFromHoles(chunk_size, candidate);
+	  
 	  unlockThisAddress(addressLocked);
+	  pthread_mutex_unlock(&locking::freeingLock);
 	  sem_post(&locking::rwMutex); // Exit critical.
 	  return ret;
 	}
@@ -76,9 +88,10 @@ void * _firstFit(const size_t chunk_size)
 				   size so we don't need any extra space. */
 	  if(((*std::next(candidate))->size) == chunk_size)
 	    {			// The chunk is exactly the right size :).
-	      std::cout<<"\tin second if\n";
+	      std::cout<<"\tin second if\t"<<pthread_self()<<std::endl;;
 	      mmState::address addressLocked;
-	      if(!tryLockThisAddress(std::next(candidate), holes.cend(), addressLocked))
+	      if(!tryLockThisAddress(std::next(candidate), holes.cend(),
+				     addressLocked))
 		{		  // This chunk is already locked.
 		  ++candidate;
 		  continue;
@@ -86,26 +99,36 @@ void * _firstFit(const size_t chunk_size)
 
 	      readers.exitCritical();
 	      sem_wait(&locking::rwMutex); // Enter critical region for writer.
+	      if(pthread_mutex_trylock(&locking::freeingLock) != 0)
+		{		// free() is in it's writer critical section.
+		  sem_post(&locking::rwMutex);
+		  unlockThisAddress(addressLocked);
+		  goto TRY_AGAIN; /* Keep trying, free() will (should ;) ) leave
+				     it's critical section eventually. */
+		}    
+
 	      auto ret = useChunkFromHoles(candidate);
+	      
 	      unlockThisAddress(addressLocked);
+	      pthread_mutex_unlock(&locking::freeingLock);
 	      sem_post(&locking::rwMutex); // Exit critical.
 	      return ret;
 	    }
 	}
     }
-
-  /* We need to know what address to unlock (the address locked will be null if
-     inUse is empty.) */
-//  mmState::address addressLocked;
-  /* Try to lock first chunk of inUse list for push_front() in
-     getNewChunkFromSystem(). */
-//  while(!tryLockThisAddress(inUse.begin(), inUse.cend(), addressLocked)) {std::cout<<"\t\tin loop\n";}
-
+  
   // Holes was empty or we didn't find a large enough chunk
   readers.exitCritical();
   sem_wait(&locking::rwMutex);
+
+  if(pthread_mutex_trylock(&locking::freeingLock) != 0)
+    {
+      sem_post(&locking::rwMutex);
+      goto TRY_AGAIN;
+    }
+  
   auto ret = getNewChunkFromSystem(chunk_size);
-//unlockThisAddress(addressLocked);
+  pthread_mutex_unlock(&locking::freeingLock);
   sem_post(&locking::rwMutex);
   return ret;
 }
@@ -365,6 +388,10 @@ void free(const void * chunk)
 {
   using namespace mmState;
 
+
+  std::cout<<"in free("<<chunk<<")\n"<<pthread_self()<<'\n';
+
+ TRY_AGAIN:
   readers.enterCritical();
     
   for(auto candidate {inUse.before_begin()};
@@ -372,27 +399,36 @@ void free(const void * chunk)
     {
       if((*std::next(candidate))->base == chunk)
 	{
-
 	  mmState::address addressLocked;
 	  while(!tryLockThisAddress(std::next(candidate), inUse.cend(),
 				    addressLocked)) {}
+
 	  readers.exitCritical();
 	  sem_wait(&locking::rwMutex);	// Enter critical region for writer.
-	  lockFreeing();	// Tell everyone else the holes list is invalid.
+
+	  // Try to signal that we are using all of holes.
+	  if(pthread_mutex_trylock(&locking::freeingLock) != 0)
+	    {
+	      sem_post(&locking::rwMutex);
+	      goto TRY_AGAIN;
+	    }
 	    
 	  holes.push_front(*std::next(candidate));
 	  inUse.erase_after(candidate);
 	  mergeHoles();
 	  mergeHoles();
 
+	  pthread_mutex_unlock(&locking::freeingLock);
 	  sem_post(&locking::rwMutex); // Exit critical region for writer.
+
+	  std::cout<<"freed("<<*candidate<<") "<<pthread_self()<<'\n';
 	  
 	  return;
 	}
-    }
+    }  
 
   /* We do this here and not in dealloc for perfomance reasons (we would have to
-  have a separate test in dealloc.) */
+     have a separate test in dealloc.) */
   error::genError(error::FREE, "Fatal error: invalid address (", chunk, ") "
 		  "passed to free() (via dealloc.)\n");
 }
@@ -443,15 +479,6 @@ inline bool holeAbuttedAgainstHole(mmState::chunk * a, mmState::chunk * b)
 {
   return (((char *)(a->base) + a->size) ==
 	  ((char *)(b->base) - chunkAccountingSize)) ? true : false;
-}
-
-
-void lockFreeing()
-{
-  using namespace mmState::locking;
-  pthread_mutex_lock(&chunkLock);
-  freeing = true;
-  pthread_mutex_unlock(&chunkLock);
 }
 
 
