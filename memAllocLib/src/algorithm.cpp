@@ -57,9 +57,15 @@ void * _firstFit(const size_t chunk_size)
 
       if(((*std::next(candidate))->size) >= (chunk_size + chunkAccountingSize))
 	{
-	  mmState::address addressLocked;
-	  if(!tryLockThisAddress(std::next(candidate), holes.cend(),
+	  mmState::address addressLocked1, addressLocked2;
+	  /*	  if(!tryLockThisAddress(std::next(candidate), holes.cend(),
 				 addressLocked))
+	    {		  // This chunk is already locked.
+	      ++candidate;
+	      continue;
+	      }*/
+	  if(!tryLockThisAndNextAddress(candidate, addressLocked1,
+					addressLocked2))
 	    {		  // This chunk is already locked.
 	      ++candidate;
 	      continue;
@@ -68,12 +74,14 @@ void * _firstFit(const size_t chunk_size)
 	  std::cout<<"\tin first if\t"<<pthread_self()<<std::endl;
 	  readers.exitCritical();
 	  sem_wait(&locking::rwMutex); // Enter critical region for writer.
-	  if(!tryFreeingLockPostAndUnlockThisAddress(addressLocked))
+	  if(!tryFreeingLockPostAndUnlockTheseAddresses(addressLocked1,
+							addressLocked2))
 	      goto TRY_AGAIN;
 	  
 	  auto ret = splitChunkFromHoles(chunk_size, candidate);
 	  
-	  unlockThisAddress(addressLocked);
+	  unlockThisAddress(addressLocked1);
+	  unlockThisAddress(addressLocked2);
 	  sem_post(&locking::rwMutex); // Exit critical.
 	  return ret;
 	}
@@ -83,9 +91,15 @@ void * _firstFit(const size_t chunk_size)
 	  if(((*std::next(candidate))->size) == chunk_size)
 	    {			// The chunk is exactly the right size :).
 	      std::cout<<"\tin second if\t"<<pthread_self()<<std::endl;;
-	      mmState::address addressLocked;
-	      if(!tryLockThisAddress(std::next(candidate), holes.cend(),
+	      mmState::address addressLocked1, addressLocked2;
+	      /*if(!tryLockThisAddress(std::next(candidate), holes.cend(),
 				     addressLocked))
+		{		  // This chunk is already locked.
+		  ++candidate;
+		  continue;
+		  }*/
+	      if(!tryLockThisAndNextAddress(candidate, addressLocked1,
+					    addressLocked2))
 		{		  // This chunk is already locked.
 		  ++candidate;
 		  continue;
@@ -93,12 +107,14 @@ void * _firstFit(const size_t chunk_size)
 
 	      readers.exitCritical();
 	      sem_wait(&locking::rwMutex); // Enter critical region for writer.
-	      if(!tryFreeingLockPostAndUnlockThisAddress(addressLocked))
+	      if(!tryFreeingLockPostAndUnlockTheseAddresses(addressLocked1,
+							    addressLocked2))
 		goto TRY_AGAIN;
 
 	      auto ret = useChunkFromHoles(candidate);
 	      
-	      unlockThisAddress(addressLocked);
+	      unlockThisAddress(addressLocked1);
+	      unlockThisAddress(addressLocked2);
 	      sem_post(&locking::rwMutex); // Exit critical.
 	      return ret;
 	    }
@@ -243,13 +259,16 @@ void * _worstFit(const size_t chunk_size)
 }
 
 
-inline bool tryFreeingLockPostAndUnlockThisAddress(const mmState::address
-						   addressLocked)
+inline bool tryFreeingLockPostAndUnlockTheseAddresses(const mmState::address
+						   addressLocked1,
+						   const mmState::address
+						   addressLocked2)
 {
   if(pthread_mutex_trylock(&mmState::locking::freeingLock) != 0)
     {			// free() is in it's writer critical section.
       sem_post(&mmState::locking::rwMutex);
-      unlockThisAddress(addressLocked);
+      unlockThisAddress(addressLocked1);
+      unlockThisAddress(addressLocked2);
       return false;	/* Keep trying, free() will (should ;) ) leave
 			   it's critical section evenutally. */
     }

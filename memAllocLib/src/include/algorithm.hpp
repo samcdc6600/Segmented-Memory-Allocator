@@ -55,14 +55,22 @@ void * _worstFit(const size_t chunk_size);
 /* Exit's if chunk_size is zero. It doesn't make sense to return a brk value
 since there may be holes. */
 inline void checkZeroChunkSize(const size_t chunk_size);
-inline bool tryFreeingLockPostAndUnlockThisAddress(const mmState::address
-						   addressLocked);
+inline bool tryFreeingLockPostAndUnlockTheseAddresses(const mmState::address
+						      addressLocked1,
+						      const mmState::address
+						      addressLocked2);
 inline bool tryFreeingLockPost();
+/* Executes "chunksLocked.push_back((*thisChunk)->base)" and
+   "chunksLocked.push_back((*std::next(thisChunk))->base)" if neither of them
+   are locked. */
+template <typename T>
+inline bool tryLockThisAndNextAddress(T thisChunk, mmState::address &lockedRet1,
+				      mmState::address &lockedRet2);
 /* If thisChunk is not locked adds thisChunk->base to chunksLocked (if thisChunk
    is != end, else adds nullptr to chunksLocked (to indicate that we are
    locking the empty list that thisChunk would be a member of if it was not null
    and the list was not empty :) )). */
-template<typename T1, typename T2>
+template <typename T1, typename T2>
 inline bool tryLockThisAddress(T1 thisChunk, const T2 end,
 			       mmState::address & lockedRet);
 inline void unlockThisAddress(const mmState::address lockedAddress);
@@ -93,9 +101,10 @@ inline bool holeAbuttedAgainstHole(mmState::chunk * a, mmState::chunk * b);
 inline void lockFreeing();
 
 
-/*template<typename T> bool tryLockThisAndNextAddress(T thisChunk)
+template <typename T>
+inline bool tryLockThisAndNextAddress(T thisChunk, mmState::address &lockedRet1,
+				      mmState::address &lockedRet2)
 {
-  std::cout<<"ehy hey hey hey hey hey\n";
   bool ret {true};                     // Indicate success / failure.
 
   pthread_mutex_lock(&mmState::locking::chunkLock);
@@ -117,11 +126,13 @@ inline void lockFreeing();
 
   pthread_mutex_unlock(&mmState::locking::chunkLock);
 
+  lockedRet1 = (*thisChunk)->base;
+  lockedRet2 = (*std::next(thisChunk))->base;
   return ret;
-  }*/
+}
 
 
-template<typename T1, typename T2>
+template <typename T1, typename T2>
 inline bool tryLockThisAddress(T1 thisChunk, const T2 end,
 			       mmState::address & lockedRet)
 {
