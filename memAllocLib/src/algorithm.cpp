@@ -20,6 +20,9 @@ namespace mmState
       code. */
     sem_t rwMutex;
     pthread_mutex_t chunkLock;
+    std::vector<address> chunksLocked {};
+    pthread_mutex_t freeingLock;
+    bool freeing = false;
   }
   
   Readers readers {};
@@ -43,30 +46,29 @@ void * _firstFit(const size_t chunk_size)
      readers.exitCritical() is called.  */
   std::cout<<"in _firstFit()"<<std::endl;
   readers.enterCritical();
+  
   checkZeroChunkSize(chunk_size);
-
-  std::cout<<"holes.before_begin() = "<<(void *)*holes.before_begin()<<std::endl;
-  //  std::cout<<"holes.cend() = "<<std::endl;
-
-  std::cout<<"sizeof(chunk) = "<<sizeof(chunk)<<std::endl;
-
+  
   for(auto candidate {holes.before_begin()};
       std::next(candidate) != holes.cend(); ++candidate)
     { /* We will need to add new accounting info when we split the chunk so it
 	 must have space for it. */
+
       if(((*std::next(candidate))->size) >= (chunk_size + chunkAccountingSize))
 	{
-	  // Check if chunks we need are free and claim them if so!
-	  if(!tryLockThisAndNext(candidate))
-	    {		  // This chunk and the next are already taken
+	  mmState::address addressLocked;
+	  if(!tryLockThisAddress(std::next(candidate), holes.cend(), addressLocked))
+	    {		  // This chunk is already locked.
 	      ++candidate;
 	      continue;
 	    }
-	  
+
+	  std::cout<<"\tin first if\n";
 	  readers.exitCritical();
-	  sem_wait(&locking::rwMutex);
+	  sem_wait(&locking::rwMutex); // Enter critical region for writer.
 	  auto ret = splitChunkFromHoles(chunk_size, candidate);
-	  sem_post(&locking::rwMutex);
+	  unlockThisAddress(addressLocked);
+	  sem_post(&locking::rwMutex); // Exit critical.
 	  return ret;
 	}
       else
@@ -74,19 +76,36 @@ void * _firstFit(const size_t chunk_size)
 				   size so we don't need any extra space. */
 	  if(((*std::next(candidate))->size) == chunk_size)
 	    {			// The chunk is exactly the right size :).
-	      return useChunkFromHoles(candidate);
+	      std::cout<<"\tin second if\n";
+	      mmState::address addressLocked;
+	      if(!tryLockThisAddress(std::next(candidate), holes.cend(), addressLocked))
+		{		  // This chunk is already locked.
+		  ++candidate;
+		  continue;
+		}
+
+	      readers.exitCritical();
+	      sem_wait(&locking::rwMutex); // Enter critical region for writer.
+	      auto ret = useChunkFromHoles(candidate);
+	      unlockThisAddress(addressLocked);
+	      sem_post(&locking::rwMutex); // Exit critical.
+	      return ret;
 	    }
 	}
     }
-  
+
+  /* We need to know what address to unlock (the address locked will be null if
+     inUse is empty.) */
+//  mmState::address addressLocked;
   /* Try to lock first chunk of inUse list for push_front() in
      getNewChunkFromSystem(). */
-  while(!tryLockThis(inUse.begin())) {}
+//  while(!tryLockThisAddress(inUse.begin(), inUse.cend(), addressLocked)) {std::cout<<"\t\tin loop\n";}
 
   // Holes was empty or we didn't find a large enough chunk
   readers.exitCritical();
   sem_wait(&locking::rwMutex);
   auto ret = getNewChunkFromSystem(chunk_size);
+//unlockThisAddress(addressLocked);
   sem_post(&locking::rwMutex);
   return ret;
 }
@@ -335,8 +354,6 @@ inline void * getNewChunkFromSystem(const size_t chunk_size)
     ((char *)virtualChunk + chunkAccountingSize);
   // Store length of virtual chunk.
   ((chunk *)(virtualChunk))->size = chunk_size;
-  // Set the lock condition to false.
-  ((chunk *)(virtualChunk))->locked = false;
   // Put new chunk accounting info on the inUse list.
   inUse.push_front((chunk *)(virtualChunk));
   
@@ -347,17 +364,28 @@ inline void * getNewChunkFromSystem(const size_t chunk_size)
 void free(const void * chunk)
 {
   using namespace mmState;
+
+  readers.enterCritical();
     
   for(auto candidate {inUse.before_begin()};
       std::next(candidate) != inUse.cend(); ++candidate)
     {
       if((*std::next(candidate))->base == chunk)
 	{
+
+	  mmState::address addressLocked;
+	  while(!tryLockThisAddress(std::next(candidate), inUse.cend(),
+				    addressLocked)) {}
+	  readers.exitCritical();
+	  sem_wait(&locking::rwMutex);	// Enter critical region for writer.
+	  lockFreeing();	// Tell everyone else the holes list is invalid.
+	    
 	  holes.push_front(*std::next(candidate));
 	  inUse.erase_after(candidate);
-	  
 	  mergeHoles();
 	  mergeHoles();
+
+	  sem_post(&locking::rwMutex); // Exit critical region for writer.
 	  
 	  return;
 	}
@@ -418,6 +446,36 @@ inline bool holeAbuttedAgainstHole(mmState::chunk * a, mmState::chunk * b)
 }
 
 
+void lockFreeing()
+{
+  using namespace mmState::locking;
+  pthread_mutex_lock(&chunkLock);
+  freeing = true;
+  pthread_mutex_unlock(&chunkLock);
+}
+
+
+inline void unlockThisAddress(const mmState::address lockedAddress)
+{
+  pthread_mutex_lock(&mmState::locking::chunkLock);
+
+  for(auto lockedChunkIter {mmState::locking::chunksLocked.begin()};
+      lockedChunkIter != mmState::locking::chunksLocked.cend(); ++lockedChunkIter)
+    {
+      if(*lockedChunkIter == lockedAddress)
+	{			// We have found a match. Remove it.
+	  mmState::locking::chunksLocked.erase(lockedChunkIter);
+	  pthread_mutex_unlock(&mmState::locking::chunkLock);
+	  return;
+	}
+    }
+
+  error::genError(error::ELEMENT_NOT_FOUND, "Error (in unlockThisAddress() "
+		  "in algorithm.cpp): unlockThisAddress called with an invalid "
+		  "address (", lockedAddress, ").\n");
+}
+
+
 void initMM()
 {
   using namespace mmState;
@@ -425,15 +483,21 @@ void initMM()
   int pshared {}, mInitVal {1};
   if(sem_init(&locking::rwMutex, pshared, mInitVal) != 0)
   {
-    error::genError(error::INIT, "Error (in intMM()) in algorithm.cpp): "
+    error::genError(error::INIT, "Error (in intMM() in algorithm.cpp): "
 		    "initialisation of rwMutex failed.\n");
   }
-  readers.setRwMutex(&locking::rwMutex);
   if(pthread_mutex_init(&locking::chunkLock, NULL) != 0)
     {
       error::genError(error::INIT, "Error (in initMM() in algorithm.cpp): "
 		      "initialistion of chunkLock failed.\n");
     }
+  if(pthread_mutex_init(&locking::freeingLock, NULL) != 0)
+    {
+      error::genError(error::INIT, "Error (in initMM() in algorithm.cpp): "
+		      "initialisation of freeingLock failed.\n");
+    }
+
+  readers.setRwMutex(&locking::rwMutex);
 }
 
 
@@ -470,7 +534,6 @@ void getStats(double * chunksInInUseListP, double * chunksInHolesListP,
     {
       ++holesSz;
       totalHoleSz += (*hole)->size;
-      std::cout<<"(*hole)->size = "<<(*hole)->size<<'\n';
     }
   *chunksInHolesListP = holesSz; // Save current size of holes list.
   // Save current average size of holes on holes list.
@@ -483,9 +546,4 @@ void getStats(double * chunksInInUseListP, double * chunksInHolesListP,
   *chunksInInUseListP = inUseSz; // Save current size of inUse list.
   // Save current average size of chunks on inUse list.
   *avgInUseSzP = totalInUseSz /= inUseSz;
-  std::cout<<"*avgInUseSzP = "<<*avgInUseSzP<<'\n';
-  std::cout<<"totalInUseSz /= inUseSz = "<<(totalInUseSz /= inUseSz)<<'\n';
-
-  std::cout<<"*avgHoleSzP = "<<*avgHoleSzP<<'\n';
-  std::cout<<"totalHoleSz /= holesSz = "<<(totalHoleSz /= holesSz)<<'\n';
 }

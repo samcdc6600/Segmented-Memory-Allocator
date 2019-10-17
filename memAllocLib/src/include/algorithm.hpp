@@ -5,12 +5,14 @@
 #include <new>			// For bad_alloc.
 #include <climits>
 #include <semaphore.h>
-
+#include <vector>
+#include <forward_list>
 
 
 namespace mmState
 {
   typedef void * address;
+  
   struct chunk
   {
     address base;
@@ -20,8 +22,9 @@ namespace mmState
        somewhat wastfull to store an extra byte for each chunk for this purpose
        we choose to do so because it seems to be the simplest way to implement
        it. */
-    bool locked;
+    //    bool locked;
   };
+  
   extern std::forward_list<chunk *> inUse;
   extern std::forward_list<chunk *> holes;
 
@@ -32,6 +35,15 @@ namespace mmState
       code. */
     extern sem_t rwMutex;
     extern pthread_mutex_t chunkLock;
+    extern std::vector<address> chunksLocked;
+    // Used when performing R/W ops on freeing.
+    extern pthread_mutex_t freeingLock;
+    /* Since free calls mergeHoles() which calls holes.sort() all iteraters to
+       holes may be invalidated. Therfore we need some way of letting other
+       threads know that we are in free. (It is unfortunate to have such a
+       costly section of code locked exclusively. However we think it would be a
+       lot of work to come up with and implement a better solution.)*/
+    extern bool freeing;
   }
 }
 
@@ -44,20 +56,25 @@ void * _worstFit(const size_t chunk_size);
 /* Exit's if chunk_size is zero. It doesn't make sense to return a brk value
 since there may be holes. */
 inline void checkZeroChunkSize(const size_t chunk_size);
-/* Sets (*thisChunk)->locked to true and (*std::next(thisChunk))->locked to true
-   if they are both false. Thread safe.*/
-template<typename T> inline bool tryLockThisAndNext(T thisChunk);
+
+
+/* Executes "chunksLocked.push_back((*thisChunk)->base)" and
+   "chunksLocked.push_back((*std::next(thisChunk))->base)" if neither of them
+   are locked. */
+//template<typename T> inline bool tryLockThisAndNextAddress(T thisChunk);
+
+
 //inline bool tryLockThisAndNext(mmState::chunk * thisChunk);
 // If we are allocating and there is only one hole.
 inline void * handleOneHole(const size_t chunk_size);
-/* Splits candidate into  */
+/* Splits candidate into two holes acording to value of chunk_size. */
 template <typename T> inline void * splitChunkFromHoles(const size_t chunk_size,
 							T candidate);
 /* Moves candidate from holes to inUse and returns base address of candidate (it
    is assumed that the size of the chunk candidate has already been checked.) */
 template <typename T> inline void * useChunkFromHoles(T candidate);
 /* Sets (*thisChunk)->locked to true if it is false. Thread safe. */
-template<typename T> inline bool tryLockThis(T thisChunk);
+//template<typename T> bool tryLockThis(T thisChunk);
 /* Allocates a chunk of chunk_size using sbrk() and put's it on the inUse list
 and then returns base address. */
 inline void * getNewChunkFromSystem(const size_t chunk_size);
@@ -69,47 +86,79 @@ inline void mergeHoles();
 inline bool holeComp(mmState::chunk * a, mmState::chunk * b);
 // Returns true if chunk a is adjacent to chunk b. Returns false otherwise.
 inline bool holeAbuttedAgainstHole(mmState::chunk * a, mmState::chunk * b);
+inline void lockFreeing();
+/* If thisChunk is not locked adds thisChunk->base to chunksLocked (if thisChunk
+   is != end, else adds nullptr to chunksLocked (to indicate that we are
+   locking the empty list that thisChunk would be a member of if it was not null
+   and the list was not empty :) )). */
+template<typename T1, typename T2>
+inline bool tryLockThisAddress(T1 thisChunk, const T2 end,
+			       mmState::address & lockedRet);
+inline void unlockThisAddress(const mmState::address lockedAddress);
 
 
-template<typename T> inline bool tryLockThisAndNext(T thisChunk)
+/*template<typename T> bool tryLockThisAndNextAddress(T thisChunk)
 {
-  bool ret;                     // Indicate success / failure.
+  std::cout<<"ehy hey hey hey hey hey\n";
+  bool ret {true};                     // Indicate success / failure.
 
   pthread_mutex_lock(&mmState::locking::chunkLock);
 
-  if((*thisChunk)->locked == false &&
-     (*std::next(thisChunk))->locked == false)
-    {                   // The chunks we want are free for use.
-      // We claim them.
-      (*thisChunk)->locked = true;
-      (*std::next(thisChunk))->locked = true;
-      ret = true;
+  for(auto lockedChunk: mmState::locking::chunksLocked)
+    {
+      if(lockedChunk == (*thisChunk)->base ||
+	 lockedChunk == (*std::next(thisChunk))->base)
+	{			// The chunks we want are not both unlocked.
+	  ret = false;
+	  break;
+	}
     }
-  else
-      ret = false;
+  if(ret)
+    {				// Chunks are both unlocked. Lock them.
+      mmState::locking::chunksLocked.push_back((*thisChunk)->base);
+      mmState::locking::chunksLocked.push_back((*std::next(thisChunk))->base);
+    }
 
   pthread_mutex_unlock(&mmState::locking::chunkLock);
 
   return ret;
-}
+  }*/
 
 
-template<typename T> inline bool tryLockThis(T thisChunk)
+template<typename T1, typename T2>
+inline bool tryLockThisAddress(T1 thisChunk, const T2 end,
+			       mmState::address & lockedRet)
 {
-  bool ret;
-  
+  bool ret {true};
+  mmState::address lockAddress {nullptr};
+
   pthread_mutex_lock(&mmState::locking::chunkLock);
 
-  if((*thisChunk)->locked == false)
-    {
-      (*thisChunk)->locked = true;
-      ret = true;
+  if(thisChunk != end)
+    {				/* ThisChunk points to a valid chunk */
+      lockAddress = (*thisChunk)->base;
     }
-  else
-    ret = false;
+ else
+   {
+     for(auto lockedChunk: mmState::locking::chunksLocked)
+       {
+	 if(lockedChunk == lockAddress)
+	   {			// The chunk we want is not unlocked.
+	     ret = false;
+	     break;
+	   }
+       }
+   }
+  
+  if(ret)
+    {				// Chunk was unlocked. Lock it.
+      mmState::locking::chunksLocked.push_back(lockAddress);
+    }
 
   pthread_mutex_unlock(&mmState::locking::chunkLock);
-
+  std::cout<<"lockAddress = "<<lockAddress<<'\n';
+  // Return address that was locked (so we can unlock it later.)
+  lockedRet = lockAddress;
   return ret;
 }
 

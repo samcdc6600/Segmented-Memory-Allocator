@@ -13,6 +13,7 @@ namespace error
       ALLOC,
       POD,
       FREE,
+      ELEMENT_NOT_FOUND,
       GEN_ERROR_ZERO_ARGS,	// GenError was called with no arguments.
       SBRK = -1
     };
