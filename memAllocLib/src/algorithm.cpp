@@ -68,18 +68,12 @@ void * _firstFit(const size_t chunk_size)
 	  std::cout<<"\tin first if\t"<<pthread_self()<<std::endl;
 	  readers.exitCritical();
 	  sem_wait(&locking::rwMutex); // Enter critical region for writer.
-	  if(pthread_mutex_trylock(&locking::freeingLock) != 0)
-	    {			// free() is in it's writer critical section.
-	      sem_post(&locking::rwMutex);
-	      unlockThisAddress(addressLocked);
-	      goto TRY_AGAIN;	/* Keep trying, free() will (should ;) ) leave
-				   it's critical section evenutally. */
-	    }
+	  if(!tryFreeingLockPostAndUnlockThisAddress(addressLocked))
+	      goto TRY_AGAIN;
 	  
 	  auto ret = splitChunkFromHoles(chunk_size, candidate);
 	  
 	  unlockThisAddress(addressLocked);
-	  pthread_mutex_unlock(&locking::freeingLock);
 	  sem_post(&locking::rwMutex); // Exit critical.
 	  return ret;
 	}
@@ -99,18 +93,12 @@ void * _firstFit(const size_t chunk_size)
 
 	      readers.exitCritical();
 	      sem_wait(&locking::rwMutex); // Enter critical region for writer.
-	      if(pthread_mutex_trylock(&locking::freeingLock) != 0)
-		{		// free() is in it's writer critical section.
-		  sem_post(&locking::rwMutex);
-		  unlockThisAddress(addressLocked);
-		  goto TRY_AGAIN; /* Keep trying, free() will (should ;) ) leave
-				     it's critical section eventually. */
-		}    
+	      if(!tryFreeingLockPostAndUnlockThisAddress(addressLocked))
+		goto TRY_AGAIN;
 
 	      auto ret = useChunkFromHoles(candidate);
 	      
 	      unlockThisAddress(addressLocked);
-	      pthread_mutex_unlock(&locking::freeingLock);
 	      sem_post(&locking::rwMutex); // Exit critical.
 	      return ret;
 	    }
@@ -121,14 +109,15 @@ void * _firstFit(const size_t chunk_size)
   readers.exitCritical();
   sem_wait(&locking::rwMutex);
 
-  if(pthread_mutex_trylock(&locking::freeingLock) != 0)
+  if(!tryFreeingLockPost())
+    goto TRY_AGAIN;
+  /*  if(pthread_mutex_trylock(&locking::freeingLock) != 0)
     {
       sem_post(&locking::rwMutex);
       goto TRY_AGAIN;
-    }
+      }*/
   
   auto ret = getNewChunkFromSystem(chunk_size);
-  pthread_mutex_unlock(&locking::freeingLock);
   sem_post(&locking::rwMutex);
   return ret;
 }
@@ -254,29 +243,34 @@ void * _worstFit(const size_t chunk_size)
 }
 
 
-/*inline bool tryLockThisAndNext(mmState::chunk * thisChunk)
+inline bool tryFreeingLockPostAndUnlockThisAddress(const mmState::address
+						   addressLocked)
 {
-  bool ret;			// Indicate success / failure.
-  
-  pthread_mutex_lock(&locking::chunkLock);
-  
-  if((*thisChunk)->locked == false &&
-     (*std::next(thisChunk))->locked == false)
-    {			// The chunks we want are free for use.
-      // We claim them.
-      (*thisChunk)->locked = true;
-      (*std::next(thisChunk))->locked = true;
-      ret = true;
+  if(pthread_mutex_trylock(&mmState::locking::freeingLock) != 0)
+    {			// free() is in it's writer critical section.
+      sem_post(&mmState::locking::rwMutex);
+      unlockThisAddress(addressLocked);
+      return false;	/* Keep trying, free() will (should ;) ) leave
+			   it's critical section evenutally. */
     }
-  else
-    {
-      ret = false;
-    }
-  
-  pthread_mutex_unlock(&locking::chunkLock);
+  /* We don't want to keep other threads not in free() from running. */
+  pthread_mutex_unlock(&mmState::locking::freeingLock);
+  return true;
+}
 
-  return ret;
-}*/
+
+inline bool tryFreeingLockPost()
+{
+  if(pthread_mutex_trylock(&mmState::locking::freeingLock) != 0)
+    {				// free() is in it's writer critical section.
+      sem_post(&mmState::locking::rwMutex);
+      return false;		/* Keep trying, free() will (should ;) ) leave
+				   it's critical section eveuntually. */
+    }
+  /* We don't want to keep other threads not in free() from running. */
+  pthread_mutex_unlock(&mmState::locking::freeingLock);
+  return true;
+}
 
 
 inline void checkZeroChunkSize(const size_t chunk_size)

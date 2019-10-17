@@ -55,12 +55,17 @@ void * _worstFit(const size_t chunk_size);
 /* Exit's if chunk_size is zero. It doesn't make sense to return a brk value
 since there may be holes. */
 inline void checkZeroChunkSize(const size_t chunk_size);
-
-
-/* Executes "chunksLocked.push_back((*thisChunk)->base)" and
-   "chunksLocked.push_back((*std::next(thisChunk))->base)" if neither of them
-   are locked. */
-//template<typename T> inline bool tryLockThisAndNextAddress(T thisChunk);
+inline bool tryFreeingLockPostAndUnlockThisAddress(const mmState::address
+						   addressLocked);
+inline bool tryFreeingLockPost();
+/* If thisChunk is not locked adds thisChunk->base to chunksLocked (if thisChunk
+   is != end, else adds nullptr to chunksLocked (to indicate that we are
+   locking the empty list that thisChunk would be a member of if it was not null
+   and the list was not empty :) )). */
+template<typename T1, typename T2>
+inline bool tryLockThisAddress(T1 thisChunk, const T2 end,
+			       mmState::address & lockedRet);
+inline void unlockThisAddress(const mmState::address lockedAddress);
 
 
 //inline bool tryLockThisAndNext(mmState::chunk * thisChunk);
@@ -86,14 +91,6 @@ inline bool holeComp(mmState::chunk * a, mmState::chunk * b);
 // Returns true if chunk a is adjacent to chunk b. Returns false otherwise.
 inline bool holeAbuttedAgainstHole(mmState::chunk * a, mmState::chunk * b);
 inline void lockFreeing();
-/* If thisChunk is not locked adds thisChunk->base to chunksLocked (if thisChunk
-   is != end, else adds nullptr to chunksLocked (to indicate that we are
-   locking the empty list that thisChunk would be a member of if it was not null
-   and the list was not empty :) )). */
-template<typename T1, typename T2>
-inline bool tryLockThisAddress(T1 thisChunk, const T2 end,
-			       mmState::address & lockedRet);
-inline void unlockThisAddress(const mmState::address lockedAddress);
 
 
 /*template<typename T> bool tryLockThisAndNextAddress(T thisChunk)
