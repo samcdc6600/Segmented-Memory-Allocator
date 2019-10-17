@@ -28,6 +28,15 @@ namespace mmState
 }
 
 
+// TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP
+// TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP
+// TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP
+// TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP
+// TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP
+// TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP
+pthread_mutex_t printLock {}; // TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP
+
+
 static_assert(std::is_pod<mmState::chunk>::value, "Fatal error: Struct \"chunk"
 	      "\" was found not to be a POD\n");
 
@@ -43,10 +52,15 @@ void * _firstFit(const size_t chunk_size)
 
   /* Note that there are multiple exit points for this critical section where
      readers.exitCritical() is called.  */
-  std::cout<<"in _firstFit() "<<pthread_self()<<std::endl;
+  pthread_mutex_lock(&printLock);
+  std::cout<<"\n\nin _firstFit()\t"<<pthread_self()<<std::endl;
+  pthread_mutex_unlock(&printLock);
 
  TRY_AGAIN:
   readers.enterCritical();
+  pthread_mutex_lock(&printLock);
+  std::cout<<"entered _firstFit() ciritcal readers zone\t"<<pthread_self()<<std::endl;
+  pthread_mutex_unlock(&printLock);
   
   checkZeroChunkSize(chunk_size);
   
@@ -55,9 +69,12 @@ void * _firstFit(const size_t chunk_size)
     { /* We will need to add new accounting info when we split the chunk so it
 	 must have space for it. */
 
+      pthread_mutex_lock(&printLock);
+      std::cout<<"in for loop in first fit\t"<<pthread_self()<<std::endl;
+      pthread_mutex_unlock(&printLock);
+
       if(((*std::next(candidate))->size) >= (chunk_size + chunkAccountingSize))
 	{
-	  //mmState::address addressLocked1, addressLocked2;
 	  mmState::address addressLocked;
 	  if(!tryLockThisAddress(std::next(candidate), holes.cend(),
 				 addressLocked))
@@ -65,27 +82,32 @@ void * _firstFit(const size_t chunk_size)
 	      ++candidate;
 	      continue;
 	    }
-	  /*	  if(!tryLockThisAndNextAddress(candidate, addressLocked1,
-					addressLocked2))
-	    {		  // This chunk is already locked.
-	      ++candidate;
-	      continue;
-	      }*/
 
+	  pthread_mutex_lock(&printLock);
 	  std::cout<<"\tin first if\t"<<pthread_self()<<std::endl;
+	  pthread_mutex_unlock(&printLock);
+	  
 	  readers.exitCritical();
 	  sem_wait(&locking::rwMutex); // Enter critical region for writer.
-	  /*	  if(!tryFreeingLockPostAndUnlockTheseAddresses(addressLocked1,
-		  addressLocked2))*/
 	  if(!tryFreeingLockPostAndUnlockThisAddress(addressLocked))
 	      goto TRY_AGAIN;
-	  
+
+	  pthread_mutex_lock(&printLock);
+	  std::cout<<"going to try to split chunk ("<<*std::next(candidate)<<")\t"<<pthread_self()<<'\n';
+	  pthread_mutex_unlock(&printLock);
 	  auto ret = splitChunkFromHoles(chunk_size, candidate);
+
+	  pthread_mutex_lock(&printLock);
+	    std::cout<<"ret after splitChunkFromHoles = "<<ret<<"\t"<<pthread_self()<<'\n';
+	    pthread_mutex_unlock(&printLock);
 	  
-	  /*unlockThisAddress(addressLocked1);
-	    unlockThisAddress(addressLocked2);*/
 	  unlockThisAddress(addressLocked);
 	  sem_post(&locking::rwMutex); // Exit critical.
+
+	  pthread_mutex_lock(&printLock);
+	  std::cout<<"exiting _firstFit \t"<<pthread_self()<<'\n';
+	  pthread_mutex_unlock(&printLock);
+	  
 	  return ret;
 	}
       else
@@ -93,8 +115,9 @@ void * _firstFit(const size_t chunk_size)
 				   size so we don't need any extra space. */
 	  if(((*std::next(candidate))->size) == chunk_size)
 	    {			// The chunk is exactly the right size :).
+	      pthread_mutex_lock(&printLock);
 	      std::cout<<"\tin second if\t"<<pthread_self()<<std::endl;;
-	      //mmState::address addressLocked1, addressLocked2;
+	      pthread_mutex_unlock(&printLock);
 	      mmState::address addressLocked;
 	      if(!tryLockThisAddress(std::next(candidate), holes.cend(),
 				     addressLocked))
@@ -102,45 +125,54 @@ void * _firstFit(const size_t chunk_size)
 		  ++candidate;
 		  continue;
 		}
-	      /*	      if(!tryLockThisAndNextAddress(candidate, addressLocked1,
-					    addressLocked2))
-		{		  // This chunk is already locked.
-		  ++candidate;
-		  continue;
-		  }*/
 
 	      readers.exitCritical();
 	      sem_wait(&locking::rwMutex); // Enter critical region for writer.
-	      /*if(!tryFreeingLockPostAndUnlockTheseAddresses(addressLocked1,
-		addressLocked2))*/
 	      if(!tryFreeingLockPostAndUnlockThisAddress(addressLocked))
 		 goto TRY_AGAIN;
 
 	      auto ret = useChunkFromHoles(candidate);
+
+	      pthread_mutex_lock(&printLock);
+	      std::cout<<"ret after useChunkFromHoles = "<<ret<<"\t"<<pthread_self()<<'\n';
+	      pthread_mutex_unlock(&printLock);
 	      
-	      /*unlockThisAddress(addressLocked1);
-		unlockThisAddress(addressLocked2);*/
 	      unlockThisAddress(addressLocked);
 	      sem_post(&locking::rwMutex); // Exit critical.
+
+	      pthread_mutex_lock(&printLock);
+	  std::cout<<"exiting _firstFit \t"<<pthread_self()<<'\n';
+	  pthread_mutex_unlock(&printLock);
 	      return ret;
 	    }
 	}
     }
-  
+
+  pthread_mutex_lock(&printLock);
+  std::cout<<"getting new "<<pthread_self()<<'\n';
+  pthread_mutex_unlock(&printLock);
   // Holes was empty or we didn't find a large enough chunk
   readers.exitCritical();
   sem_wait(&locking::rwMutex);
-
   if(!tryFreeingLockPost())
-    goto TRY_AGAIN;
-  /*  if(pthread_mutex_trylock(&locking::freeingLock) != 0)
     {
-      sem_post(&locking::rwMutex);
-      goto TRY_AGAIN;
-      }*/
+      pthread_mutex_lock(&printLock);
+      std::cout<<"TRY_AGAIN getting new \t"<<pthread_self()<<'\n';
+      pthread_mutex_unlock(&printLock);
+    goto TRY_AGAIN;
+    }
   
   auto ret = getNewChunkFromSystem(chunk_size);
+
+  pthread_mutex_lock(&printLock);
+  std::cout<<"ret after getNewChunkFromSystem = "<<ret<<"\t"<<pthread_self()<<'\n';
+  pthread_mutex_unlock(&printLock);
+  
   sem_post(&locking::rwMutex);
+
+  pthread_mutex_lock(&printLock);
+	  std::cout<<"exiting _firstFit \t"<<pthread_self()<<'\n';
+	  pthread_mutex_unlock(&printLock);
   return ret;
 }
 
@@ -345,7 +377,9 @@ template <typename T> inline void * splitChunkFromHoles(const size_t chunk_size,
 {
   using namespace mmState;
 
-  std::cout<<"in splitChunkFromHoles()\n";
+  pthread_mutex_lock(&printLock);
+  std::cout<<"in splitChunkFromHoles()\t"<<pthread_self()<<'\n';
+  pthread_mutex_unlock(&printLock);
   
   // Base address of chunk to be returned.
   auto ret = (*std::next(candidate))->base;
@@ -396,7 +430,9 @@ inline void * getNewChunkFromSystem(const size_t chunk_size)
   using namespace mmState;
 
 
-  std::cout<<"in getNewChunkFromSystem()\n";
+  pthread_mutex_lock(&printLock);
+  std::cout<<"in getNewChunkFromSystem()\t"<<pthread_self()<<'\n';
+  pthread_mutex_unlock(&printLock);
 
   // Get new chunk (plus memory for accounting.)
   address virtualChunk {address(sbrk(chunk_size + chunkAccountingSize))};
@@ -423,8 +459,9 @@ void free(const void * chunk)
 {
   using namespace mmState;
 
-
-  std::cout<<"in free("<<chunk<<")\n"<<pthread_self()<<'\n';
+  pthread_mutex_lock(&printLock);
+  std::cout<<"in free("<<chunk<<")\t"<<pthread_self()<<'\n';
+  pthread_mutex_unlock(&printLock);
 
  TRY_AGAIN:
   readers.enterCritical();
@@ -447,6 +484,10 @@ void free(const void * chunk)
 	      sem_post(&locking::rwMutex);
 	      goto TRY_AGAIN;
 	    }
+
+	  pthread_mutex_lock(&printLock);
+	  std::cout<<"freeing ("<<*std::next(candidate)<<")\t"<<pthread_self()<<'\n';
+	  pthread_mutex_unlock(&printLock);
 	    
 	  holes.push_front(*std::next(candidate));
 	  inUse.erase_after(candidate);
@@ -456,7 +497,9 @@ void free(const void * chunk)
 	  pthread_mutex_unlock(&locking::freeingLock);
 	  sem_post(&locking::rwMutex); // Exit critical region for writer.
 
-	  std::cout<<"freed("<<*candidate<<") "<<pthread_self()<<'\n';
+	  pthread_mutex_lock(&printLock);
+	  std::cout<<"freed(previous address)\t"<<pthread_self()<<'\n';
+	  pthread_mutex_unlock(&printLock);
 	  
 	  return;
 	}
@@ -473,14 +516,21 @@ inline void mergeHoles()
 {
   using namespace mmState;
 
-  std::cout<<"in mergeHoles\n";
+  pthread_mutex_lock(&printLock);
+  std::cout<<"in mergeHoles\t"<<pthread_self()<<'\n';
+  pthread_mutex_unlock(&printLock);
   
   /* We must make sure that holes is sorted (it may be more efficient to do this
      differently.) */
   holes.sort(holeComp);
   
   if(std::next(holes.begin()) == holes.cend())
-    return;			// There is only one hole in the list.
+    {
+      pthread_mutex_lock(&printLock);
+      std::cout<<"returning from mergeHoles (only one hole was in list )\t"<<pthread_self()<<'\n';
+      pthread_mutex_unlock(&printLock);
+      return;			// There is only one hole in the list.
+    }
   else
     {
       for(auto candidate {holes.begin()};
@@ -491,7 +541,13 @@ inline void mergeHoles()
 	      (*candidate)->size +=
 		((*std::next(candidate))->size + chunkAccountingSize);
 	      // Remove higher hole from holes list :).
+	      pthread_mutex_lock(&printLock);
+	      std::cout<<"eraseing "<<*std::next(candidate)<<" in merge holes\t"<<pthread_self()<<'\n';
+	      pthread_mutex_unlock(&printLock);
 	      candidate = holes.erase_after(candidate);
+	      pthread_mutex_lock(&printLock);
+	      std::cout<<"erased previous "<<" in merge holes\t"<<pthread_self()<<'\n';
+	      pthread_mutex_unlock(&printLock);
 	      /* A merge should only be possible after inserting a new node, so
 		 no more then two merges should even need to be done (i.e.
 		 mergeHoles() should be called twice.) */
@@ -500,6 +556,10 @@ inline void mergeHoles()
 	  ++candidate;
 	}
     }
+
+  pthread_mutex_lock(&printLock);
+  std::cout<<"exiting merge holes after erasure.\t"<<pthread_self()<<'\n';
+  pthread_mutex_unlock(&printLock);
 }
 
 
@@ -558,6 +618,12 @@ void initMM()
       error::genError(error::INIT, "Error (in initMM() in algorithm.cpp): "
 		      "initialisation of freeingLock failed.\n");
     }
+  // TMP  TMP TMP  TMP TMP  TMP TMP  TMP TMP  TMP TMP  TMP TMP  TMP
+  // TMP  TMP TMP  TMP TMP  TMP TMP  TMP TMP  TMP TMP  TMP TMP  TMP
+  // TMP  TMP TMP  TMP TMP  TMP TMP  TMP TMP  TMP TMP  TMP TMP  TMP
+  // TMP  TMP TMP  TMP TMP  TMP TMP  TMP TMP  TMP TMP  TMP TMP  TMP
+  // TMP  TMP TMP  TMP TMP  TMP TMP  TMP TMP  TMP TMP  TMP TMP  TMP
+  pthread_mutex_init(&printLock, NULL); // TMP  TMP TMP  TMP TMP  TMP TMP  TMP TMP  TMP TMP  TMP TMP  TMP
 
   readers.setRwMutex(&locking::rwMutex);
 }

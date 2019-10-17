@@ -9,6 +9,17 @@
 #include <forward_list>
 
 
+// TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP      |
+// TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP      |
+// TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP      |
+// TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP      |
+// TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP      |
+// TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP      |
+// TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP      |
+// TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP      |                                                                       
+extern pthread_mutex_t printLock; // TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP     
+
+
 namespace mmState
 {
   typedef void * address;
@@ -165,7 +176,10 @@ inline bool tryLockThisAddress(T1 thisChunk, const T2 end,
     }
 
   pthread_mutex_unlock(&mmState::locking::chunkLock);
-  std::cout<<"lockAddress = "<<lockAddress<<'\n';
+
+  pthread_mutex_lock(&printLock);
+  std::cout<<"lockAddress = "<<lockAddress<<" "<<pthread_self()<<'\n';
+  pthread_mutex_unlock(&printLock);
   // Return address that was locked (so we can unlock it later.)
   lockedRet = lockAddress;
   return ret;

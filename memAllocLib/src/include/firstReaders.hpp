@@ -70,6 +70,7 @@ public:
   
   void enterCritical()
   {
+    std::cout<<"in enterCritical()\n";
     rwSetCheck("Error (in firstReaders.hpp): enterCritical() called on object "
 	       "of type Reader but rwMutex not set!\n");
     if(sem_wait(&mutex))
