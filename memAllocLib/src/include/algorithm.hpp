@@ -1,7 +1,8 @@
 #ifndef ALGORITHM_HPP_
 #define ALGORITHM_HPP_
 #include <cstddef>		// For size_t.
-#include <forward_list>
+//#include <forward_list>
+#include <list>
 #include <new>			// For bad_alloc.
 #include <climits>
 #include <semaphore.h>
@@ -37,8 +38,8 @@ namespace mmState
     bool locked;
   };
   
-  extern std::forward_list<chunk *> inUse;
-  extern std::forward_list<chunk *> holes;
+  extern std::list<chunk *> inUse;
+  extern std::list<chunk *> holes;
 }
 
 

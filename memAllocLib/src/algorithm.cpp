@@ -10,8 +10,8 @@
 
 namespace mmState
 {
-  std::forward_list<chunk *> inUse {};
-  std::forward_list<chunk *> holes {};
+  std::list<chunk *> inUse {};
+  std::list<chunk *> holes {};
   
   namespace locking
   {/* This semaphore is shared between readers and writers it is initialised
@@ -23,7 +23,6 @@ namespace mmState
        variable it is initialised and passed to an object (freeVsAllocsReaders)
        in intMM(). Should only be used in free(). */
     sem_t freeVsAllocsRwSem;
-    std::vector<std::_Fwd_list_iterator<mmState::chunk *>> itersLocked {};
     // This is used to make rw ops on chunk.locked atomic.
     pthread_mutex_t chunkLock;
   }
@@ -56,81 +55,78 @@ void * (* allocAlgo)(const size_t chunk_size) {_firstFit};
 
 void * _firstFit(const size_t chunk_size)
 {
+  //  std::cout<<"In first fit\n";
   using namespace mmState;
-
   /* Note that there are multiple exit points for this critical section where
      readers.exitCritical() is called.  */
-
   freeVsAllocsReaders.enterCritical();
 
-  
- TRY_AGAIN:
-    allocsReaders.enterCritical();
-  
+   TRY_AGAIN:  
+  allocsReaders.enterCritical();
   checkZeroChunkSize(chunk_size);
   
-  for(auto candidate {holes.before_begin()};
-      std::next(candidate) != holes.cend(); ++candidate)
+  for(auto candidate {holes.begin()};
+      candidate != holes.cend(); ++candidate)
     { /* We will need to add new accounting info when we split the chunk so it
 	 must have space for it. */
-      if(((*std::next(candidate))->size) >= (chunk_size + chunkAccountingSize))
+      if((*candidate)->size >= (chunk_size + chunkAccountingSize))
 	{
-	  if(!chunkLockTestAndSet(*std::next(candidate)))
+	  if(!chunkLockTestAndSet(*candidate))
 	    {
+	      //std::cout<<"trying again in ChunkLockTestAndSet\n";
 	      allocsReaders.exitCritical();
 	      goto TRY_AGAIN;
 	    }
 	    
 	  allocsReaders.exitCritical();
-	  sem_wait(&locking::rwSem); // Enter critical region for writer.
-	  setChunkLockFalse(*std::next(candidate));
-
 	  
-
+	  sem_wait(&locking::rwSem); // Enter critical region for writer.
+	  setChunkLockFalse(*candidate);
 	  auto ret = splitChunkFromHoles(chunk_size, candidate);
-
 	  sem_post(&locking::rwSem); // Exit critical.
 
 	  freeVsAllocsReaders.exitCritical();
+
 	  return ret;
 	}
       else
 	{			/* We dont split the chunk if it is equal in
 				   size so we don't need any extra space. */
-	  if(((*std::next(candidate))->size) == chunk_size)
+	  if(((*candidate)->size) == chunk_size)
 	    {			// The chunk is exactly the right size :).
-	      if(!chunkLockTestAndSet(*std::next(candidate)))
+	      if(!chunkLockTestAndSet(*candidate))
 		{
+		  //		  std::cout<<"trying again in next one\n";
 		  allocsReaders.exitCritical();
-		goto TRY_AGAIN;
+		  goto TRY_AGAIN;
 		}
 		
 	      allocsReaders.exitCritical();
-	      sem_wait(&locking::rwSem); // Enter critical region for writer.
-	      setChunkLockFalse(*std::next(candidate));
-		  
-	      auto ret = useChunkFromHoles(candidate);
-
-	      sem_post(&locking::rwSem); // Exit critical.
 	      
+	      sem_wait(&locking::rwSem); // Enter critical region for writer.
+	      setChunkLockFalse(*candidate);
+	      auto ret = useChunkFromHoles(candidate);
+	      sem_post(&locking::rwSem); // Exit critical.
+
 	      freeVsAllocsReaders.exitCritical();
+
 	      return ret;
 	    }
 	}
     }
-
   // Holes was empty or we didn't find a large enough chunk
-
   allocsReaders.exitCritical();
   sem_wait(&locking::rwSem);
-      
   auto ret = getNewChunkFromSystem(chunk_size);
-
   sem_post(&locking::rwSem);
-  /*      pthread_mutex_lock(&printLock);
-	  std::cout<<"exiting _firstFit \t"<<pthread_self()<<'\n';
-	  pthread_mutex_unlock(&printLock);*/
+
+  
   freeVsAllocsReaders.exitCritical();
+
+  /*  pthread_mutex_lock(&printLock);
+  std::cout<<"exiting _firstFit after genNewChunkFromSystem()\t"<<pthread_self()<<'\n';
+  pthread_mutex_unlock(&printLock);*/
+
   return ret;
 }
 
@@ -138,17 +134,34 @@ void * _firstFit(const size_t chunk_size)
 void * _bestFit(const size_t chunk_size)
 {
   using namespace mmState;
-
+  /*
+  freeVsAllocsReaders.enterCritical();
+ TRY_AGAIN:
+  allocsReaders.enterCritical();
   checkZeroChunkSize(chunk_size);
   
   if(!holes.empty())
     {
-      if(std::next(holes.begin()) == holes.cend())
-	{			// There is only one hole in the holes list.
+    if(std::next(holes.begin()) == holes.cend())
+	{		*/	// There is only one hole in the holes list.
+	  /*	  if(!chunkLockTestAndSet(*std::next(candidate)))
+	    {
+	      allocsReaders.exitCritical();
+	      goto TRY_AGAIN;
+	    }
+
+	  allocsReaders.exitCritical();
+
+	  sem_wait(&locking::rwSem);
+	  setChunkLockFalse(*std::next(candidate));
 	  auto ret = handleOneHole(chunk_size);
+	  sem_post(&locking::rwSem);
+
+	  freeVsAllocsReaders.exitCritical();
+	  
 	  if(ret != nullptr)
-	    return ret;
-	}
+	  return ret;*/
+  /*	}
       else
 	{
 	  auto bestFit {holes.before_begin()};
@@ -157,9 +170,24 @@ void * _bestFit(const size_t chunk_size)
 	      std::next(candidate) != holes.cend(); ++candidate)
 	    {
 	      if(((*std::next(candidate))->size) == chunk_size)
-		{		// Must be best fit.
-		  return useChunkFromHoles(candidate);
-		}
+	      {*/		// Must be best fit.
+		  /*  if(!chunkLockTestAndSet(*std::next(candidate)))
+		    {
+		      allocsReaders.exitCritical();
+		      goto TRY_AGAIN;
+		    }
+
+		  allocsReaders.exitCritical();
+
+		  sem_wait(&locking::rwSem);
+		  setChunkLockFalse(*std::next(candidate));
+		  auto ret = useChunkFromHoles(candidate);
+		  sem_post(&locking::rwSem);
+
+		  freeVsAllocsReaders.exitCritical();
+		  
+		  return ret;*/
+  /*		}
 	      else
 		{
 		  if(((*std::next(candidate))->size) >=
@@ -186,13 +214,13 @@ void * _bestFit(const size_t chunk_size)
 	}
     }
   // Holes was empty or no hole of large enough size was found.
-  return getNewChunkFromSystem(chunk_size);
+  return getNewChunkFromSystem(chunk_size);*/
 }
 
 
 void * _worstFit(const size_t chunk_size)
 {
-  using namespace mmState;
+  /*  using namespace mmState;
 
   checkZeroChunkSize(chunk_size);
 
@@ -206,10 +234,10 @@ void * _worstFit(const size_t chunk_size)
 	}
       else
 	{
-	  auto worstFit {holes.before_begin()};
+	auto worstFit {holes.before_begin()};*/
 	  /* When we don't find a worst fit (we use + chunkAccountingSize) we
 	     may use equal. */
-	  auto equal {holes.before_begin()};
+  /*	  auto equal {holes.before_begin()};
 	  bool foundWorstFit {false};
 	  for(auto candidate {holes.before_begin()};
 	      std::next(candidate) != holes.cend(); ++candidate)
@@ -251,7 +279,7 @@ void * _worstFit(const size_t chunk_size)
     }
 
   // Holes was empty or no hole of large enough size was found.
-  return getNewChunkFromSystem(chunk_size);
+  return getNewChunkFromSystem(chunk_size);*/
 }
 
 
@@ -274,6 +302,9 @@ inline void checkZeroChunkSize(const size_t chunk_size)
 
 inline bool chunkLockTestAndSet(mmState::chunk * candidate)
 {
+  /*      pthread_mutex_lock(&printLock);
+  std::cout<<"exiting _firstFit \t"<<pthread_self()<<'\n';
+  pthread_mutex_unlock(&printLock);*/
   pthread_mutex_lock(&mmState::locking::chunkLock);
   bool ret {false};
   if(!candidate->locked)	// Lock if not locked.
@@ -306,11 +337,11 @@ inline void * handleOneHole(const size_t chunk_size)
   if(((*holes.begin())->size) >= (chunk_size + chunkAccountingSize))
     {		/* We have found a chunk but it is too big. There is more work
 		   to be done. */
-      return splitChunkFromHoles(chunk_size, holes.before_begin());
+      return splitChunkFromHoles(chunk_size, holes.begin());
     }
   if(((*holes.begin())->size) == chunk_size)
     {		// The chunk is exactly the right size :).
-      return useChunkFromHoles(holes.before_begin());
+      return useChunkFromHoles(holes.begin());
     }
 
   return nullptr;
@@ -322,12 +353,12 @@ template <typename T> inline void * splitChunkFromHoles(const size_t chunk_size,
 {
   using namespace mmState;
 
-  pthread_mutex_lock(&printLock);
+  /*  pthread_mutex_lock(&printLock);
   std::cout<<"in splitChunkFromHoles()\t"<<pthread_self()<<'\n';
-  pthread_mutex_unlock(&printLock);
+  pthread_mutex_unlock(&printLock);*/
   
   // Base address of chunk to be returned.
-  auto ret = (*std::next(candidate))->base;
+  auto ret = (*candidate)->base;
   // CALCULATE FOR NEW HOLES CHUNK----------------------------------------------
   {						// New chunk.
     // Base address of new chunk to be put in holes.
@@ -338,24 +369,24 @@ template <typename T> inline void * splitChunkFromHoles(const size_t chunk_size,
     ((chunk *)((char *)(ret) + chunk_size))->base = newBase;
     // Set new chunk's size accounting info to the the size of the new chunk.
     ((chunk *)((char *)(ret) + chunk_size))->size =
-      (*std::next(candidate))->size - (chunkAccountingSize + chunk_size);
+      (*candidate)->size - (chunkAccountingSize + chunk_size);
     // Set new chunk's locked var.
     ((chunk *)((char *)(ret) + chunk_size))->locked = false;
   }
 
   // UPDATE HOLES AND INUSE-----------------------------------------------------
   // Set new size of chunk to be returned.
-  (*std::next(candidate))->size = chunk_size;
+  (*candidate)->size = chunk_size;
   // Push new hole onto inUse list.
-  inUse.push_front(*std::next(candidate));
+  inUse.push_front(*candidate);
   // Remove old hole from holes list.
-  holes.erase_after(candidate);
+  holes.erase(candidate);
   // Add new hole to holes list.
   holes.push_front((chunk *)((char*)ret + chunk_size));
 
-  pthread_mutex_lock(&printLock);
+  /*  pthread_mutex_lock(&printLock);
   std::cout<<"exiting splitChunkFromHoles()\t"<<pthread_self()<<'\n';
-  pthread_mutex_unlock(&printLock);
+  pthread_mutex_unlock(&printLock);*/
   
   return ret;
 }
@@ -364,13 +395,11 @@ template <typename T> inline void * splitChunkFromHoles(const size_t chunk_size,
 template <typename T> inline void * useChunkFromHoles(T candidate)
 {
   using namespace mmState;
-
-  std::cout<<"in useChunkFromHoles()\n";
   
-  auto ret = (*std::next(candidate))->base;
+  auto ret = (*candidate)->base;
   
-  inUse.push_front(*std::next(candidate));
-  holes.erase_after(candidate);
+  inUse.push_front(*candidate);
+  holes.erase(candidate);
   
   return ret;
 }
@@ -381,9 +410,9 @@ inline void * getNewChunkFromSystem(const size_t chunk_size)
   using namespace mmState;
 
 
-  pthread_mutex_lock(&printLock);
+  /*  pthread_mutex_lock(&printLock);
   std::cout<<"in getNewChunkFromSystem()\t"<<pthread_self()<<'\n';
-  pthread_mutex_unlock(&printLock);
+  pthread_mutex_unlock(&printLock);*/
 
   // Get new chunk (plus memory for accounting.)
   address virtualChunk {address(sbrk(chunk_size + chunkAccountingSize))};
@@ -414,13 +443,13 @@ void free(const void * chunk)
 
   sem_wait(&locking::freeVsAllocsRwSem);
     
-  for(auto candidate {inUse.before_begin()};
-      std::next(candidate) != inUse.cend(); ++candidate)
+  for(auto candidate {inUse.begin()};
+      candidate != inUse.cend(); ++candidate)
     {
-      if((*std::next(candidate))->base == chunk)
+      if((*candidate)->base == chunk)
 	{
-	  holes.push_front(*std::next(candidate));
-	  inUse.erase_after(candidate);
+	  holes.push_front(*candidate);
+	  inUse.erase(candidate);
 	  mergeHoles();
 	  mergeHoles();
 
@@ -440,9 +469,12 @@ inline void mergeHoles()
 {
   using namespace mmState;
 
-  pthread_mutex_lock(&printLock);
+
+  //  std::cout<<"hello \n";
+
+  /*  pthread_mutex_lock(&printLock);
   std::cout<<"in mergeHoles\t"<<pthread_self()<<'\n';
-  pthread_mutex_unlock(&printLock);
+  pthread_mutex_unlock(&printLock);*/
   
   /* We must make sure that holes is sorted (it may be more efficient to do this
      differently.) */
@@ -450,9 +482,9 @@ inline void mergeHoles()
   
   if(std::next(holes.begin()) == holes.cend())
     {
-      pthread_mutex_lock(&printLock);
+      /*      pthread_mutex_lock(&printLock);
       std::cout<<"returning from mergeHoles (only one hole was in list )\t"<<pthread_self()<<'\n';
-      pthread_mutex_unlock(&printLock);
+      pthread_mutex_unlock(&printLock);*/
       return;			// There is only one hole in the list.
     }
   else
@@ -464,14 +496,18 @@ inline void mergeHoles()
 	    {			// Resize lower hole.
 	      (*candidate)->size +=
 		((*std::next(candidate))->size + chunkAccountingSize);
+	      /*	      if((*std::next(candidate))->locked)
+		{
+		  error::genError(-1, "candidate = locked\n");
+		  }*/
 	      // Remove higher hole from holes list :).
-	      pthread_mutex_lock(&printLock);
+	      /*pthread_mutex_lock(&printLock);
 	      std::cout<<"eraseing "<<*std::next(candidate)<<" in merge holes\t"<<pthread_self()<<'\n';
-	      pthread_mutex_unlock(&printLock);
-	      candidate = holes.erase_after(candidate);
-	      pthread_mutex_lock(&printLock);
+	      pthread_mutex_unlock(&printLock);*/
+	      candidate = holes.erase(candidate);
+	      /*pthread_mutex_lock(&printLock);
 	      std::cout<<"erased previous "<<" in merge holes\t"<<pthread_self()<<'\n';
-	      pthread_mutex_unlock(&printLock);
+	      pthread_mutex_unlock(&printLock);*/
 	      /* A merge should only be possible after inserting a new node, so
 		 no more then two merges should even need to be done (i.e.
 		 mergeHoles() should be called twice.) */
@@ -481,9 +517,9 @@ inline void mergeHoles()
 	}
     }
 
-  pthread_mutex_lock(&printLock);
+  /*  pthread_mutex_lock(&printLock);
   std::cout<<"exiting merge holes after erasure.\t"<<pthread_self()<<'\n';
-  pthread_mutex_unlock(&printLock);
+  pthread_mutex_unlock(&printLock);*/
 }
 
 

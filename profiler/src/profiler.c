@@ -221,7 +221,7 @@ inline void saveStat(const int size, const bool listStat, const int iter,
     { 
       if(iter % (testSizes[size] / saveStatOutputFrequency) == 0)
 	{
-	  printf("\t\tHey\n");
+	  //	  printf("\t\tHey\n");
 	  const int index = iter / (testSizes[size] /
 				    saveStatOutputFrequency) + indexOffset;
 	  getStats(&chunksInInUseListP[index], &chunksInHolesListP[index],
@@ -482,8 +482,6 @@ void * sequentialFixedSizeAllocationAndDeallocation(void * args)
 	       stats.chunksInHolesList[threadIndex],
 	       stats.avgInUseSz[threadIndex], stats.avgHoleSz[threadIndex]);
     }
-
-  printf("All allocation's passed?\n");
   
   clock_t end = clock();
   const double timeAlloc = (double)(end - begin) / CLOCKS_PER_SEC;
@@ -492,7 +490,6 @@ void * sequentialFixedSizeAllocationAndDeallocation(void * args)
   
   for(int iter = 0; iter < testSizes[args(args)->size]; ++iter)
     {			// Make n deallocations.
-      printf("\t\tIn dealloc for loop\n");
       dealloc(allocs[threadIndex][iter]);
       saveStat(args(args)->size, args(args)->listStat, iter,
 	       saveStatOutputFrequency +1,
