@@ -29,7 +29,7 @@ private:
   const int pshared {0};
   const int mInitVal {1};
 
-  pthread_mutex_t tmpMutex;
+  //  pthread_mutex_t tmpMutex;
   
 public:
   Readers()
@@ -128,9 +128,9 @@ public:
 		      "sem_wait(mutex) in exitCritical() failed!\n");
 
 
-    pthread_mutex_lock(&tmpMutex);
+    //    pthread_mutex_lock(&tmpMutex);
     //    std::cout<<"\tExiting critical section for reader. read count = "<<readCount<<std::endl;
-    pthread_mutex_unlock(&tmpMutex);
+    //    pthread_mutex_unlock(&tmpMutex);
 
 
         // TMP======================================================================
