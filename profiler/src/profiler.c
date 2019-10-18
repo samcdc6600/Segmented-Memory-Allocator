@@ -354,6 +354,7 @@ void waitForThreads(const size_t threadCount, const pthread_t tids[])
       int joinRet;
       int * pJoinRet = &joinRet;
       pthread_join(tids[iter], (void **)(&pJoinRet));
+      printf("\t\t\tjoined thread!!!\n");
       /* Compile results here? */
     }
 }

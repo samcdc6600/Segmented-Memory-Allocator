@@ -61,10 +61,10 @@ void * _firstFit(const size_t chunk_size)
   /* Note that there are multiple exit points for this critical section where
      readers.exitCritical() is called.  */
 
- TRY_AGAIN:
-
   freeVsAllocsReaders.enterCritical();
   allocsReaders.enterCritical();
+  
+ TRY_AGAIN:
   
   checkZeroChunkSize(chunk_size);
   
@@ -74,8 +74,12 @@ void * _firstFit(const size_t chunk_size)
 	 must have space for it. */
       if(((*std::next(candidate))->size) >= (chunk_size + chunkAccountingSize))
 	{
+	  if(!chunkLockTestAndSet(*std::next(candidate)))
+	      goto TRY_AGAIN;
+	    
 	  allocsReaders.exitCritical();
 	  sem_wait(&locking::rwSem); // Enter critical region for writer.
+	  setChunkLockFalse(*std::next(candidate));
 
 	  
 
@@ -91,8 +95,12 @@ void * _firstFit(const size_t chunk_size)
 				   size so we don't need any extra space. */
 	  if(((*std::next(candidate))->size) == chunk_size)
 	    {			// The chunk is exactly the right size :).
+	      if(!chunkLockTestAndSet(*std::next(candidate)))
+		goto TRY_AGAIN;
+		  
 	      allocsReaders.exitCritical();
 	      sem_wait(&locking::rwSem); // Enter critical region for writer.
+	      setChunkLockFalse(*std::next(candidate));
 		  
 	      auto ret = useChunkFromHoles(candidate);
 
@@ -260,9 +268,12 @@ inline void checkZeroChunkSize(const size_t chunk_size)
 inline bool chunkLockTestAndSet(mmState::chunk * candidate)
 {
   pthread_mutex_lock(&mmState::locking::chunkLock);
-  bool ret {candidate->locked};
-  if(!ret)			// Lock if not locked.
-    candidate->locked = true;	// :O
+  bool ret {false};
+  if(!candidate->locked)	// Lock if not locked.
+    {
+      candidate->locked = true;	// :O
+      ret = true;
+    }
   pthread_mutex_unlock(&mmState::locking::chunkLock);
   return ret;
 }
@@ -321,6 +332,8 @@ template <typename T> inline void * splitChunkFromHoles(const size_t chunk_size,
     // Set new chunk's size accounting info to the the size of the new chunk.
     ((chunk *)((char *)(ret) + chunk_size))->size =
       (*std::next(candidate))->size - (chunkAccountingSize + chunk_size);
+    // Set new chunk's locked var.
+    ((chunk *)((char *)(ret) + chunk_size))->locked = false;
   }
 
   // UPDATE HOLES AND INUSE-----------------------------------------------------
@@ -332,6 +345,10 @@ template <typename T> inline void * splitChunkFromHoles(const size_t chunk_size,
   holes.erase_after(candidate);
   // Add new hole to holes list.
   holes.push_front((chunk *)((char*)ret + chunk_size));
+
+  pthread_mutex_lock(&printLock);
+  std::cout<<"exiting splitChunkFromHoles()\t"<<pthread_self()<<'\n';
+  pthread_mutex_unlock(&printLock);
   
   return ret;
 }
@@ -375,6 +392,8 @@ inline void * getNewChunkFromSystem(const size_t chunk_size)
     ((char *)virtualChunk + chunkAccountingSize);
   // Store length of virtual chunk.
   ((chunk *)(virtualChunk))->size = chunk_size;
+  // Set lock var to false.
+  ((chunk *)(virtualChunk))->locked = false;
   // Put new chunk accounting info on the inUse list.
   inUse.push_front((chunk *)(virtualChunk));
   
