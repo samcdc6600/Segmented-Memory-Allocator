@@ -1,5 +1,5 @@
-CC      = clang
-#CC	= gcc
+#CC      = clang
+CC	= gcc
 CFLAGS	= -Wall -std=c11 -Wpedantic -Wextra -O3
 # -lstdc++ is very very important here!
 # Gcc and clang don't link it by default like g++ and clang++!

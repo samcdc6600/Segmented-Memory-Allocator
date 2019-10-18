@@ -19,8 +19,8 @@ namespace mmState
       be directly accessed in other functions where it is being used for writer
       code. */
     sem_t rwMutex;
-    pthread_mutex_t chunkLock;
-    std::vector<address> chunksLocked {};
+    pthread_mutex_t iterLock;
+    std::vector<std::_Fwd_list_iterator<mmState::chunk *>> itersLocked {};
     pthread_mutex_t freeingLock;
   }
   
@@ -52,15 +52,8 @@ void * _firstFit(const size_t chunk_size)
 
   /* Note that there are multiple exit points for this critical section where
      readers.exitCritical() is called.  */
-  pthread_mutex_lock(&printLock);
-  std::cout<<"\n\nin _firstFit()\t"<<pthread_self()<<std::endl;
-  pthread_mutex_unlock(&printLock);
-
  TRY_AGAIN:
   readers.enterCritical();
-  pthread_mutex_lock(&printLock);
-  std::cout<<"entered _firstFit() ciritcal readers zone\t"<<pthread_self()<<std::endl;
-  pthread_mutex_unlock(&printLock);
   
   checkZeroChunkSize(chunk_size);
   
@@ -68,113 +61,77 @@ void * _firstFit(const size_t chunk_size)
       std::next(candidate) != holes.cend(); ++candidate)
     { /* We will need to add new accounting info when we split the chunk so it
 	 must have space for it. */
-
-      pthread_mutex_lock(&printLock);
-      std::cout<<"in for loop in first fit\t"<<pthread_self()<<std::endl;
-      pthread_mutex_unlock(&printLock);
-
       if(((*std::next(candidate))->size) >= (chunk_size + chunkAccountingSize))
 	{
-	  mmState::address addressLocked;
-	  if(!tryLockThisAddress(std::next(candidate), holes.cend(),
-				 addressLocked))
-	    {		  // This chunk is already locked.
-	      ++candidate;
-	      continue;
+	    readers.exitCritical();
+	    sem_wait(&locking::rwMutex); // Enter critical region for writer.
+
+	    auto iterLocked1 {candidate}, iterLocked2 {candidate};
+	    if(!tryLockThisAndNextIter(candidate))
+	      {		  // This chunk is already locked.
+		++candidate;
+		readers.enterCritical();
+		continue;
+	      }
+
+	    auto ret = splitChunkFromHoles(chunk_size, candidate);
+
+	    unlockThisIter(candidate);
+	    unlockThisIter(iterLocked2);
+	    sem_post(&locking::rwMutex); // Exit critical.
+
+	    return ret;
 	    }
-
-	  pthread_mutex_lock(&printLock);
-	  std::cout<<"\tin first if\t"<<pthread_self()<<std::endl;
-	  pthread_mutex_unlock(&printLock);
-	  
-	  readers.exitCritical();
-	  sem_wait(&locking::rwMutex); // Enter critical region for writer.
-	  if(!tryFreeingLockPostAndUnlockThisAddress(addressLocked))
-	      goto TRY_AGAIN;
-
-	  pthread_mutex_lock(&printLock);
-	  std::cout<<"going to try to split chunk ("<<*std::next(candidate)<<")\t"<<pthread_self()<<'\n';
-	  pthread_mutex_unlock(&printLock);
-	  auto ret = splitChunkFromHoles(chunk_size, candidate);
-
-	  pthread_mutex_lock(&printLock);
-	    std::cout<<"ret after splitChunkFromHoles = "<<ret<<"\t"<<pthread_self()<<'\n';
-	    pthread_mutex_unlock(&printLock);
-	  
-	  unlockThisAddress(addressLocked);
-	  sem_post(&locking::rwMutex); // Exit critical.
-
-	  pthread_mutex_lock(&printLock);
-	  std::cout<<"exiting _firstFit \t"<<pthread_self()<<'\n';
-	  pthread_mutex_unlock(&printLock);
-	  
-	  return ret;
-	}
-      else
-	{			/* We dont split the chunk if it is equal in
+	  else
+	    {			/* We dont split the chunk if it is equal in
 				   size so we don't need any extra space. */
-	  if(((*std::next(candidate))->size) == chunk_size)
-	    {			// The chunk is exactly the right size :).
-	      pthread_mutex_lock(&printLock);
-	      std::cout<<"\tin second if\t"<<pthread_self()<<std::endl;;
-	      pthread_mutex_unlock(&printLock);
-	      mmState::address addressLocked;
-	      if(!tryLockThisAddress(std::next(candidate), holes.cend(),
-				     addressLocked))
-		{		  // This chunk is already locked.
-		  ++candidate;
-		  continue;
+	      if(((*std::next(candidate))->size) == chunk_size)
+		{			// The chunk is exactly the right size :).
+		  readers.exitCritical();
+		  sem_wait(&locking::rwMutex); // Enter critical region for writer.
+
+		  auto iterLocked1 {candidate}, iterLocked2 {candidate};
+		  if(!tryLockThisAndNextIter(candidate))
+		    {		  // This chunk is already locked.
+		      ++candidate;
+		      readers.enterCritical();
+		      continue;
+		    }
+		  
+		  auto ret = useChunkFromHoles(candidate);
+
+		  unlockThisIter(iterLocked1);
+		  unlockThisIter(iterLocked2);
+		  sem_post(&locking::rwMutex); // Exit critical.
+
+		  return ret;
 		}
-
-	      readers.exitCritical();
-	      sem_wait(&locking::rwMutex); // Enter critical region for writer.
-	      if(!tryFreeingLockPostAndUnlockThisAddress(addressLocked))
-		 goto TRY_AGAIN;
-
-	      auto ret = useChunkFromHoles(candidate);
-
-	      pthread_mutex_lock(&printLock);
-	      std::cout<<"ret after useChunkFromHoles = "<<ret<<"\t"<<pthread_self()<<'\n';
-	      pthread_mutex_unlock(&printLock);
-	      
-	      unlockThisAddress(addressLocked);
-	      sem_post(&locking::rwMutex); // Exit critical.
-
-	      pthread_mutex_lock(&printLock);
-	  std::cout<<"exiting _firstFit \t"<<pthread_self()<<'\n';
-	  pthread_mutex_unlock(&printLock);
-	      return ret;
 	    }
 	}
-    }
 
-  pthread_mutex_lock(&printLock);
-  std::cout<<"getting new "<<pthread_self()<<'\n';
-  pthread_mutex_unlock(&printLock);
-  // Holes was empty or we didn't find a large enough chunk
-  readers.exitCritical();
-  sem_wait(&locking::rwMutex);
-  if(!tryFreeingLockPost())
-    {
+      // Holes was empty or we didn't find a large enough chunk
+      readers.exitCritical();
+      sem_wait(&locking::rwMutex);
+
+
+      auto iterLocked {holes.before_begin()};
+      if(!tryLockThisIter(holes.before_begin()))
+	{		  // This chunk is already locked.
+	  std::cout<<"\t\t\ttry again\n";
+	  sem_post(&locking::rwMutex);
+	  goto TRY_AGAIN;
+	}
+      
+      auto ret = getNewChunkFromSystem(chunk_size);
+
+      unlockThisIter(iterLocked);
+      sem_post(&locking::rwMutex);
+
       pthread_mutex_lock(&printLock);
-      std::cout<<"TRY_AGAIN getting new \t"<<pthread_self()<<'\n';
+      std::cout<<"exiting _firstFit \t"<<pthread_self()<<'\n';
       pthread_mutex_unlock(&printLock);
-    goto TRY_AGAIN;
+      return ret;
     }
-  
-  auto ret = getNewChunkFromSystem(chunk_size);
-
-  pthread_mutex_lock(&printLock);
-  std::cout<<"ret after getNewChunkFromSystem = "<<ret<<"\t"<<pthread_self()<<'\n';
-  pthread_mutex_unlock(&printLock);
-  
-  sem_post(&locking::rwMutex);
-
-  pthread_mutex_lock(&printLock);
-	  std::cout<<"exiting _firstFit \t"<<pthread_self()<<'\n';
-	  pthread_mutex_unlock(&printLock);
-  return ret;
-}
 
 
 void * _bestFit(const size_t chunk_size)
@@ -316,13 +273,25 @@ void * _worstFit(const size_t chunk_size)
 }*/
 
 
-inline bool tryFreeingLockPostAndUnlockThisAddress(const mmState::address
+/*inline bool tryFreeingLockPostAndUnlockThisAddress(const mmState::address
 						      addressLocked)
 {
   if(pthread_mutex_trylock(&mmState::locking::freeingLock) != 0)
     {			// free() is in it's writer critical section.
       sem_post(&mmState::locking::rwMutex);
       unlockThisAddress(addressLocked);
+      return false;	/* Keep trying, free() will (should ;) ) leave
+			   it's critical section evenutally. */
+      /*   }*/
+  /* We don't want to keep other threads not in free() from running. */
+      /*  pthread_mutex_unlock(&mmState::locking::freeingLock);
+  return true;
+}*/
+
+inline bool tryFreeingLockPostAndUnlockThisAddress()
+{
+  if(pthread_mutex_trylock(&mmState::locking::freeingLock) != 0)
+    {			// free() is in it's writer critical section.
       return false;	/* Keep trying, free() will (should ;) ) leave
 			   it's critical section evenutally. */
     }
@@ -458,43 +427,14 @@ inline void * getNewChunkFromSystem(const size_t chunk_size)
 void free(const void * chunk)
 {
   using namespace mmState;
-
-  pthread_mutex_lock(&printLock);
-  std::cout<<"in free("<<chunk<<")\t"<<pthread_self()<<'\n';
-  pthread_mutex_unlock(&printLock);
-
   
- TRY_AGAIN:
-  	  sem_wait(&locking::rwMutex);	// Enter critical region for writer.
-  //  readers.enterCritical();
-
-  // Try to signal that we are using all of holes.
-  if(pthread_mutex_trylock(&locking::freeingLock) != 0)
-    {
-      pthread_mutex_lock(&printLock);
-      std::cout<<"trying again in free\t"<<pthread_self()<<'\n';
-      pthread_mutex_unlock(&printLock);
-      sem_post(&locking::rwMutex);
-      goto TRY_AGAIN;
-    }
+  sem_wait(&locking::rwMutex);	// Enter critical region for writer.
     
   for(auto candidate {inUse.before_begin()};
       std::next(candidate) != inUse.cend(); ++candidate)
     {
       if((*std::next(candidate))->base == chunk)
 	{
-	  mmState::address addressLocked;
-	  while(!tryLockThisAddress(std::next(candidate), inUse.cend(),
-				    addressLocked)) {}
-
-	  //  readers.exitCritical();
-	  //	  sem_wait(&locking::rwMutex);	// Enter critical region for writer.
-
-	  pthread_mutex_lock(&printLock);
-	  std::cout<<"about to free candidate pt ="<<pthread_self()<<std::endl;
-	  std::cout<<"candidate = "<<*std::next(candidate)<<")\t"<<pthread_self()<<'\n';
-	  pthread_mutex_unlock(&printLock);
-	    
 	  holes.push_front(*std::next(candidate));
 	  inUse.erase_after(candidate);
 	  mergeHoles();
@@ -502,11 +442,6 @@ void free(const void * chunk)
 
 	  pthread_mutex_unlock(&locking::freeingLock);
 	  sem_post(&locking::rwMutex); // Exit critical region for writer.
-
-	  pthread_mutex_lock(&printLock);
-	  std::cout<<"freed(previous address)\t"<<pthread_self()<<'\n';
-	  pthread_mutex_unlock(&printLock);
-	  
 	  return;
 	}
     }  
@@ -583,27 +518,6 @@ inline bool holeAbuttedAgainstHole(mmState::chunk * a, mmState::chunk * b)
 }
 
 
-inline void unlockThisAddress(const mmState::address lockedAddress)
-{
-  pthread_mutex_lock(&mmState::locking::chunkLock);
-
-  for(auto lockedChunkIter {mmState::locking::chunksLocked.begin()};
-      lockedChunkIter != mmState::locking::chunksLocked.cend(); ++lockedChunkIter)
-    {
-      if(*lockedChunkIter == lockedAddress)
-	{			// We have found a match. Remove it.
-	  mmState::locking::chunksLocked.erase(lockedChunkIter);
-	  pthread_mutex_unlock(&mmState::locking::chunkLock);
-	  return;
-	}
-    }
-
-  error::genError(error::ELEMENT_NOT_FOUND, "Error (in unlockThisAddress() "
-		  "in algorithm.cpp): unlockThisAddress called with an invalid "
-		  "address (", lockedAddress, ").\n");
-}
-
-
 void initMM()
 {
   using namespace mmState;
@@ -614,7 +528,7 @@ void initMM()
     error::genError(error::INIT, "Error (in intMM() in algorithm.cpp): "
 		    "initialisation of rwMutex failed.\n");
   }
-  if(pthread_mutex_init(&locking::chunkLock, NULL) != 0)
+  if(pthread_mutex_init(&locking::iterLock, NULL) != 0)
     {
       error::genError(error::INIT, "Error (in initMM() in algorithm.cpp): "
 		      "initialistion of chunkLock failed.\n");
