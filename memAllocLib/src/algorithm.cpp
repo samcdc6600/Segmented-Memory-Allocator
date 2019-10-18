@@ -15,21 +15,24 @@ namespace mmState
   
   namespace locking
   {/* This semaphore is shared between readers and writers it is initialised
-      and passed to the readers object in the function init(). It should only
-      be directly accessed in other functions where it is being used for writer
-      code. The readers veriable should be used only within the allocaion
-      algorithms and not free().*/
-    sem_t rwMutex;
+      and passed to the allocsReaders object in the function initMM(). It should
+      only be directly accessed in the alloc functions where it is being used
+      for writer code. */
+    sem_t rwSem;
     /* This semaphore is shared between readers and writers and like the last
        variable it is initialised and passed to an object (freeVsAllocsReaders)
-       in intMM. freeVsAllocsReaders is used to make sure that no allocs
-       (readers here) take place while a free (writer) is taking place and that
-       only one free can take place at a time. */
-    sem_t freeVsAllocsRwMutex;
+       in intMM(). Should only be used in free(). */
+    sem_t freeVsAllocsRwSem;
     std::vector<std::_Fwd_list_iterator<mmState::chunk *>> itersLocked {};
+    // This is used to make rw ops on chunk.locked atomic.
+    pthread_mutex_t chunkLock;
   }
 
-  Readers readers {}, freeVsAllocsReaders {}; // IDK :)
+  /* allocReaders should be used only within the allocaion
+     algorithms and not free(). freeVsAllocsReaders is used along with 
+     freeVsAllocsRwSem to implement readers writer locking on the allocation
+     algorithms and free(), where free() is the reader. */
+  Readers allocsReaders {}, freeVsAllocsReaders {}; // IDK :)
 }
 
 
@@ -61,7 +64,7 @@ void * _firstFit(const size_t chunk_size)
  TRY_AGAIN:
 
   freeVsAllocsReaders.enterCritical();
-  readers.enterCritical();
+  allocsReaders.enterCritical();
   
   checkZeroChunkSize(chunk_size);
   
@@ -71,12 +74,14 @@ void * _firstFit(const size_t chunk_size)
 	 must have space for it. */
       if(((*std::next(candidate))->size) >= (chunk_size + chunkAccountingSize))
 	{
-	  readers.exitCritical();
-	  sem_wait(&locking::rwMutex); // Enter critical region for writer.
+	  allocsReaders.exitCritical();
+	  sem_wait(&locking::rwSem); // Enter critical region for writer.
+
+	  
 
 	  auto ret = splitChunkFromHoles(chunk_size, candidate);
 
-	  sem_post(&locking::rwMutex); // Exit critical.
+	  sem_post(&locking::rwSem); // Exit critical.
 
 	  freeVsAllocsReaders.exitCritical();
 	  return ret;
@@ -86,12 +91,12 @@ void * _firstFit(const size_t chunk_size)
 				   size so we don't need any extra space. */
 	  if(((*std::next(candidate))->size) == chunk_size)
 	    {			// The chunk is exactly the right size :).
-	      readers.exitCritical();
-	      sem_wait(&locking::rwMutex); // Enter critical region for writer.
+	      allocsReaders.exitCritical();
+	      sem_wait(&locking::rwSem); // Enter critical region for writer.
 		  
 	      auto ret = useChunkFromHoles(candidate);
 
-	      sem_post(&locking::rwMutex); // Exit critical.
+	      sem_post(&locking::rwSem); // Exit critical.
 	      
 	      freeVsAllocsReaders.exitCritical();
 	      return ret;
@@ -101,12 +106,12 @@ void * _firstFit(const size_t chunk_size)
 
   // Holes was empty or we didn't find a large enough chunk
 
-  readers.exitCritical();
-  sem_wait(&locking::rwMutex);
+  allocsReaders.exitCritical();
+  sem_wait(&locking::rwSem);
       
   auto ret = getNewChunkFromSystem(chunk_size);
 
-  sem_post(&locking::rwMutex);
+  sem_post(&locking::rwSem);
   /*      pthread_mutex_lock(&printLock);
 	  std::cout<<"exiting _firstFit \t"<<pthread_self()<<'\n';
 	  pthread_mutex_unlock(&printLock);*/
@@ -244,6 +249,39 @@ inline void checkZeroChunkSize(const size_t chunk_size)
 }
 
 
+/*inline bool checkChunkLock(const mmState::chunk * candidate)
+{
+  pthread_mutex_lock(&mmState::locking::chunkLock);
+  bool ret {candidate->locked};
+  return ret;
+  pthread_mutex_unlock(&mmState::locking::chunkLock);
+  }*/
+
+inline bool chunkLockTestAndSet(mmState::chunk * candidate)
+{
+  pthread_mutex_lock(&mmState::locking::chunkLock);
+  bool ret {candidate->locked};
+  if(!ret)			// Lock if not locked.
+    candidate->locked = true;	// :O
+  pthread_mutex_unlock(&mmState::locking::chunkLock);
+  return ret;
+}
+
+inline void setChunkLockFalse(mmState::chunk * victim)
+{
+  pthread_mutex_lock(&mmState::locking::chunkLock);
+  victim->locked = false;
+  pthread_mutex_unlock(&mmState::locking::chunkLock);
+}
+
+/*inline void setChunkLock(mmState::chunk * victim, const bool truth)
+{
+  pthread_mutex_lock(&mmState::locking::chunkLock);
+  victim->locked = truth;	// :O
+  pthread_mutex_unlock(&mmState::locking::chunkLock);
+  }*/
+
+
 inline void * handleOneHole(const size_t chunk_size)
 {
   using namespace mmState;
@@ -348,7 +386,7 @@ void free(const void * chunk)
 {
   using namespace mmState;
 
-  sem_wait(&locking::freeVsAllocsRwMutex);
+  sem_wait(&locking::freeVsAllocsRwSem);
     
   for(auto candidate {inUse.before_begin()};
       std::next(candidate) != inUse.cend(); ++candidate)
@@ -360,7 +398,7 @@ void free(const void * chunk)
 	  mergeHoles();
 	  mergeHoles();
 
-	  sem_post(&locking::freeVsAllocsRwMutex);
+	  sem_post(&locking::freeVsAllocsRwSem);
 	  return;
 	}
     }  
@@ -442,17 +480,21 @@ void initMM()
   using namespace mmState;
   
   int pshared {}, mInitVal {1};
-  if(sem_init(&locking::rwMutex, pshared, mInitVal) != 0)
+  if(sem_init(&locking::rwSem, pshared, mInitVal) != 0)
   {
     error::genError(error::INIT, "Error (in intMM() in algorithm.cpp): "
-		    "initialisation of rwMutex failed.\n");
+		    "initialisation of rwSem failed.\n");
   }
-  if(sem_init(&locking::freeVsAllocsRwMutex, pshared, mInitVal) != 0)
+  if(sem_init(&locking::freeVsAllocsRwSem, pshared, mInitVal) != 0)
     {
       error::genError(error::INIT, "Error (in initMM() in algorithm.cpp): "
-		      "initialisation of freeVsAllocsRwMutex failed.\n");
+		      "initialisation of freeVsAllocsRwSem failed.\n");
     }
-  
+  if(pthread_mutex_init(&locking::chunkLock, NULL))
+    {
+      error::genError(error::INIT, "Error (in initMM() in algorithm.cpp): "
+		      "initialisation of chunkLock failed.\n");
+    }
   // TMP  TMP TMP  TMP TMP  TMP TMP  TMP TMP  TMP TMP  TMP TMP  TMP
   // TMP  TMP TMP  TMP TMP  TMP TMP  TMP TMP  TMP TMP  TMP TMP  TMP
   // TMP  TMP TMP  TMP TMP  TMP TMP  TMP TMP  TMP TMP  TMP TMP  TMP
@@ -460,8 +502,8 @@ void initMM()
   // TMP  TMP TMP  TMP TMP  TMP TMP  TMP TMP  TMP TMP  TMP TMP  TMP
   pthread_mutex_init(&printLock, NULL); // TMP  TMP TMP  TMP TMP  TMP TMP  TMP TMP  TMP TMP  TMP TMP  TMP
 
-  readers.setRwMutex(&locking::rwMutex);
-  freeVsAllocsReaders.setRwMutex(&locking::freeVsAllocsRwMutex);
+  allocsReaders.setRwMutex(&locking::rwSem);
+  freeVsAllocsReaders.setRwMutex(&locking::freeVsAllocsRwSem);
 }
 
 

@@ -39,20 +39,6 @@ namespace mmState
   
   extern std::forward_list<chunk *> inUse;
   extern std::forward_list<chunk *> holes;
-
-  namespace locking
-  {/* This semaphore is shared between readers and writers it is initialised
-      and passed to the Readers class in the function init(). It should only
-      be directly accessed in other functions where it is being used for writer
-      code. */
-    extern sem_t rwMutex;
-    //    extern pthread_mutex_t iterLock;
-    extern std::vector<std::_Fwd_list_iterator<mmState::chunk *>> itersLocked;
-    /* Since free() calls mergeHoles() which calls holes.sort() all iteraters to
-       the holes list may be invalidated. So we chose the slow but simple option
-       of locking the code in free() with a reader lock and locking all the code
-       in the allocation algorithms with a corrisponding writters lock */
-  }
 }
 
 
@@ -64,10 +50,10 @@ void * _worstFit(const size_t chunk_size);
 /* Exit's if chunk_size is zero. It doesn't make sense to return a brk value
 since there may be holes. */
 inline void checkZeroChunkSize(const size_t chunk_size);
-
-
-
-
+//inline bool checkChunkLock(const mmState::chunk * candidate);
+//inline void setChunkLock(mmState::chunk * victim, const bool truth);
+inline bool chunkLockTestAndSet(mmState::chunk * candidate);
+inline void setChunkLockFalse(mmState::chunk * victim);
 //inline bool tryLockThisAndNext(mmState::chunk * thisChunk);
 // If we are allocating and there is only one hole.
 inline void * handleOneHole(const size_t chunk_size);
