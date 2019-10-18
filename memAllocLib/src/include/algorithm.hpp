@@ -124,6 +124,7 @@ inline bool tryLockThisAndNextAddress(T thisChunk, mmState::address &lockedRet1,
 
   for(auto lockedChunk: mmState::locking::chunksLocked)
     {
+      //      if(thisChunk == this
       if(lockedChunk == (*thisChunk)->base ||
 	 lockedChunk == (*std::next(thisChunk))->base)
 	{			// The chunks we want are not both unlocked.

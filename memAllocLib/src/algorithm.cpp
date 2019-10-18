@@ -463,8 +463,20 @@ void free(const void * chunk)
   std::cout<<"in free("<<chunk<<")\t"<<pthread_self()<<'\n';
   pthread_mutex_unlock(&printLock);
 
+  
  TRY_AGAIN:
-  readers.enterCritical();
+  	  sem_wait(&locking::rwMutex);	// Enter critical region for writer.
+  //  readers.enterCritical();
+
+  // Try to signal that we are using all of holes.
+  if(pthread_mutex_trylock(&locking::freeingLock) != 0)
+    {
+      pthread_mutex_lock(&printLock);
+      std::cout<<"trying again in free\t"<<pthread_self()<<'\n';
+      pthread_mutex_unlock(&printLock);
+      sem_post(&locking::rwMutex);
+      goto TRY_AGAIN;
+    }
     
   for(auto candidate {inUse.before_begin()};
       std::next(candidate) != inUse.cend(); ++candidate)
@@ -475,18 +487,12 @@ void free(const void * chunk)
 	  while(!tryLockThisAddress(std::next(candidate), inUse.cend(),
 				    addressLocked)) {}
 
-	  readers.exitCritical();
-	  sem_wait(&locking::rwMutex);	// Enter critical region for writer.
-
-	  // Try to signal that we are using all of holes.
-	  if(pthread_mutex_trylock(&locking::freeingLock) != 0)
-	    {
-	      sem_post(&locking::rwMutex);
-	      goto TRY_AGAIN;
-	    }
+	  //  readers.exitCritical();
+	  //	  sem_wait(&locking::rwMutex);	// Enter critical region for writer.
 
 	  pthread_mutex_lock(&printLock);
-	  std::cout<<"freeing ("<<*std::next(candidate)<<")\t"<<pthread_self()<<'\n';
+	  std::cout<<"about to free candidate pt ="<<pthread_self()<<std::endl;
+	  std::cout<<"candidate = "<<*std::next(candidate)<<")\t"<<pthread_self()<<'\n';
 	  pthread_mutex_unlock(&printLock);
 	    
 	  holes.push_front(*std::next(candidate));

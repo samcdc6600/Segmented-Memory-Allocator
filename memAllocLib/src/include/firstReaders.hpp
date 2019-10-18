@@ -3,6 +3,16 @@
 #include <semaphore.h>
 #include "error.hpp"
 
+
+
+// TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP
+// TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP
+// TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP
+// TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP
+// TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP
+// TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP
+extern pthread_mutex_t printLock; // TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP TMP 
+
 /* Because rwMutext is common to both readers and writers it is not a member of
    either associated class. Rather The Readers class and the Writers class each
    get passed a mutex that they both use as the "rw-mutext". Therfore it is up
@@ -70,7 +80,9 @@ public:
   
   void enterCritical()
   {
-    std::cout<<"in enterCritical()\n";
+    pthread_mutex_lock(&printLock);
+    std::cout<<"in enterCritical() "<<pthread_self()<<'\n';
+    pthread_mutex_unlock(&printLock);
     rwSetCheck("Error (in firstReaders.hpp): enterCritical() called on object "
 	       "of type Reader but rwMutex not set!\n");
     if(sem_wait(&mutex))
@@ -96,12 +108,19 @@ public:
     // TMP======================================================================
     inCritical = true;
     // TMP======================================================================
-      
+
+    pthread_mutex_lock(&printLock);
+    std::cout<<"exiting enterCritical() "<<pthread_self()<<'\n';
+    pthread_mutex_unlock(&printLock);
   }
   
 
   void exitCritical()
   {
+    pthread_mutex_lock(&printLock);
+    std::cout<<"in exitCritical() "<<pthread_self()<<'\n';
+    pthread_mutex_unlock(&printLock);
+    
     rwSetCheck("Error (in firstReaders.hpp): exitCritical() called on object of"
 	       "type Reader but rwMutex not set!\n");
     if(sem_wait(&mutex))
@@ -126,6 +145,10 @@ public:
     if(sem_post(&mutex))
       error::genError(error::INIT, "Error (in firstReaders.hpp): call to "
 		      "sem_post(&mutex) in exitCritical() failed!\n");
+
+        pthread_mutex_lock(&printLock);
+    std::cout<<"exiting exitCritical() "<<pthread_self()<<'\n';
+    pthread_mutex_unlock(&printLock);
   }
   
 
