@@ -67,86 +67,13 @@ void * _worstFit(const size_t chunk_size);
 /* Exit's if chunk_size is zero. It doesn't make sense to return a brk value
 since there may be holes. */
 inline void checkZeroChunkSize(const size_t chunk_size);
-/*inline bool tryFreeingLockPostAndUnlockTheseAddresses(const mmState::address
-						      addressLocked1,
-						      const mmState::address
-						      addressLocked2);*/
-/*inline bool tryFreeingLockPostAndUnlockThisAddress(const mmState::address
-  addressLocked);*/
+
+
+
 inline bool tryFreeingLockPostAndUnlockThisAddress();
 inline bool tryFreeingLockPost();
 
 
-template <typename T> inline bool tryLockThisAndNextIter(T thisIter)
-{
-  pthread_mutex_lock(&mmState::locking::iterLock);
-
-  bool ret {true};                     // Indicate success / failure.
-  for(auto lockedIter: mmState::locking::itersLocked)
-    {
-      std::cout<<"try lock this and next iter\n";
-      if(lockedIter == thisIter ||
-	 lockedIter == std::next(thisIter))
-	{			// The chunks we want are not both unlocked.
-	  ret = false;
-	  break;
-	}
-    }
-  if(ret)
-    {				// Chunks are both unlocked. Lock them.
-      mmState::locking::itersLocked.push_back(thisIter);
-      mmState::locking::itersLocked.push_back(std::next(thisIter));
-    }
-  
-  pthread_mutex_unlock(&mmState::locking::iterLock);
-  return ret;
-}
-
-
-template <typename T> inline bool tryLockThisIter(T thisIter)
-{
-  pthread_mutex_lock(&mmState::locking::iterLock);
-  
-  bool ret {true};
-  for(auto lockedIter: mmState::locking::itersLocked)
-    {
-      std::cout<<"try lock this iter \n";
-      if(lockedIter == thisIter)
-	{			// The chunk we want is not unlocked.
-	  ret = false;
-	  break;
-	}
-    }
-  if(ret)
-    {				// Chunk was unlocked. Lock it.
-      mmState::locking::itersLocked.push_back(thisIter);
-    }
-
-  pthread_mutex_unlock(&mmState::locking::iterLock);
-  return ret;
-}
-
-
-template <typename T> inline void unlockThisIter(T thisIter)
-{
-  pthread_mutex_lock(&mmState::locking::iterLock);
-
-  for(size_t iter {}; iter < mmState::locking::itersLocked.size(); ++iter)
-    {
-      if(mmState::locking::itersLocked[iter] == thisIter)
-	{
-	  std::cout<<"unlockedThisiter\n";
-	  mmState::locking::itersLocked.erase(mmState::locking::itersLocked.begin() +
-					      iter);
-	  pthread_mutex_unlock(&mmState::locking::iterLock);
-	  return;
-	}
-    }
-
-  error::genError(error::ELEMENT_NOT_FOUND, "Error (in unlockThisIter() "
-                  "in algorithm.cpp): called with an invalid "
-                  "thisIter not found (", &thisIter, ").\n");
-}
 
 //inline bool tryLockThisAndNext(mmState::chunk * thisChunk);
 // If we are allocating and there is only one hole.

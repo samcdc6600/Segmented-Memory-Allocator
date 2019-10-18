@@ -52,6 +52,7 @@ void * _firstFit(const size_t chunk_size)
 
   /* Note that there are multiple exit points for this critical section where
      readers.exitCritical() is called.  */
+
  TRY_AGAIN:
   readers.enterCritical();
   
@@ -65,21 +66,12 @@ void * _firstFit(const size_t chunk_size)
 	{
 	    readers.exitCritical();
 	    sem_wait(&locking::rwMutex); // Enter critical region for writer.
-
-	    auto iterLocked1 {candidate}, iterLocked2 {candidate};
-	    if(!tryLockThisAndNextIter(candidate))
-	      {		  // This chunk is already locked.
-		++candidate;
-		readers.enterCritical();
-		continue;
-	      }
+	    if(!tryFreeingLockPost())
+	      goto TRY_AGAIN;
 
 	    auto ret = splitChunkFromHoles(chunk_size, candidate);
 
-	    unlockThisIter(candidate);
-	    unlockThisIter(iterLocked2);
 	    sem_post(&locking::rwMutex); // Exit critical.
-
 	    return ret;
 	    }
 	  else
@@ -89,47 +81,30 @@ void * _firstFit(const size_t chunk_size)
 		{			// The chunk is exactly the right size :).
 		  readers.exitCritical();
 		  sem_wait(&locking::rwMutex); // Enter critical region for writer.
-
-		  auto iterLocked1 {candidate}, iterLocked2 {candidate};
-		  if(!tryLockThisAndNextIter(candidate))
-		    {		  // This chunk is already locked.
-		      ++candidate;
-		      readers.enterCritical();
-		      continue;
-		    }
+		  if(!tryFreeingLockPost())
+		    goto TRY_AGAIN;
 		  
 		  auto ret = useChunkFromHoles(candidate);
 
-		  unlockThisIter(iterLocked1);
-		  unlockThisIter(iterLocked2);
 		  sem_post(&locking::rwMutex); // Exit critical.
-
 		  return ret;
 		}
 	    }
 	}
 
       // Holes was empty or we didn't find a large enough chunk
-      readers.exitCritical();
-      sem_wait(&locking::rwMutex);
 
-
-      auto iterLocked {holes.before_begin()};
-      if(!tryLockThisIter(holes.before_begin()))
-	{		  // This chunk is already locked.
-	  std::cout<<"\t\t\ttry again\n";
-	  sem_post(&locking::rwMutex);
-	  goto TRY_AGAIN;
-	}
+  readers.exitCritical();
+  sem_wait(&locking::rwMutex);
+  if(!tryFreeingLockPost())
+    goto TRY_AGAIN;
       
       auto ret = getNewChunkFromSystem(chunk_size);
 
-      unlockThisIter(iterLocked);
       sem_post(&locking::rwMutex);
-
-      pthread_mutex_lock(&printLock);
+      /*      pthread_mutex_lock(&printLock);
       std::cout<<"exiting _firstFit \t"<<pthread_self()<<'\n';
-      pthread_mutex_unlock(&printLock);
+      pthread_mutex_unlock(&printLock);*/
       return ret;
     }
 
@@ -252,54 +227,6 @@ void * _worstFit(const size_t chunk_size)
   // Holes was empty or no hole of large enough size was found.
   return getNewChunkFromSystem(chunk_size);
 }
-
-
-/*inline bool tryFreeingLockPostAndUnlockTheseAddresses(const mmState::address
-						   addressLocked1,
-						   const mmState::address
-						   addressLocked2)
-{
-  if(pthread_mutex_trylock(&mmState::locking::freeingLock) != 0)
-    {			// free() is in it's writer critical section.
-      sem_post(&mmState::locking::rwMutex);
-      unlockThisAddress(addressLocked1);
-      unlockThisAddress(addressLocked2);
-      return false;	/* Keep trying, free() will (should ;) ) leave
-			   it's critical section evenutally. */
-//    }
-  /* We don't want to keep other threads not in free() from running. */
-/*  pthread_mutex_unlock(&mmState::locking::freeingLock);
-  return true;
-}*/
-
-
-/*inline bool tryFreeingLockPostAndUnlockThisAddress(const mmState::address
-						      addressLocked)
-{
-  if(pthread_mutex_trylock(&mmState::locking::freeingLock) != 0)
-    {			// free() is in it's writer critical section.
-      sem_post(&mmState::locking::rwMutex);
-      unlockThisAddress(addressLocked);
-      return false;	/* Keep trying, free() will (should ;) ) leave
-			   it's critical section evenutally. */
-      /*   }*/
-  /* We don't want to keep other threads not in free() from running. */
-      /*  pthread_mutex_unlock(&mmState::locking::freeingLock);
-  return true;
-}*/
-
-inline bool tryFreeingLockPostAndUnlockThisAddress()
-{
-  if(pthread_mutex_trylock(&mmState::locking::freeingLock) != 0)
-    {			// free() is in it's writer critical section.
-      return false;	/* Keep trying, free() will (should ;) ) leave
-			   it's critical section evenutally. */
-    }
-  /* We don't want to keep other threads not in free() from running. */
-  pthread_mutex_unlock(&mmState::locking::freeingLock);
-  return true;
-}
-
 
 inline bool tryFreeingLockPost()
 {
@@ -427,7 +354,8 @@ inline void * getNewChunkFromSystem(const size_t chunk_size)
 void free(const void * chunk)
 {
   using namespace mmState;
-  
+
+  pthread_mutex_lock(&locking::freeingLock);
   sem_wait(&locking::rwMutex);	// Enter critical region for writer.
     
   for(auto candidate {inUse.before_begin()};
