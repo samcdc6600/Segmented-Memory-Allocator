@@ -15,16 +15,21 @@ namespace mmState
   
   namespace locking
   {/* This semaphore is shared between readers and writers it is initialised
-      and passed to the Readers class in the function init(). It should only
+      and passed to the readers object in the function init(). It should only
       be directly accessed in other functions where it is being used for writer
-      code. */
+      code. The readers veriable should be used only within the allocaion
+      algorithms and not free().*/
     sem_t rwMutex;
-    pthread_mutex_t iterLock;
+    /* This semaphore is shared between readers and writers and like the last
+       variable it is initialised and passed to an object (freeVsAllocsReaders)
+       in intMM. freeVsAllocsReaders is used to make sure that no allocs
+       (readers here) take place while a free (writer) is taking place and that
+       only one free can take place at a time. */
+    sem_t freeVsAllocsRwMutex;
     std::vector<std::_Fwd_list_iterator<mmState::chunk *>> itersLocked {};
-    pthread_mutex_t freeingLock;
   }
-  
-  Readers readers {};
+
+  Readers readers {}, freeVsAllocsReaders {}; // IDK :)
 }
 
 
@@ -54,6 +59,8 @@ void * _firstFit(const size_t chunk_size)
      readers.exitCritical() is called.  */
 
  TRY_AGAIN:
+
+  freeVsAllocsReaders.enterCritical();
   readers.enterCritical();
   
   checkZeroChunkSize(chunk_size);
@@ -64,49 +71,48 @@ void * _firstFit(const size_t chunk_size)
 	 must have space for it. */
       if(((*std::next(candidate))->size) >= (chunk_size + chunkAccountingSize))
 	{
-	    readers.exitCritical();
-	    sem_wait(&locking::rwMutex); // Enter critical region for writer.
-	    if(!tryFreeingLockPost())
-	      goto TRY_AGAIN;
+	  readers.exitCritical();
+	  sem_wait(&locking::rwMutex); // Enter critical region for writer.
 
-	    auto ret = splitChunkFromHoles(chunk_size, candidate);
+	  auto ret = splitChunkFromHoles(chunk_size, candidate);
 
-	    sem_post(&locking::rwMutex); // Exit critical.
-	    return ret;
-	    }
-	  else
-	    {			/* We dont split the chunk if it is equal in
+	  sem_post(&locking::rwMutex); // Exit critical.
+
+	  freeVsAllocsReaders.exitCritical();
+	  return ret;
+	}
+      else
+	{			/* We dont split the chunk if it is equal in
 				   size so we don't need any extra space. */
-	      if(((*std::next(candidate))->size) == chunk_size)
-		{			// The chunk is exactly the right size :).
-		  readers.exitCritical();
-		  sem_wait(&locking::rwMutex); // Enter critical region for writer.
-		  if(!tryFreeingLockPost())
-		    goto TRY_AGAIN;
+	  if(((*std::next(candidate))->size) == chunk_size)
+	    {			// The chunk is exactly the right size :).
+	      readers.exitCritical();
+	      sem_wait(&locking::rwMutex); // Enter critical region for writer.
 		  
-		  auto ret = useChunkFromHoles(candidate);
+	      auto ret = useChunkFromHoles(candidate);
 
-		  sem_post(&locking::rwMutex); // Exit critical.
-		  return ret;
-		}
+	      sem_post(&locking::rwMutex); // Exit critical.
+	      
+	      freeVsAllocsReaders.exitCritical();
+	      return ret;
 	    }
 	}
+    }
 
-      // Holes was empty or we didn't find a large enough chunk
+  // Holes was empty or we didn't find a large enough chunk
 
   readers.exitCritical();
   sem_wait(&locking::rwMutex);
-  if(!tryFreeingLockPost())
-    goto TRY_AGAIN;
       
-      auto ret = getNewChunkFromSystem(chunk_size);
+  auto ret = getNewChunkFromSystem(chunk_size);
 
-      sem_post(&locking::rwMutex);
-      /*      pthread_mutex_lock(&printLock);
-      std::cout<<"exiting _firstFit \t"<<pthread_self()<<'\n';
-      pthread_mutex_unlock(&printLock);*/
-      return ret;
-    }
+  sem_post(&locking::rwMutex);
+  /*      pthread_mutex_lock(&printLock);
+	  std::cout<<"exiting _firstFit \t"<<pthread_self()<<'\n';
+	  pthread_mutex_unlock(&printLock);*/
+  freeVsAllocsReaders.exitCritical();
+  return ret;
+}
 
 
 void * _bestFit(const size_t chunk_size)
@@ -228,19 +234,6 @@ void * _worstFit(const size_t chunk_size)
   return getNewChunkFromSystem(chunk_size);
 }
 
-inline bool tryFreeingLockPost()
-{
-  if(pthread_mutex_trylock(&mmState::locking::freeingLock) != 0)
-    {				// free() is in it's writer critical section.
-      sem_post(&mmState::locking::rwMutex);
-      return false;		/* Keep trying, free() will (should ;) ) leave
-				   it's critical section eveuntually. */
-    }
-  /* We don't want to keep other threads not in free() from running. */
-  pthread_mutex_unlock(&mmState::locking::freeingLock);
-  return true;
-}
-
 
 inline void checkZeroChunkSize(const size_t chunk_size)
 {
@@ -355,8 +348,7 @@ void free(const void * chunk)
 {
   using namespace mmState;
 
-  pthread_mutex_lock(&locking::freeingLock);
-  sem_wait(&locking::rwMutex);	// Enter critical region for writer.
+  sem_wait(&locking::freeVsAllocsRwMutex);
     
   for(auto candidate {inUse.before_begin()};
       std::next(candidate) != inUse.cend(); ++candidate)
@@ -368,8 +360,7 @@ void free(const void * chunk)
 	  mergeHoles();
 	  mergeHoles();
 
-	  pthread_mutex_unlock(&locking::freeingLock);
-	  sem_post(&locking::rwMutex); // Exit critical region for writer.
+	  sem_post(&locking::freeVsAllocsRwMutex);
 	  return;
 	}
     }  
@@ -456,16 +447,12 @@ void initMM()
     error::genError(error::INIT, "Error (in intMM() in algorithm.cpp): "
 		    "initialisation of rwMutex failed.\n");
   }
-  if(pthread_mutex_init(&locking::iterLock, NULL) != 0)
+  if(sem_init(&locking::freeVsAllocsRwMutex, pshared, mInitVal) != 0)
     {
       error::genError(error::INIT, "Error (in initMM() in algorithm.cpp): "
-		      "initialistion of chunkLock failed.\n");
+		      "initialisation of freeVsAllocsRwMutex failed.\n");
     }
-  if(pthread_mutex_init(&locking::freeingLock, NULL) != 0)
-    {
-      error::genError(error::INIT, "Error (in initMM() in algorithm.cpp): "
-		      "initialisation of freeingLock failed.\n");
-    }
+  
   // TMP  TMP TMP  TMP TMP  TMP TMP  TMP TMP  TMP TMP  TMP TMP  TMP
   // TMP  TMP TMP  TMP TMP  TMP TMP  TMP TMP  TMP TMP  TMP TMP  TMP
   // TMP  TMP TMP  TMP TMP  TMP TMP  TMP TMP  TMP TMP  TMP TMP  TMP
@@ -474,6 +461,7 @@ void initMM()
   pthread_mutex_init(&printLock, NULL); // TMP  TMP TMP  TMP TMP  TMP TMP  TMP TMP  TMP TMP  TMP TMP  TMP
 
   readers.setRwMutex(&locking::rwMutex);
+  freeVsAllocsReaders.setRwMutex(&locking::freeVsAllocsRwMutex);
 }
 
 

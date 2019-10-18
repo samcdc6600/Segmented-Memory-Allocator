@@ -46,15 +46,12 @@ namespace mmState
       be directly accessed in other functions where it is being used for writer
       code. */
     extern sem_t rwMutex;
-    extern pthread_mutex_t iterLock;
+    //    extern pthread_mutex_t iterLock;
     extern std::vector<std::_Fwd_list_iterator<mmState::chunk *>> itersLocked;
-    /* Since free calls mergeHoles() which calls holes.sort() all iteraters to
-       holes may be invalidated. Therfore we need some way of letting other
-       threads know that we are in free. (It is unfortunate to have such a
-       costly section of code locked exclusively. However we think it would be a
-       lot of work to come up with and implement a better solution.)*/
-    extern pthread_mutex_t freeingLock;
-    extern bool freeing;
+    /* Since free() calls mergeHoles() which calls holes.sort() all iteraters to
+       the holes list may be invalidated. So we chose the slow but simple option
+       of locking the code in free() with a reader lock and locking all the code
+       in the allocation algorithms with a corrisponding writters lock */
   }
 }
 
@@ -68,10 +65,6 @@ void * _worstFit(const size_t chunk_size);
 since there may be holes. */
 inline void checkZeroChunkSize(const size_t chunk_size);
 
-
-
-inline bool tryFreeingLockPostAndUnlockThisAddress();
-inline bool tryFreeingLockPost();
 
 
 
