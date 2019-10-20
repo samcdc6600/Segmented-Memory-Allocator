@@ -1,0 +1,10 @@
+Using first fit.
+Starting battery of 4 test\s of type "interleavedAllocationAndDeallocation()"
+
+Test size		= 4096
+Allocation unit		= 65536
+
+(long)holes.size()) = 0
+(long)holes.size()) = 0
+(long)holes.size()) = 0
+(long)holes.size()) = 0

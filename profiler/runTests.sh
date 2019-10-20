@@ -7,12 +7,12 @@ do
     for testNum in 0 1 2 3 4 5 6 7
     do
 	#5 6 # Number of allocations to perform, where the range is [0, 6]
-	for sizeNum in 0 1 2 3 4
+	for sizeNum in 0 1 2
 	do
 	    # How many threads to run a test in. I.e., each thread will run a
 	    # duplicate test. (The results will still be output to the same
 	    # file.)
-	    for explicitConcurrencyNumber in 1 4 8
+	    for explicitConcurrencyNumber in 1 2 3 4
 	    do
 		# Output extra statistics about the inUse and holes lists when
 		# 1. There is a choice here because there is a run time overhead

@@ -1,0 +1,26 @@
+Using first fit.
+Starting battery of 2 test\s of type "sequentialAllocationAndDeallocation()"
+
+Test size		= 1024
+Allocation unit		= 262144
+
+			joined thread!!!
+			joined thread!!!
+
+
+
+================================================================================
+Results for thread	0:
+================================================================================
+	Allocation time		= 0.013982
+	Deallocation time	= 0.028189
+	Total time		= 0.042171
+
+
+
+================================================================================
+Results for thread	1:
+================================================================================
+	Allocation time		= 0.044241
+	Deallocation time	= 0.012592
+	Total time		= 0.056833

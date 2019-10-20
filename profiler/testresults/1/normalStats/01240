@@ -1,0 +1,9 @@
+Using first fit.
+Starting battery of 4 test\s of type "sequentialAllocationAndDeallocation()"
+
+Test size		= 16384
+Allocation unit		= 16384
+
+(long)holes.size()) = 0
+(long)holes.size()) = 0
+(long)holes.size()) = 0

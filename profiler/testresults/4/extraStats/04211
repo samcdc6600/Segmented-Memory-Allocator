@@ -1,0 +1,7 @@
+Using first fit.
+Starting battery of 1 test\s of type "interleavedFixedSizeAllocationAndDeallocation()"
+
+Test size		= 16384
+Allocation unit		= 1
+
+(long)holes.size()) = 0

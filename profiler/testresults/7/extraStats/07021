@@ -1,0 +1,2412 @@
+Using first fit.
+Starting battery of 2 test\s of type "randomAllocationsAndDeallocations()"
+
+Test size		= 1024
+Allocation unit		= 262144
+
+Calculating random allocation and deallocation sequence...
+Calculating random allocation and deallocation sequence...
+(long)holes.size()) = 0
+(long)holes.size()) = 1
+merege 
+(long)holes.size()) = 2
+(long)holes.size()) = 3
+(long)holes.size()) = 3
+(long)holes.size()) = 4
+(long)holes.size()) = 6
+(long)holes.size()) = 6
+(long)holes.size()) = 7
+(long)holes.size()) = 8
+(long)holes.size()) = 9
+(long)holes.size()) = 10
+merege 
+(long)holes.size()) = 10
+(long)holes.size()) = 12
+(long)holes.size()) = 12
+(long)holes.size()) = 13
+(long)holes.size()) = 14
+(long)holes.size()) = 15
+(long)holes.size()) = 17
+(long)holes.size()) = 18
+(long)holes.size()) = 18
+(long)holes.size()) = 19
+(long)holes.size()) = 20
+(long)holes.size()) = 21
+(long)holes.size()) = 22
+(long)holes.size()) = 24
+(long)holes.size()) = 24
+(long)holes.size()) = 26
+(long)holes.size()) = 27
+(long)holes.size()) = 27
+(long)holes.size()) = 28
+(long)holes.size()) = 30
+(long)holes.size()) = 30
+(long)holes.size()) = 32
+(long)holes.size()) = 32
+(long)holes.size()) = 33
+(long)holes.size()) = 34
+(long)holes.size()) = 36
+(long)holes.size()) = 36
+(long)holes.size()) = 37
+(long)holes.size()) = 38
+(long)holes.size()) = 40
+(long)holes.size()) = 40
+(long)holes.size()) = 41
+(long)holes.size()) = 42
+(long)holes.size()) = 43
+(long)holes.size()) = 44
+(long)holes.size()) = 45
+(long)holes.size()) = 46
+(long)holes.size()) = 47
+(long)holes.size()) = 48
+(long)holes.size()) = 49
+(long)holes.size()) = 51
+(long)holes.size()) = 51
+(long)holes.size()) = 52
+(long)holes.size()) = 53
+(long)holes.size()) = 54
+(long)holes.size()) = 55
+(long)holes.size()) = 56
+(long)holes.size()) = 58
+(long)holes.size()) = 59
+(long)holes.size()) = 59
+(long)holes.size()) = 60
+(long)holes.size()) = 61
+(long)holes.size()) = 62
+(long)holes.size()) = 64
+(long)holes.size()) = 64
+(long)holes.size()) = 65
+(long)holes.size()) = 66
+(long)holes.size()) = 67
+(long)holes.size()) = 68
+(long)holes.size()) = 69
+(long)holes.size()) = 70
+(long)holes.size()) = 71
+(long)holes.size()) = 72
+(long)holes.size()) = 73
+(long)holes.size()) = 74
+(long)holes.size()) = 75
+(long)holes.size()) = 76
+(long)holes.size()) = 77
+(long)holes.size()) = 78
+(long)holes.size()) = 80
+(long)holes.size()) = 80
+(long)holes.size()) = 81
+(long)holes.size()) = 83
+(long)holes.size()) = 84
+(long)holes.size()) = 85
+(long)holes.size()) = 86
+(long)holes.size()) = 87
+(long)holes.size()) = 88
+(long)holes.size()) = 88
+(long)holes.size()) = 89
+(long)holes.size()) = 90
+(long)holes.size()) = 92
+(long)holes.size()) = 92
+(long)holes.size()) = 93
+(long)holes.size()) = 94
+(long)holes.size()) = 95
+(long)holes.size()) = 96
+(long)holes.size()) = 97
+(long)holes.size()) = 98
+(long)holes.size()) = 99
+(long)holes.size()) = 100
+(long)holes.size()) = 102
+(long)holes.size()) = 102
+(long)holes.size()) = 103
+(long)holes.size()) = 104
+(long)holes.size()) = 106
+(long)holes.size()) = 107
+(long)holes.size()) = 107
+(long)holes.size()) = 108
+(long)holes.size()) = 109
+(long)holes.size()) = 110
+(long)holes.size()) = 111
+(long)holes.size()) = 112
+(long)holes.size()) = 113
+(long)holes.size()) = 114
+(long)holes.size()) = 115
+(long)holes.size()) = 116
+(long)holes.size()) = 117
+(long)holes.size()) = 118
+(long)holes.size()) = 119
+(long)holes.size()) = 121
+(long)holes.size()) = 122
+(long)holes.size()) = 122
+(long)holes.size()) = 123
+(long)holes.size()) = 124
+(long)holes.size()) = 125
+(long)holes.size()) = 126
+(long)holes.size()) = 127
+(long)holes.size()) = 128
+(long)holes.size()) = 129
+(long)holes.size()) = 130
+(long)holes.size()) = 131
+(long)holes.size()) = 132
+(long)holes.size()) = 133
+(long)holes.size()) = 135
+(long)holes.size()) = 135
+(long)holes.size()) = 136
+(long)holes.size()) = 137
+(long)holes.size()) = 138
+(long)holes.size()) = 139
+(long)holes.size()) = 141
+(long)holes.size()) = 141
+(long)holes.size()) = 142
+(long)holes.size()) = 143
+(long)holes.size()) = 144
+(long)holes.size()) = 145
+(long)holes.size()) = 146
+(long)holes.size()) = 147
+(long)holes.size()) = 148
+(long)holes.size()) = 149
+(long)holes.size()) = 151
+(long)holes.size()) = 151
+(long)holes.size()) = 152
+(long)holes.size()) = 153
+(long)holes.size()) = 154
+(long)holes.size()) = 155
+(long)holes.size()) = 156
+(long)holes.size()) = 157
+(long)holes.size()) = 158
+(long)holes.size()) = 159
+(long)holes.size()) = 160
+(long)holes.size()) = 161
+(long)holes.size()) = 162
+(long)holes.size()) = 163
+(long)holes.size()) = 164
+(long)holes.size()) = 165
+(long)holes.size()) = 166
+(long)holes.size()) = 167
+(long)holes.size()) = 168
+(long)holes.size()) = 169
+(long)holes.size()) = 170
+(long)holes.size()) = 171
+(long)holes.size()) = 172
+(long)holes.size()) = 173
+(long)holes.size()) = 174
+(long)holes.size()) = 176
+(long)holes.size()) = 177
+(long)holes.size()) = 177
+(long)holes.size()) = 178
+(long)holes.size()) = 179
+(long)holes.size()) = 180
+(long)holes.size()) = 181
+(long)holes.size()) = 182
+(long)holes.size()) = 183
+(long)holes.size()) = 184
+(long)holes.size()) = 185
+(long)holes.size()) = 186
+(long)holes.size()) = 187
+(long)holes.size()) = 188
+(long)holes.size()) = 189
+(long)holes.size()) = 190
+(long)holes.size()) = 191
+(long)holes.size()) = 192
+(long)holes.size()) = 193
+(long)holes.size()) = 194
+(long)holes.size()) = 195
+(long)holes.size()) = 196
+(long)holes.size()) = 197
+(long)holes.size()) = 199
+(long)holes.size()) = 199
+(long)holes.size()) = 200
+(long)holes.size()) = 201
+(long)holes.size()) = 202
+(long)holes.size()) = 203
+(long)holes.size()) = 204
+(long)holes.size()) = 205
+(long)holes.size()) = 206
+(long)holes.size()) = 207
+(long)holes.size()) = 208
+(long)holes.size()) = 209
+(long)holes.size()) = 210
+(long)holes.size()) = 211
+(long)holes.size()) = 212
+(long)holes.size()) = 213
+(long)holes.size()) = 214
+(long)holes.size()) = 215
+(long)holes.size()) = 216
+(long)holes.size()) = 217
+(long)holes.size()) = 218
+(long)holes.size()) = 219
+(long)holes.size()) = 220
+(long)holes.size()) = 221
+(long)holes.size()) = 222
+(long)holes.size()) = 223
+(long)holes.size()) = 224
+(long)holes.size()) = 226
+(long)holes.size()) = 226
+(long)holes.size()) = 227
+(long)holes.size()) = 228
+(long)holes.size()) = 229
+(long)holes.size()) = 230
+(long)holes.size()) = 231
+(long)holes.size()) = 232
+(long)holes.size()) = 233
+(long)holes.size()) = 234
+(long)holes.size()) = 236
+(long)holes.size()) = 236
+(long)holes.size()) = 237
+(long)holes.size()) = 238
+(long)holes.size()) = 240
+(long)holes.size()) = 240
+(long)holes.size()) = 241
+(long)holes.size()) = 242
+(long)holes.size()) = 243
+(long)holes.size()) = 244
+(long)holes.size()) = 245
+(long)holes.size()) = 246
+(long)holes.size()) = 247
+(long)holes.size()) = 248
+(long)holes.size()) = 249
+(long)holes.size()) = 250
+(long)holes.size()) = 251
+(long)holes.size()) = 252
+(long)holes.size()) = 253
+(long)holes.size()) = 254
+(long)holes.size()) = 255
+(long)holes.size()) = 256
+(long)holes.size()) = 257
+(long)holes.size()) = 258
+(long)holes.size()) = 259
+(long)holes.size()) = 260
+(long)holes.size()) = 261
+(long)holes.size()) = 262
+(long)holes.size()) = 263
+(long)holes.size()) = 264
+(long)holes.size()) = (long)holes.size()) = 266
+266
+(long)holes.size()) = 267
+(long)holes.size()) = 268
+(long)holes.size()) = 269
+(long)holes.size()) = 270
+(long)holes.size()) = 271
+(long)holes.size()) = 272
+(long)holes.size()) = 273
+(long)holes.size()) = 274
+(long)holes.size()) = 275
+(long)holes.size()) = 276
+(long)holes.size()) = 277
+(long)holes.size()) = 278
+(long)holes.size()) = 279
+(long)holes.size()) = 280
+(long)holes.size()) = 281
+(long)holes.size()) = 282
+(long)holes.size()) = 283
+(long)holes.size()) = 284
+(long)holes.size()) = 285
+(long)holes.size()) = 286
+(long)holes.size()) = 287
+(long)holes.size()) = 288
+(long)holes.size()) = 289
+(long)holes.size()) = 290
+(long)holes.size()) = 291
+(long)holes.size()) = 293
+(long)holes.size()) = 293
+(long)holes.size()) = 294
+(long)holes.size()) = 295
+(long)holes.size()) = 296
+(long)holes.size()) = 297
+(long)holes.size()) = 298
+(long)holes.size()) = 299
+(long)holes.size()) = 300
+(long)holes.size()) = 301
+(long)holes.size()) = 303
+(long)holes.size()) = 303
+(long)holes.size()) = 304
+(long)holes.size()) = 306
+(long)holes.size()) = 306
+(long)holes.size()) = 307
+(long)holes.size()) = 308
+(long)holes.size()) = 309
+(long)holes.size()) = 310
+(long)holes.size()) = 311
+(long)holes.size()) = 312
+(long)holes.size()) = 313
+(long)holes.size()) = 314
+(long)holes.size()) = 315
+(long)holes.size()) = 316
+(long)holes.size()) = 317
+(long)holes.size()) = 318
+(long)holes.size()) = 319
+(long)holes.size()) = 320
+(long)holes.size()) = 321
+(long)holes.size()) = 322
+(long)holes.size()) = 323
+(long)holes.size()) = 324
+(long)holes.size()) = 325
+(long)holes.size()) = 326
+(long)holes.size()) = 327
+(long)holes.size()) = 328
+(long)holes.size()) = 329
+(long)holes.size()) = 331
+(long)holes.size()) = 331
+(long)holes.size()) = 332
+(long)holes.size()) = 333
+(long)holes.size()) = 334
+(long)holes.size()) = 336
+(long)holes.size()) = 336
+(long)holes.size()) = 338
+(long)holes.size()) = 338
+(long)holes.size()) = 339
+(long)holes.size()) = 340
+(long)holes.size()) = 341
+(long)holes.size()) = 343
+(long)holes.size()) = 343
+(long)holes.size()) = 344
+(long)holes.size()) = 345
+(long)holes.size()) = 346
+(long)holes.size()) = 347
+(long)holes.size()) = 348
+(long)holes.size()) = 349
+(long)holes.size()) = 350
+(long)holes.size()) = 351
+(long)holes.size()) = 352
+(long)holes.size()) = 353
+(long)holes.size()) = 355
+(long)holes.size()) = 356
+(long)holes.size()) = 356
+(long)holes.size()) = 357
+(long)holes.size()) = 358
+(long)holes.size()) = 359
+(long)holes.size()) = 360
+(long)holes.size()) = 361
+(long)holes.size()) = 362
+(long)holes.size()) = 363
+(long)holes.size()) = 365
+(long)holes.size()) = 365
+(long)holes.size()) = 366
+(long)holes.size()) = 367
+(long)holes.size()) = 368
+(long)holes.size()) = 369
+(long)holes.size()) = 370
+(long)holes.size()) = 371
+(long)holes.size()) = 372
+(long)holes.size()) = 373
+(long)holes.size()) = 374
+(long)holes.size()) = 375
+(long)holes.size()) = (long)holes.size()) = 377
+377
+(long)holes.size()) = 378
+(long)holes.size()) = 379
+(long)holes.size()) = 380
+(long)holes.size()) = 381
+(long)holes.size()) = 382
+(long)holes.size()) = 383
+(long)holes.size()) = 384
+(long)holes.size()) = 385
+(long)holes.size()) = 386
+(long)holes.size()) = 387
+(long)holes.size()) = 388
+(long)holes.size()) = 389
+(long)holes.size()) = 390
+(long)holes.size()) = 391
+(long)holes.size()) = (long)holes.size()) = 393393
+
+(long)holes.size()) = 394
+(long)holes.size()) = 395
+(long)holes.size()) = 396
+(long)holes.size()) = 397
+(long)holes.size()) = 398
+(long)holes.size()) = 399
+(long)holes.size()) = 400
+(long)holes.size()) = 401
+(long)holes.size()) = 402
+(long)holes.size()) = 403
+(long)holes.size()) = 404
+(long)holes.size()) = 405
+(long)holes.size()) = 406
+(long)holes.size()) = 407
+(long)holes.size()) = 408
+(long)holes.size()) = 409
+(long)holes.size()) = 410
+(long)holes.size()) = 411
+(long)holes.size()) = 412
+(long)holes.size()) = 413
+(long)holes.size()) = 414
+(long)holes.size()) = 415
+(long)holes.size()) = 416
+(long)holes.size()) = 418
+(long)holes.size()) = 418
+(long)holes.size()) = 419
+(long)holes.size()) = 420
+(long)holes.size()) = 421
+(long)holes.size()) = 422
+(long)holes.size()) = 423
+(long)holes.size()) = 424
+(long)holes.size()) = 425
+(long)holes.size()) = 426
+(long)holes.size()) = 427
+(long)holes.size()) = 429
+(long)holes.size()) = 429
+(long)holes.size()) = 430
+(long)holes.size()) = 431
+(long)holes.size()) = 432
+(long)holes.size()) = 433
+(long)holes.size()) = 434
+(long)holes.size()) = 435
+(long)holes.size()) = 436
+(long)holes.size()) = 437
+(long)holes.size()) = 438
+(long)holes.size()) = 440
+(long)holes.size()) = 440
+(long)holes.size()) = 442
+(long)holes.size()) = 443
+(long)holes.size()) = 444
+(long)holes.size()) = 444
+(long)holes.size()) = 445
+(long)holes.size()) = 446
+(long)holes.size()) = 447
+(long)holes.size()) = 448
+(long)holes.size()) = 449
+(long)holes.size()) = 450
+(long)holes.size()) = 451
+(long)holes.size()) = 452
+(long)holes.size()) = 454
+(long)holes.size()) = 454
+(long)holes.size()) = 455
+(long)holes.size()) = 456
+(long)holes.size()) = 457
+(long)holes.size()) = 458
+(long)holes.size()) = 459
+(long)holes.size()) = 460
+(long)holes.size()) = 461
+(long)holes.size()) = 462
+(long)holes.size()) = 463
+(long)holes.size()) = 464
+(long)holes.size()) = 465
+(long)holes.size()) = 466
+(long)holes.size()) = 467
+(long)holes.size()) = 468
+(long)holes.size()) = 469
+(long)holes.size()) = 470
+(long)holes.size()) = 471
+(long)holes.size()) = 472
+(long)holes.size()) = 473
+(long)holes.size()) = 474
+(long)holes.size()) = 475
+(long)holes.size()) = 476
+(long)holes.size()) = 477
+(long)holes.size()) = 478
+(long)holes.size()) = 479
+(long)holes.size()) = 480
+(long)holes.size()) = 481
+(long)holes.size()) = 482
+(long)holes.size()) = 483
+(long)holes.size()) = 484
+(long)holes.size()) = 485
+(long)holes.size()) = 486
+(long)holes.size()) = 487
+(long)holes.size()) = 488
+(long)holes.size()) = 489
+(long)holes.size()) = 490
+(long)holes.size()) = 491
+(long)holes.size()) = 492
+(long)holes.size()) = 493
+(long)holes.size()) = 494
+(long)holes.size()) = 495
+(long)holes.size()) = 496
+(long)holes.size()) = 497
+(long)holes.size()) = 499
+(long)holes.size()) = 500
+(long)holes.size()) = 500
+(long)holes.size()) = 501
+(long)holes.size()) = 502
+(long)holes.size()) = 503
+(long)holes.size()) = 504
+(long)holes.size()) = 505
+(long)holes.size()) = 506
+(long)holes.size()) = 507
+(long)holes.size()) = 508
+(long)holes.size()) = 509
+(long)holes.size()) = 510
+(long)holes.size()) = 511
+(long)holes.size()) = 512
+(long)holes.size()) = 513
+(long)holes.size()) = 514
+(long)holes.size()) = 515
+(long)holes.size()) = 516
+(long)holes.size()) = 517
+(long)holes.size()) = 518
+(long)holes.size()) = 519
+(long)holes.size()) = 520
+(long)holes.size()) = 521
+(long)holes.size()) = 523
+(long)holes.size()) = 523
+(long)holes.size()) = 524
+(long)holes.size()) = 525
+(long)holes.size()) = 526
+(long)holes.size()) = 527
+(long)holes.size()) = 528
+(long)holes.size()) = 529
+(long)holes.size()) = 530
+(long)holes.size()) = 531
+(long)holes.size()) = 532
+(long)holes.size()) = 533
+(long)holes.size()) = 534
+(long)holes.size()) = 535
+(long)holes.size()) = 536
+(long)holes.size()) = 537
+(long)holes.size()) = 538
+(long)holes.size()) = 540
+(long)holes.size()) = 540
+(long)holes.size()) = 541
+(long)holes.size()) = 542
+(long)holes.size()) = 543
+(long)holes.size()) = 544
+(long)holes.size()) = 545
+(long)holes.size()) = 546
+(long)holes.size()) = 547
+(long)holes.size()) = 548
+(long)holes.size()) = 549
+(long)holes.size()) = 550
+(long)holes.size()) = 551
+(long)holes.size()) = 553
+(long)holes.size()) = 553
+(long)holes.size()) = 554
+(long)holes.size()) = 555
+(long)holes.size()) = 556
+(long)holes.size()) = 557
+(long)holes.size()) = 558
+(long)holes.size()) = 559
+(long)holes.size()) = 560
+(long)holes.size()) = 561
+(long)holes.size()) = 562
+(long)holes.size()) = 563
+(long)holes.size()) = 564
+(long)holes.size()) = 565
+(long)holes.size()) = 566
+(long)holes.size()) = 567
+(long)holes.size()) = 568
+(long)holes.size()) = 569
+(long)holes.size()) = 570
+(long)holes.size()) = 571
+(long)holes.size()) = 572
+(long)holes.size()) = 573
+(long)holes.size()) = 574
+(long)holes.size()) = 575
+(long)holes.size()) = 576
+(long)holes.size()) = 577
+(long)holes.size()) = 578
+(long)holes.size()) = 579
+(long)holes.size()) = 580
+(long)holes.size()) = 581
+(long)holes.size()) = 582
+(long)holes.size()) = 584
+(long)holes.size()) = 584
+(long)holes.size()) = 585
+(long)holes.size()) = 586
+(long)holes.size()) = 588
+(long)holes.size()) = 589
+(long)holes.size()) = 589
+(long)holes.size()) = 590
+(long)holes.size()) = 591
+(long)holes.size()) = 592
+(long)holes.size()) = 593
+(long)holes.size()) = 594
+(long)holes.size()) = 596
+(long)holes.size()) = 596
+(long)holes.size()) = 597
+(long)holes.size()) = 598
+(long)holes.size()) = 599
+(long)holes.size()) = 600
+(long)holes.size()) = 601
+(long)holes.size()) = 602
+(long)holes.size()) = 603
+(long)holes.size()) = 604
+(long)holes.size()) = 605
+(long)holes.size()) = 606
+(long)holes.size()) = 607
+(long)holes.size()) = 608
+(long)holes.size()) = 609
+(long)holes.size()) = 610
+(long)holes.size()) = 611
+(long)holes.size()) = 613
+(long)holes.size()) = 613
+(long)holes.size()) = 614
+(long)holes.size()) = 615
+(long)holes.size()) = 616
+(long)holes.size()) = 617
+(long)holes.size()) = 619
+(long)holes.size()) = 619
+(long)holes.size()) = 620
+(long)holes.size()) = 621
+(long)holes.size()) = 622
+(long)holes.size()) = 623
+(long)holes.size()) = 624
+(long)holes.size()) = 625
+(long)holes.size()) = 626
+(long)holes.size()) = 627
+(long)holes.size()) = 629
+(long)holes.size()) = 629
+(long)holes.size()) = 630
+(long)holes.size()) = 631
+(long)holes.size()) = 632
+(long)holes.size()) = 633
+(long)holes.size()) = 634
+(long)holes.size()) = 635
+(long)holes.size()) = 636
+(long)holes.size()) = 637
+(long)holes.size()) = 638
+(long)holes.size()) = 639
+(long)holes.size()) = 640
+(long)holes.size()) = 641
+(long)holes.size()) = 642
+(long)holes.size()) = 644
+(long)holes.size()) = 644
+(long)holes.size()) = 645
+(long)holes.size()) = 646
+(long)holes.size()) = 647
+(long)holes.size()) = 648
+(long)holes.size()) = 649
+(long)holes.size()) = 650
+(long)holes.size()) = 651
+(long)holes.size()) = 652
+(long)holes.size()) = 653
+(long)holes.size()) = 654
+(long)holes.size()) = 655
+(long)holes.size()) = 656
+(long)holes.size()) = 657
+(long)holes.size()) = 658
+(long)holes.size()) = 659
+(long)holes.size()) = 660
+(long)holes.size()) = 661
+(long)holes.size()) = 662
+(long)holes.size()) = 663
+(long)holes.size()) = 664
+(long)holes.size()) = 665
+(long)holes.size()) = 666
+(long)holes.size()) = 667
+(long)holes.size()) = 668
+(long)holes.size()) = 669
+(long)holes.size()) = 670
+(long)holes.size()) = 671
+(long)holes.size()) = 672
+(long)holes.size()) = 673
+(long)holes.size()) = 674
+(long)holes.size()) = 675
+(long)holes.size()) = 676
+(long)holes.size()) = 677
+(long)holes.size()) = 679
+(long)holes.size()) = 680
+(long)holes.size()) = 680
+(long)holes.size()) = 681
+(long)holes.size()) = 682
+(long)holes.size()) = 683
+(long)holes.size()) = 684
+(long)holes.size()) = 685
+(long)holes.size()) = 686
+(long)holes.size()) = 687
+(long)holes.size()) = 688
+(long)holes.size()) = 690
+(long)holes.size()) = 691
+(long)holes.size()) = 691
+(long)holes.size()) = 692
+(long)holes.size()) = 693
+(long)holes.size()) = 694
+(long)holes.size()) = 695
+(long)holes.size()) = 696
+(long)holes.size()) = 697
+(long)holes.size()) = 698
+(long)holes.size()) = 699
+(long)holes.size()) = 700
+(long)holes.size()) = 701
+(long)holes.size()) = 702
+(long)holes.size()) = 703
+(long)holes.size()) = 704
+(long)holes.size()) = 705
+(long)holes.size()) = 706
+(long)holes.size()) = 707
+(long)holes.size()) = 708
+(long)holes.size()) = 709
+(long)holes.size()) = 710
+(long)holes.size()) = 712
+(long)holes.size()) = 712
+(long)holes.size()) = 713
+(long)holes.size()) = 714
+(long)holes.size()) = 715
+(long)holes.size()) = 716
+(long)holes.size()) = 717
+(long)holes.size()) = 718
+(long)holes.size()) = 719
+(long)holes.size()) = 720
+(long)holes.size()) = 721
+(long)holes.size()) = 722
+(long)holes.size()) = 723
+(long)holes.size()) = 724
+(long)holes.size()) = 725
+(long)holes.size()) = 726
+(long)holes.size()) = 727
+(long)holes.size()) = 728
+(long)holes.size()) = 729
+(long)holes.size()) = 730
+(long)holes.size()) = 731
+(long)holes.size()) = 732
+(long)holes.size()) = 733
+(long)holes.size()) = 734
+(long)holes.size()) = 735
+(long)holes.size()) = 736
+(long)holes.size()) = 737
+(long)holes.size()) = 738
+(long)holes.size()) = 739
+(long)holes.size()) = 741
+(long)holes.size()) = 741
+(long)holes.size()) = 742
+(long)holes.size()) = 743
+(long)holes.size()) = 744
+(long)holes.size()) = 745
+(long)holes.size()) = 746
+(long)holes.size()) = 747
+(long)holes.size()) = 748
+(long)holes.size()) = 749
+(long)holes.size()) = 750
+(long)holes.size()) = 751
+(long)holes.size()) = 752
+(long)holes.size()) = 753
+(long)holes.size()) = 754
+(long)holes.size()) = 755
+(long)holes.size()) = 756
+(long)holes.size()) = 757
+(long)holes.size()) = 758
+(long)holes.size()) = 759
+(long)holes.size()) = 760
+(long)holes.size()) = 761
+(long)holes.size()) = 762
+(long)holes.size()) = 763
+(long)holes.size()) = 764
+(long)holes.size()) = 765
+(long)holes.size()) = 766
+(long)holes.size()) = 767
+(long)holes.size()) = 768
+(long)holes.size()) = 770
+(long)holes.size()) = 771
+(long)holes.size()) = 772
+(long)holes.size()) = 772
+(long)holes.size()) = 774
+(long)holes.size()) = 775
+(long)holes.size()) = 776
+(long)holes.size()) = 776
+(long)holes.size()) = 777
+(long)holes.size()) = 778
+(long)holes.size()) = 779
+(long)holes.size()) = 780
+(long)holes.size()) = 782
+(long)holes.size()) = 782
+(long)holes.size()) = 783
+(long)holes.size()) = 784
+(long)holes.size()) = 785
+(long)holes.size()) = 786
+(long)holes.size()) = 787
+(long)holes.size()) = 788
+(long)holes.size()) = 789
+(long)holes.size()) = 790
+(long)holes.size()) = 791
+(long)holes.size()) = 792
+(long)holes.size()) = 793
+(long)holes.size()) = 794
+(long)holes.size()) = 795
+(long)holes.size()) = 796
+(long)holes.size()) = 797
+(long)holes.size()) = 798
+(long)holes.size()) = 799
+(long)holes.size()) = 800
+(long)holes.size()) = 801
+(long)holes.size()) = 802
+(long)holes.size()) = 803
+(long)holes.size()) = 804
+(long)holes.size()) = 805
+(long)holes.size()) = 806
+(long)holes.size()) = 807
+(long)holes.size()) = 808
+(long)holes.size()) = 809
+(long)holes.size()) = 810
+(long)holes.size()) = 811
+(long)holes.size()) = 812
+(long)holes.size()) = 813
+(long)holes.size()) = 814
+(long)holes.size()) = 815
+(long)holes.size()) = 816
+(long)holes.size()) = 817
+(long)holes.size()) = 818
+(long)holes.size()) = 819
+(long)holes.size()) = 820
+(long)holes.size()) = 821
+(long)holes.size()) = 822
+(long)holes.size()) = 823
+(long)holes.size()) = 824
+(long)holes.size()) = 825
+(long)holes.size()) = 826
+(long)holes.size()) = 827
+(long)holes.size()) = 828
+(long)holes.size()) = 829
+(long)holes.size()) = 830
+(long)holes.size()) = 831
+(long)holes.size()) = 832
+(long)holes.size()) = 833
+(long)holes.size()) = 834
+(long)holes.size()) = 835
+(long)holes.size()) = 836
+(long)holes.size()) = 837
+(long)holes.size()) = 838
+(long)holes.size()) = 839
+(long)holes.size()) = 840
+(long)holes.size()) = 841
+(long)holes.size()) = 842
+(long)holes.size()) = 843
+(long)holes.size()) = 844
+(long)holes.size()) = 845
+(long)holes.size()) = 846
+(long)holes.size()) = 847
+(long)holes.size()) = 848
+(long)holes.size()) = 849
+(long)holes.size()) = 850
+(long)holes.size()) = 851
+(long)holes.size()) = 852
+(long)holes.size()) = 853
+(long)holes.size()) = 854
+(long)holes.size()) = 855
+(long)holes.size()) = 856
+(long)holes.size()) = 858
+(long)holes.size()) = 858
+(long)holes.size()) = 859
+(long)holes.size()) = 860
+(long)holes.size()) = 862
+(long)holes.size()) = 863
+(long)holes.size()) = (long)holes.size()) = 864
+864
+(long)holes.size()) = 865
+(long)holes.size()) = 866
+(long)holes.size()) = 868
+(long)holes.size()) = 869
+(long)holes.size()) = 870
+(long)holes.size()) = 871
+(long)holes.size()) = 872
+(long)holes.size()) = 872
+(long)holes.size()) = 873
+(long)holes.size()) = 874
+(long)holes.size()) = 875
+(long)holes.size()) = 876
+(long)holes.size()) = 878
+(long)holes.size()) = 878
+(long)holes.size()) = (long)holes.size()) = 880
+880
+(long)holes.size()) = 881
+(long)holes.size()) = 882
+(long)holes.size()) = 883
+(long)holes.size()) = 884
+(long)holes.size()) = 885
+(long)holes.size()) = 886
+(long)holes.size()) = 887
+(long)holes.size()) = 888
+(long)holes.size()) = 889
+(long)holes.size()) = 890
+(long)holes.size()) = 891
+(long)holes.size()) = 892
+(long)holes.size()) = 893
+(long)holes.size()) = 894
+(long)holes.size()) = 895
+(long)holes.size()) = 896
+(long)holes.size()) = 897
+(long)holes.size()) = 898
+(long)holes.size()) = 899
+(long)holes.size()) = 900
+(long)holes.size()) = 901
+(long)holes.size()) = 902
+(long)holes.size()) = 903
+(long)holes.size()) = 904
+(long)holes.size()) = 905
+(long)holes.size()) = 906
+(long)holes.size()) = 907
+(long)holes.size()) = 908
+(long)holes.size()) = 909
+(long)holes.size()) = 910
+(long)holes.size()) = 911
+(long)holes.size()) = 912
+(long)holes.size()) = 913
+(long)holes.size()) = 914
+(long)holes.size()) = 915
+(long)holes.size()) = 916
+(long)holes.size()) = 917
+(long)holes.size()) = 918
+(long)holes.size()) = 919
+(long)holes.size()) = 920
+(long)holes.size()) = 921
+(long)holes.size()) = 922
+(long)holes.size()) = 923
+(long)holes.size()) = 924
+(long)holes.size()) = 925
+(long)holes.size()) = 926
+(long)holes.size()) = 927
+(long)holes.size()) = 928
+(long)holes.size()) = 929
+(long)holes.size()) = 930
+(long)holes.size()) = 931
+(long)holes.size()) = 932
+(long)holes.size()) = 933
+(long)holes.size()) = 934
+(long)holes.size()) = 935
+(long)holes.size()) = (long)holes.size()) = 937937
+
+(long)holes.size()) = 938
+(long)holes.size()) = 939
+(long)holes.size()) = 940
+(long)holes.size()) = 941
+(long)holes.size()) = 942
+(long)holes.size()) = 943
+(long)holes.size()) = 944
+(long)holes.size()) = 945
+(long)holes.size()) = 946
+(long)holes.size()) = 947
+(long)holes.size()) = 948
+(long)holes.size()) = 949
+(long)holes.size()) = 950
+(long)holes.size()) = 951
+(long)holes.size()) = 952
+(long)holes.size()) = 953
+(long)holes.size()) = 954
+(long)holes.size()) = 955
+(long)holes.size()) = 956
+(long)holes.size()) = 957
+(long)holes.size()) = 958
+(long)holes.size()) = 959
+(long)holes.size()) = 960
+(long)holes.size()) = 961
+(long)holes.size()) = 962
+(long)holes.size()) = 963
+(long)holes.size()) = 964
+(long)holes.size()) = 965
+(long)holes.size()) = 966
+(long)holes.size()) = 968
+(long)holes.size()) = 969
+(long)holes.size()) = 969
+(long)holes.size()) = 970
+(long)holes.size()) = 972
+(long)holes.size()) = 972
+(long)holes.size()) = 973
+(long)holes.size()) = 975
+(long)holes.size()) = 976
+(long)holes.size()) = 976
+(long)holes.size()) = 977
+(long)holes.size()) = 978
+(long)holes.size()) = 979
+(long)holes.size()) = 980
+(long)holes.size()) = 981
+(long)holes.size()) = 983
+(long)holes.size()) = 983
+(long)holes.size()) = 984
+(long)holes.size()) = 985
+(long)holes.size()) = 986
+(long)holes.size()) = 987
+(long)holes.size()) = 988
+(long)holes.size()) = 989
+(long)holes.size()) = 990
+(long)holes.size()) = 991
+(long)holes.size()) = 992
+(long)holes.size()) = 993
+(long)holes.size()) = 994
+(long)holes.size()) = 995
+(long)holes.size()) = 996
+(long)holes.size()) = 997
+(long)holes.size()) = 998
+(long)holes.size()) = 999
+(long)holes.size()) = 1000
+(long)holes.size()) = 1001
+(long)holes.size()) = 1002
+(long)holes.size()) = 1003
+(long)holes.size()) = 1004
+(long)holes.size()) = 1005
+(long)holes.size()) = 1007
+(long)holes.size()) = 1007
+(long)holes.size()) = 1008
+(long)holes.size()) = 1009
+(long)holes.size()) = 1010
+(long)holes.size()) = 1011
+(long)holes.size()) = 1012
+(long)holes.size()) = 1013
+(long)holes.size()) = 1014
+(long)holes.size()) = 1015
+(long)holes.size()) = 1016
+(long)holes.size()) = 1017
+(long)holes.size()) = (long)holes.size()) = 1019
+1019
+(long)holes.size()) = 1020
+(long)holes.size()) = 1021
+(long)holes.size()) = 1022
+(long)holes.size()) = 1023
+(long)holes.size()) = 1024
+(long)holes.size()) = 1025
+(long)holes.size()) = 1026
+(long)holes.size()) = 1027
+(long)holes.size()) = 1028
+(long)holes.size()) = 1029
+(long)holes.size()) = 1030
+(long)holes.size()) = 1031
+(long)holes.size()) = 1032
+(long)holes.size()) = 1033
+(long)holes.size()) = 1034
+(long)holes.size()) = 1035
+(long)holes.size()) = 1036
+(long)holes.size()) = 1037
+(long)holes.size()) = 1038
+(long)holes.size()) = 1039
+(long)holes.size()) = 1040
+(long)holes.size()) = 1041
+(long)holes.size()) = 1042
+(long)holes.size()) = 1043
+(long)holes.size()) = 1044
+(long)holes.size()) = 1045
+(long)holes.size()) = 1046
+(long)holes.size()) = 1047
+(long)holes.size()) = 1048
+(long)holes.size()) = 1050
+(long)holes.size()) = 1050
+(long)holes.size()) = 1051
+(long)holes.size()) = 1052
+(long)holes.size()) = 1053
+(long)holes.size()) = 1055
+(long)holes.size()) = (long)holes.size()) = 1056
+1056
+(long)holes.size()) = 1057
+(long)holes.size()) = 1058
+(long)holes.size()) = 1059
+(long)holes.size()) = 1060
+(long)holes.size()) = 1061
+(long)holes.size()) = 1062
+(long)holes.size()) = 1063
+(long)holes.size()) = 1064
+(long)holes.size()) = (long)holes.size()) = 1066
+1066
+(long)holes.size()) = 1068
+(long)holes.size()) = 1068
+(long)holes.size()) = 1069
+(long)holes.size()) = 1070
+(long)holes.size()) = 1071
+(long)holes.size()) = 1072
+(long)holes.size()) = 1073
+(long)holes.size()) = 1075
+(long)holes.size()) = 1076
+(long)holes.size()) = 1077
+(long)holes.size()) = 1077
+(long)holes.size()) = 1078
+(long)holes.size()) = 1079
+(long)holes.size()) = 1080
+(long)holes.size()) = 1082
+(long)holes.size()) = 1083
+(long)holes.size()) = 1084
+(long)holes.size()) = 1084
+(long)holes.size()) = 1085
+(long)holes.size()) = 1086
+(long)holes.size()) = 1087
+(long)holes.size()) = 1088
+(long)holes.size()) = 1089
+(long)holes.size()) = 1090
+(long)holes.size()) = 1091
+(long)holes.size()) = 1092
+(long)holes.size()) = 1093
+(long)holes.size()) = 1094
+(long)holes.size()) = 1095
+(long)holes.size()) = 1096
+(long)holes.size()) = 1097
+(long)holes.size()) = 1098
+(long)holes.size()) = 1099
+(long)holes.size()) = 1100
+(long)holes.size()) = 1101
+(long)holes.size()) = 1102
+(long)holes.size()) = 1103
+(long)holes.size()) = 1104
+(long)holes.size()) = 1105
+(long)holes.size()) = 1106
+(long)holes.size()) = 1107
+(long)holes.size()) = 1108
+(long)holes.size()) = 1109
+(long)holes.size()) = 1110
+(long)holes.size()) = 1111
+(long)holes.size()) = 1112
+(long)holes.size()) = 1113
+(long)holes.size()) = 1114
+(long)holes.size()) = 1115
+(long)holes.size()) = 1117
+(long)holes.size()) = 1117
+(long)holes.size()) = 1118
+(long)holes.size()) = 1119
+(long)holes.size()) = 1120
+(long)holes.size()) = 1121
+(long)holes.size()) = 1122
+(long)holes.size()) = 1123
+(long)holes.size()) = 1124
+(long)holes.size()) = 1125
+(long)holes.size()) = 1126
+(long)holes.size()) = 1127
+(long)holes.size()) = 1128
+(long)holes.size()) = 1129
+(long)holes.size()) = 1130
+(long)holes.size()) = 1131
+(long)holes.size()) = 1132
+(long)holes.size()) = 1133
+(long)holes.size()) = 1134
+(long)holes.size()) = 1135
+(long)holes.size()) = 1136
+(long)holes.size()) = 1137
+(long)holes.size()) = 1138
+(long)holes.size()) = 1139
+(long)holes.size()) = 1140
+(long)holes.size()) = 1141
+(long)holes.size()) = 1142
+(long)holes.size()) = 1143
+(long)holes.size()) = 1144
+(long)holes.size()) = 1145
+(long)holes.size()) = 1146
+(long)holes.size()) = 1147
+(long)holes.size()) = 1148
+(long)holes.size()) = 1149
+(long)holes.size()) = 1150
+(long)holes.size()) = 1151
+(long)holes.size()) = 1152
+(long)holes.size()) = 1153
+(long)holes.size()) = 1154
+(long)holes.size()) = 1155
+(long)holes.size()) = 1156
+(long)holes.size()) = 1157
+(long)holes.size()) = 1158
+(long)holes.size()) = 1159
+(long)holes.size()) = 1160
+(long)holes.size()) = 1161
+(long)holes.size()) = 1162
+(long)holes.size()) = 1163
+(long)holes.size()) = 1164
+(long)holes.size()) = 1165
+(long)holes.size()) = 1166
+(long)holes.size()) = 1167
+(long)holes.size()) = 1168
+(long)holes.size()) = 1169
+(long)holes.size()) = 1170
+(long)holes.size()) = 1171
+(long)holes.size()) = 1172
+(long)holes.size()) = 1173
+(long)holes.size()) = 1174
+(long)holes.size()) = 1175
+(long)holes.size()) = 1176
+(long)holes.size()) = 1177
+(long)holes.size()) = 1178
+(long)holes.size()) = 1179
+(long)holes.size()) = 1180
+(long)holes.size()) = 1181
+(long)holes.size()) = 1182
+(long)holes.size()) = 1183
+(long)holes.size()) = 1184
+(long)holes.size()) = 1185
+(long)holes.size()) = 1186
+(long)holes.size()) = (long)holes.size()) = 11881188
+
+(long)holes.size()) = 1189
+(long)holes.size()) = 1190
+(long)holes.size()) = 1192
+(long)holes.size()) = 1193
+(long)holes.size()) = 1194
+(long)holes.size()) = 1194
+(long)holes.size()) = 1196
+(long)holes.size()) = 1197
+(long)holes.size()) = 1198
+(long)holes.size()) = 1198
+(long)holes.size()) = 1199
+(long)holes.size()) = 1200
+(long)holes.size()) = 1201
+(long)holes.size()) = 1202
+(long)holes.size()) = 1203
+(long)holes.size()) = 1204
+(long)holes.size()) = 1205
+(long)holes.size()) = 1207
+(long)holes.size()) = 1207
+(long)holes.size()) = 1208
+(long)holes.size()) = 1209
+(long)holes.size()) = 1210
+(long)holes.size()) = 1211
+(long)holes.size()) = 1212
+(long)holes.size()) = 1213
+(long)holes.size()) = 1214
+(long)holes.size()) = 1215
+(long)holes.size()) = 1216
+(long)holes.size()) = 1217
+(long)holes.size()) = 1218
+(long)holes.size()) = (long)holes.size()) = 1220
+(long)holes.size()) = 1221
+(long)holes.size()) = 1222
+1220
+(long)holes.size()) = 1223
+(long)holes.size()) = 1224
+(long)holes.size()) = 1225
+(long)holes.size()) = 1226
+(long)holes.size()) = 1227
+(long)holes.size()) = 1228
+(long)holes.size()) = 1229
+(long)holes.size()) = 1230
+(long)holes.size()) = 1231
+(long)holes.size()) = 1232
+(long)holes.size()) = 1233
+(long)holes.size()) = 1234
+(long)holes.size()) = 1235
+(long)holes.size()) = 1236
+(long)holes.size()) = 1237
+(long)holes.size()) = 1238
+(long)holes.size()) = 1239
+(long)holes.size()) = 1240
+(long)holes.size()) = 1241
+(long)holes.size()) = 1242
+(long)holes.size()) = 1243
+(long)holes.size()) = 1244
+(long)holes.size()) = 1245
+(long)holes.size()) = 1246
+(long)holes.size()) = 1247
+(long)holes.size()) = 1248
+(long)holes.size()) = 1249
+(long)holes.size()) = 1250
+(long)holes.size()) = 1251
+(long)holes.size()) = 1252
+(long)holes.size()) = 1253
+(long)holes.size()) = 1254
+(long)holes.size()) = 1255
+(long)holes.size()) = 1256
+(long)holes.size()) = 1257
+(long)holes.size()) = 1258
+(long)holes.size()) = 1259
+(long)holes.size()) = 1260
+(long)holes.size()) = 1261
+(long)holes.size()) = 1262
+(long)holes.size()) = 1263
+(long)holes.size()) = 1264
+(long)holes.size()) = 1265
+(long)holes.size()) = 1266
+(long)holes.size()) = 1267
+(long)holes.size()) = 1269
+(long)holes.size()) = 1269
+(long)holes.size()) = 1270
+(long)holes.size()) = 1271
+(long)holes.size()) = 1272
+(long)holes.size()) = 1273
+(long)holes.size()) = 1274
+(long)holes.size()) = 1275
+(long)holes.size()) = 1276
+(long)holes.size()) = 1277
+(long)holes.size()) = (long)holes.size()) = 1279
+1279
+(long)holes.size()) = 1280
+(long)holes.size()) = 1281
+(long)holes.size()) = 1282
+(long)holes.size()) = 1283
+(long)holes.size()) = 1284
+(long)holes.size()) = 1285
+(long)holes.size()) = 1286
+(long)holes.size()) = 1287
+(long)holes.size()) = 1288
+(long)holes.size()) = 1289
+(long)holes.size()) = 1290
+(long)holes.size()) = 1291
+(long)holes.size()) = 1292
+(long)holes.size()) = 1294
+(long)holes.size()) = 1295
+(long)holes.size()) = 1296
+(long)holes.size()) = 1297
+(long)holes.size()) = (long)holes.size()) = 1298
+1298
+(long)holes.size()) = 1299
+(long)holes.size()) = 1300
+(long)holes.size()) = 1301
+(long)holes.size()) = 1302
+(long)holes.size()) = 1303
+(long)holes.size()) = 1304
+(long)holes.size()) = 1306
+(long)holes.size()) = 1307
+(long)holes.size()) = 1308
+(long)holes.size()) = 1308
+(long)holes.size()) = 1309
+(long)holes.size()) = 1311
+(long)holes.size()) = 1311
+(long)holes.size()) = 1312
+(long)holes.size()) = 1313
+(long)holes.size()) = 1314
+(long)holes.size()) = 1315
+(long)holes.size()) = 1316
+(long)holes.size()) = 1317
+(long)holes.size()) = 1318
+(long)holes.size()) = 1319
+(long)holes.size()) = 1320
+(long)holes.size()) = 1321
+(long)holes.size()) = 1322
+(long)holes.size()) = 1323
+(long)holes.size()) = 1324
+(long)holes.size()) = 1326
+(long)holes.size()) = 1327
+(long)holes.size()) = 1327
+(long)holes.size()) = 1328
+(long)holes.size()) = 1329
+(long)holes.size()) = 1330
+(long)holes.size()) = 1331
+(long)holes.size()) = 1332
+(long)holes.size()) = 1334(long)holes.size()) = 
+1334
+(long)holes.size()) = 1335
+(long)holes.size()) = 1336
+(long)holes.size()) = 1337
+(long)holes.size()) = 1338
+(long)holes.size()) = 1339
+(long)holes.size()) = 1340
+(long)holes.size()) = 1341
+(long)holes.size()) = 1342
+(long)holes.size()) = 1343
+(long)holes.size()) = 1344
+(long)holes.size()) = 1345
+(long)holes.size()) = 1346
+(long)holes.size()) = 1347
+(long)holes.size()) = 1348
+(long)holes.size()) = 1349
+(long)holes.size()) = 1350
+(long)holes.size()) = 1351
+(long)holes.size()) = 1352
+(long)holes.size()) = 1353
+(long)holes.size()) = 1354
+(long)holes.size()) = 1355
+(long)holes.size()) = 1356
+(long)holes.size()) = 1357
+(long)holes.size()) = 1358
+(long)holes.size()) = 1359
+(long)holes.size()) = 1360
+(long)holes.size()) = 1362(long)holes.size()) = 
+1362
+(long)holes.size()) = 1363
+(long)holes.size()) = 1364
+(long)holes.size()) = 1365
+(long)holes.size()) = 1366
+(long)holes.size()) = 1367
+(long)holes.size()) = 1368
+(long)holes.size()) = 1369
+(long)holes.size()) = 1370
+(long)holes.size()) = 1371
+(long)holes.size()) = 1372
+(long)holes.size()) = 1373
+(long)holes.size()) = 1374
+(long)holes.size()) = 1375
+(long)holes.size()) = (long)holes.size()) = 1377
+1377
+(long)holes.size()) = 1378
+(long)holes.size()) = 1379
+(long)holes.size()) = 1380
+(long)holes.size()) = 1381
+(long)holes.size()) = 1382
+(long)holes.size()) = 1383
+(long)holes.size()) = 1384
+(long)holes.size()) = 1385
+(long)holes.size()) = 1386
+(long)holes.size()) = 1387
+(long)holes.size()) = 1388
+(long)holes.size()) = 1389
+(long)holes.size()) = 1390
+(long)holes.size()) = 1391
+(long)holes.size()) = 1392
+(long)holes.size()) = 1393
+(long)holes.size()) = 1394
+(long)holes.size()) = 1395
+(long)holes.size()) = 1396
+(long)holes.size()) = 1397
+(long)holes.size()) = (long)holes.size()) = 1399
+1399
+(long)holes.size()) = 1400
+(long)holes.size()) = 1401
+(long)holes.size()) = (long)holes.size()) = 1403
+1403
+(long)holes.size()) = 1404
+(long)holes.size()) = 1405
+(long)holes.size()) = 1406
+(long)holes.size()) = 1407
+(long)holes.size()) = 1408
+(long)holes.size()) = 1409
+(long)holes.size()) = 1410
+(long)holes.size()) = 1411
+(long)holes.size()) = 1412
+(long)holes.size()) = 1413
+(long)holes.size()) = 1414
+(long)holes.size()) = 1415
+(long)holes.size()) = 1416
+(long)holes.size()) = 1417
+(long)holes.size()) = 1419
+(long)holes.size()) = 1420
+(long)holes.size()) = 1421
+(long)holes.size()) = 1421
+(long)holes.size()) = 1423
+(long)holes.size()) = 1424
+(long)holes.size()) = 1425
+(long)holes.size()) = 1426(long)holes.size()) = 
+1426
+(long)holes.size()) = 1427
+(long)holes.size()) = 1428
+(long)holes.size()) = 1429
+(long)holes.size()) = 1430
+(long)holes.size()) = 1431
+(long)holes.size()) = 1432
+(long)holes.size()) = (long)holes.size()) = 1434
+1434
+(long)holes.size()) = 1435
+(long)holes.size()) = 1436
+(long)holes.size()) = 1438
+(long)holes.size()) = 1438
+(long)holes.size()) = 1439
+(long)holes.size()) = 1440
+(long)holes.size()) = 1441
+(long)holes.size()) = 1442
+(long)holes.size()) = (long)holes.size()) = 1444
+1444
+(long)holes.size()) = 1445
+(long)holes.size()) = 1446
+(long)holes.size()) = 1447
+(long)holes.size()) = 1448
+(long)holes.size()) = 1449
+(long)holes.size()) = 1450
+(long)holes.size()) = 1451
+(long)holes.size()) = 1452
+(long)holes.size()) = 1453
+(long)holes.size()) = 1454
+(long)holes.size()) = 1455
+(long)holes.size()) = 1456
+(long)holes.size()) = 1457
+(long)holes.size()) = 1458
+(long)holes.size()) = 1459
+(long)holes.size()) = (long)holes.size()) = 1461
+1461
+(long)holes.size()) = 1462
+(long)holes.size()) = 1463
+(long)holes.size()) = 1464
+(long)holes.size()) = 1465
+(long)holes.size()) = 1466
+(long)holes.size()) = 1467
+(long)holes.size()) = 1468
+(long)holes.size()) = 1469
+(long)holes.size()) = 1470
+(long)holes.size()) = 1471
+(long)holes.size()) = 1472
+(long)holes.size()) = 1473
+(long)holes.size()) = 1474
+(long)holes.size()) = 1475
+(long)holes.size()) = 1476
+(long)holes.size()) = (long)holes.size()) = 14781478
+
+(long)holes.size()) = 1479
+(long)holes.size()) = 1480
+(long)holes.size()) = 1481
+(long)holes.size()) = 1482
+(long)holes.size()) = 1483
+(long)holes.size()) = 1484
+(long)holes.size()) = 1485
+(long)holes.size()) = 1486
+(long)holes.size()) = 1487
+(long)holes.size()) = 1488
+(long)holes.size()) = 1489
+(long)holes.size()) = 1490
+(long)holes.size()) = 1491
+(long)holes.size()) = 1493
+(long)holes.size()) = 1493
+(long)holes.size()) = 1494
+(long)holes.size()) = 1495
+(long)holes.size()) = (long)holes.size()) = 1497
+1497
+(long)holes.size()) = (long)holes.size()) = 1499
+1499
+(long)holes.size()) = 1500
+(long)holes.size()) = 1501
+(long)holes.size()) = 1502
+(long)holes.size()) = (long)holes.size()) = 1504
+(long)holes.size()) = 1505
+1504
+(long)holes.size()) = 1506
+(long)holes.size()) = 1507
+(long)holes.size()) = 1508
+(long)holes.size()) = 1509
+(long)holes.size()) = 1510
+(long)holes.size()) = 1511
+(long)holes.size()) = 1512
+(long)holes.size()) = 1513
+(long)holes.size()) = 1514
+(long)holes.size()) = 1515
+(long)holes.size()) = 1516
+(long)holes.size()) = 1517
+(long)holes.size()) = 1518
+(long)holes.size()) = 1519
+(long)holes.size()) = 1520
+(long)holes.size()) = 1521
+(long)holes.size()) = 1522
+(long)holes.size()) = 1524
+(long)holes.size()) = 1525
+(long)holes.size()) = 1526
+(long)holes.size()) = 1527
+(long)holes.size()) = 1527
+(long)holes.size()) = 1528
+(long)holes.size()) = 1529
+(long)holes.size()) = 1530
+(long)holes.size()) = 1531
+(long)holes.size()) = 1532
+(long)holes.size()) = 1533
+(long)holes.size()) = 1534
+(long)holes.size()) = 1535
+(long)holes.size()) = 1536
+(long)holes.size()) = 1537
+(long)holes.size()) = (long)holes.size()) = 1539
+1539
+(long)holes.size()) = 1540
+(long)holes.size()) = 1541
+(long)holes.size()) = 1542
+(long)holes.size()) = 1543
+(long)holes.size()) = 1545
+(long)holes.size()) = 1545
+(long)holes.size()) = 1546
+(long)holes.size()) = 1547
+(long)holes.size()) = 1548
+(long)holes.size()) = 1549
+(long)holes.size()) = 1550
+(long)holes.size()) = 1551
+(long)holes.size()) = 1552
+(long)holes.size()) = 1553
+(long)holes.size()) = 1554
+(long)holes.size()) = 1555
+(long)holes.size()) = 1556
+(long)holes.size()) = 1557
+(long)holes.size()) = (long)holes.size()) = 1559
+1559
+(long)holes.size()) = 1560
+(long)holes.size()) = 1561
+(long)holes.size()) = 1562
+(long)holes.size()) = 1563
+(long)holes.size()) = 1564
+(long)holes.size()) = 1565
+(long)holes.size()) = 1566
+(long)holes.size()) = 1567
+(long)holes.size()) = 1568
+(long)holes.size()) = 1569
+(long)holes.size()) = (long)holes.size()) = 1571
+1571
+(long)holes.size()) = 1572
+(long)holes.size()) = 1573
+(long)holes.size()) = (long)holes.size()) = 15751575
+
+(long)holes.size()) = 1576
+(long)holes.size()) = 1577
+(long)holes.size()) = 1578
+(long)holes.size()) = 1579
+(long)holes.size()) = 1580
+(long)holes.size()) = 1582(long)holes.size()) = 
+1582
+(long)holes.size()) = 1583
+(long)holes.size()) = 1584
+(long)holes.size()) = 1585
+(long)holes.size()) = (long)holes.size()) = 1587
+1587
+(long)holes.size()) = 1588
+(long)holes.size()) = (long)holes.size()) = 1590
+1590
+(long)holes.size()) = 1591
+(long)holes.size()) = 1592
+(long)holes.size()) = 1593
+(long)holes.size()) = 1594
+(long)holes.size()) = 1596
+(long)holes.size()) = 1596
+(long)holes.size()) = 1597
+(long)holes.size()) = 1598
+(long)holes.size()) = 1599
+(long)holes.size()) = 1600
+(long)holes.size()) = 1601
+(long)holes.size()) = 1602
+(long)holes.size()) = (long)holes.size()) = 1604
+1604
+(long)holes.size()) = 1605
+(long)holes.size()) = (long)holes.size()) = 1607
+1607
+(long)holes.size()) = (long)holes.size()) = 1609
+1609
+(long)holes.size()) = 1611
+(long)holes.size()) = 1611
+(long)holes.size()) = 1612
+(long)holes.size()) = 1613
+(long)holes.size()) = 1614
+(long)holes.size()) = 1615
+(long)holes.size()) = 1616
+(long)holes.size()) = 1617
+(long)holes.size()) = 1618
+(long)holes.size()) = 1619
+(long)holes.size()) = 1620
+(long)holes.size()) = 1621
+(long)holes.size()) = 1622
+(long)holes.size()) = 1623
+(long)holes.size()) = (long)holes.size()) = 16251625
+
+(long)holes.size()) = 1626
+(long)holes.size()) = 1627
+(long)holes.size()) = 1628
+(long)holes.size()) = 1629
+(long)holes.size()) = 1630
+(long)holes.size()) = 1631
+(long)holes.size()) = 1633
+(long)holes.size()) = 1634
+(long)holes.size()) = 1635
+(long)holes.size()) = 1636
+(long)holes.size()) = 1637
+(long)holes.size()) = 1638
+(long)holes.size()) = 1639
+(long)holes.size()) = 1639
+(long)holes.size()) = 1640
+(long)holes.size()) = 1641
+(long)holes.size()) = 1642
+(long)holes.size()) = 1643
+(long)holes.size()) = 1644
+(long)holes.size()) = 1645
+(long)holes.size()) = 1646
+(long)holes.size()) = 1647
+(long)holes.size()) = 1648
+(long)holes.size()) = 1649
+(long)holes.size()) = 1650
+(long)holes.size()) = 1651
+(long)holes.size()) = 1652
+(long)holes.size()) = 1653
+(long)holes.size()) = 1654
+(long)holes.size()) = 1655
+(long)holes.size()) = 1656
+(long)holes.size()) = (long)holes.size()) = 1658
+1658
+(long)holes.size()) = (long)holes.size()) = 1660
+1660(long)holes.size()) = 1661
+
+(long)holes.size()) = 1662
+(long)holes.size()) = 1663
+(long)holes.size()) = 1664
+(long)holes.size()) = 1665
+(long)holes.size()) = 1666
+(long)holes.size()) = 1667
+(long)holes.size()) = 1668
+(long)holes.size()) = 1669
+(long)holes.size()) = (long)holes.size()) = 1671
+1671
+(long)holes.size()) = 1672
+(long)holes.size()) = (long)holes.size()) = 1674
+1674
+(long)holes.size()) = 1675
+(long)holes.size()) = 1677
+(long)holes.size()) = 1677
+(long)holes.size()) = 1678
+(long)holes.size()) = 1679
+(long)holes.size()) = 1681(long)holes.size()) = 
+1681
+(long)holes.size()) = 1682
+(long)holes.size()) = 1683
+(long)holes.size()) = 1684
+(long)holes.size()) = 1685
+(long)holes.size()) = 1686
+(long)holes.size()) = 1687
+(long)holes.size()) = 1688
+(long)holes.size()) = 1689
+(long)holes.size()) = 1691
+(long)holes.size()) = 1691
+(long)holes.size()) = 1693
+(long)holes.size()) = 1693
+(long)holes.size()) = 1694
+(long)holes.size()) = 1695
+(long)holes.size()) = (long)holes.size()) = 1697
+1697
+(long)holes.size()) = 1699(long)holes.size()) = 
+1699
+(long)holes.size()) = 1700
+(long)holes.size()) = 1701
+(long)holes.size()) = 1702
+(long)holes.size()) = 1703
+(long)holes.size()) = 1704
+(long)holes.size()) = 1705
+(long)holes.size()) = 1706
+(long)holes.size()) = 1707
+(long)holes.size()) = 1709
+(long)holes.size()) = 1709
+(long)holes.size()) = 1710
+(long)holes.size()) = 1711
+(long)holes.size()) = 1712
+(long)holes.size()) = 1713
+(long)holes.size()) = 1714
+(long)holes.size()) = 1715
+(long)holes.size()) = 1716
+(long)holes.size()) = 1717
+(long)holes.size()) = 1718
+(long)holes.size()) = 1720(long)holes.size()) = 
+1720
+(long)holes.size()) = 1721
+(long)holes.size()) = 1723
+(long)holes.size()) = 1723
+(long)holes.size()) = 1724
+(long)holes.size()) = 1725
+(long)holes.size()) = (long)holes.size()) = 1727
+1727(long)holes.size()) = 1728
+
+(long)holes.size()) = 1729
+(long)holes.size()) = 1731(long)holes.size()) = 
+1731
+(long)holes.size()) = 1732
+(long)holes.size()) = 1733
+(long)holes.size()) = 1734
+(long)holes.size()) = 1736(long)holes.size()) = 
+1736
+(long)holes.size()) = 1737
+(long)holes.size()) = 1739
+(long)holes.size()) = 1740
+(long)holes.size()) = 1741
+(long)holes.size()) = 1742
+(long)holes.size()) = (long)holes.size()) = 1743
+1743
+(long)holes.size()) = 1745
+(long)holes.size()) = 1746
+(long)holes.size()) = 1747
+(long)holes.size()) = 1748
+(long)holes.size()) = 1748
+(long)holes.size()) = 1749
+(long)holes.size()) = 1750
+(long)holes.size()) = 1751
+(long)holes.size()) = 1752
+(long)holes.size()) = 1753
+(long)holes.size()) = 1754
+(long)holes.size()) = 1755
+(long)holes.size()) = 1756
+(long)holes.size()) = 1757
+(long)holes.size()) = 1758
+(long)holes.size()) = (long)holes.size()) = 1760
+1760
+(long)holes.size()) = 1762
+(long)holes.size()) = 1762
+(long)holes.size()) = 1764
+(long)holes.size()) = 1765
+(long)holes.size()) = (long)holes.size()) = 1766
+(long)holes.size()) = 1767
+(long)holes.size()) = 1768
+1766(long)holes.size()) = 1769
+
+(long)holes.size()) = 1770
+(long)holes.size()) = 1771
+(long)holes.size()) = 1772
+(long)holes.size()) = 1773
+(long)holes.size()) = 1774
+(long)holes.size()) = 1775
+(long)holes.size()) = 1776
+(long)holes.size()) = 1777
+(long)holes.size()) = (long)holes.size()) = 17791779
+
+(long)holes.size()) = 1780
+(long)holes.size()) = 1781
+(long)holes.size()) = 1782
+(long)holes.size()) = 1783
+(long)holes.size()) = 1784
+(long)holes.size()) = 1785
+(long)holes.size()) = 1786
+(long)holes.size()) = 1787
+(long)holes.size()) = 1788
+(long)holes.size()) = 1789
+(long)holes.size()) = 1790
+(long)holes.size()) = (long)holes.size()) = 1792
+1792
+(long)holes.size()) = 1793
+(long)holes.size()) = 1794
+(long)holes.size()) = 1795
+(long)holes.size()) = 1797(long)holes.size()) = 
+1797
+(long)holes.size()) = 1798
+(long)holes.size()) = 1799
+(long)holes.size()) = (long)holes.size()) = 1801
+1801
+(long)holes.size()) = 1802
+(long)holes.size()) = (long)holes.size()) = 1804
+(long)holes.size()) = 1805
+1804
+(long)holes.size()) = 1806
+(long)holes.size()) = 1807
+(long)holes.size()) = 1808
+(long)holes.size()) = 1810
+(long)holes.size()) = 1810
+(long)holes.size()) = (long)holes.size()) = 1812
+1812
+(long)holes.size()) = 1813
+(long)holes.size()) = 1814
+(long)holes.size()) = 1815
+(long)holes.size()) = 1816
+(long)holes.size()) = (long)holes.size()) = 1818
+1818
+(long)holes.size()) = 1819
+(long)holes.size()) = (long)holes.size()) = 1821
+1821
+(long)holes.size()) = 1822
+(long)holes.size()) = 1823
+(long)holes.size()) = 1824
+(long)holes.size()) = 1825
+(long)holes.size()) = (long)holes.size()) = 18271827
+(long)holes.size()) = 1828
+
+(long)holes.size()) = 1830
+(long)holes.size()) = 1831
+(long)holes.size()) = 1832
+(long)holes.size()) = 1833
+(long)holes.size()) = 1833
+(long)holes.size()) = (long)holes.size()) = 18351835
+
+(long)holes.size()) = 1836
+(long)holes.size()) = 1837
+(long)holes.size()) = 1838
+(long)holes.size()) = 1839
+(long)holes.size()) = 1840
+(long)holes.size()) = 1841
+(long)holes.size()) = (long)holes.size()) = 1843
+1843
+(long)holes.size()) = 1844
+(long)holes.size()) = 1845
+(long)holes.size()) = 1846
+(long)holes.size()) = (long)holes.size()) = 18481848
+
+(long)holes.size()) = 1849
+(long)holes.size()) = 1850
+(long)holes.size()) = 1852
+(long)holes.size()) = 1852
+(long)holes.size()) = 1853
+(long)holes.size()) = (long)holes.size()) = 1855
+1855
+(long)holes.size()) = (long)holes.size()) = 18571857
+
+(long)holes.size()) = 1858
+(long)holes.size()) = 1859
+(long)holes.size()) = 1860
+(long)holes.size()) = 1862(long)holes.size()) = 
+1862
+(long)holes.size()) = 1863
+(long)holes.size()) = 1865
+(long)holes.size()) = 1866
+(long)holes.size()) = 1867
+(long)holes.size()) = 1868
+(long)holes.size()) = (long)holes.size()) = 18691869
+(long)holes.size()) = 1870
+
+(long)holes.size()) = 1871
+(long)holes.size()) = (long)holes.size()) = 1873
+1873
+(long)holes.size()) = (long)holes.size()) = 1875
+1875
+(long)holes.size()) = 1876
+(long)holes.size()) = (long)holes.size()) = 1878
+1878
+(long)holes.size()) = 1880(long)holes.size()) = 
+1880
+(long)holes.size()) = 1881
+(long)holes.size()) = 1883
+(long)holes.size()) = 1883
+(long)holes.size()) = 1885
+(long)holes.size()) = (long)holes.size()) = 1886
+(long)holes.size()) = 1887
+1886
+(long)holes.size()) = 1889(long)holes.size()) = 
+1889(long)holes.size()) = 1890
+
+(long)holes.size()) = 1891
+(long)holes.size()) = 1892
+(long)holes.size()) = (long)holes.size()) = 18941894
+
+(long)holes.size()) = 1895
+(long)holes.size()) = (long)holes.size()) = 1897
+1897
+(long)holes.size()) = 1898
+(long)holes.size()) = 1900
+(long)holes.size()) = 1900
+(long)holes.size()) = 1902
+(long)holes.size()) = 1902
+(long)holes.size()) = 1903
+(long)holes.size()) = 1904
+(long)holes.size()) = 1906
+(long)holes.size()) = 1907
+(long)holes.size()) = 1907
+(long)holes.size()) = (long)holes.size()) = 1909
+1909
+(long)holes.size()) = (long)holes.size()) = 1911
+1911
+(long)holes.size()) = (long)holes.size()) = 1913
+1913(long)holes.size()) = 1914
+
+(long)holes.size()) = 1915
+(long)holes.size()) = 1917
+(long)holes.size()) = 1918
+(long)holes.size()) = 1919
+(long)holes.size()) = 1920
+(long)holes.size()) = 1921
+(long)holes.size()) = 1922
+(long)holes.size()) = 1923
+(long)holes.size()) = 1924
+(long)holes.size()) = 1924(long)holes.size()) = 
+1925
+(long)holes.size()) = 1926
+(long)holes.size()) = 1927
+(long)holes.size()) = 1928
+(long)holes.size()) = (long)holes.size()) = 19301930
+(long)holes.size()) = 1931
+
+(long)holes.size()) = 1932
+(long)holes.size()) = 1933
+(long)holes.size()) = 1935(long)holes.size()) = 
+(long)holes.size()) = 19351936
+(long)holes.size()) = 
+1937
+(long)holes.size()) = 1938
+(long)holes.size()) = 1940
+(long)holes.size()) = 1940
+(long)holes.size()) = (long)holes.size()) = 1942
+1942
+(long)holes.size()) = 1943
+(long)holes.size()) = (long)holes.size()) = 1945
+1945
+(long)holes.size()) = 1947
+(long)holes.size()) = 1948
+(long)holes.size()) = 1949
+(long)holes.size()) = 1950
+(long)holes.size()) = 1951
+(long)holes.size()) = 1952
+(long)holes.size()) = 1953(long)holes.size()) = 
+1953
+(long)holes.size()) = 1954
+(long)holes.size()) = 1956
+(long)holes.size()) = (long)holes.size()) = 1957
+(long)holes.size()) = 1958
+1957(long)holes.size()) = 1959
+
+(long)holes.size()) = 1960
+(long)holes.size()) = (long)holes.size()) = 19621962
+
+(long)holes.size()) = 1963
+(long)holes.size()) = 1964
+(long)holes.size()) = (long)holes.size()) = 1966
+1966(long)holes.size()) = 1967
+
+(long)holes.size()) = (long)holes.size()) = 19691969
+
+(long)holes.size()) = 1970
+(long)holes.size()) = (long)holes.size()) = 1972
+(long)holes.size()) = 1973
+(long)holes.size()) = 1974
+1972
+(long)holes.size()) = 1975
+(long)holes.size()) = 1977
+(long)holes.size()) = (long)holes.size()) = 1978
+(long)holes.size()) = 19781979
+
+(long)holes.size()) = 1980(long)holes.size()) = 1981
+(long)holes.size()) = 1982
+
+(long)holes.size()) = 1983
+(long)holes.size()) = (long)holes.size()) = 19851985
+
+(long)holes.size()) = 1986
+(long)holes.size()) = 1988
+(long)holes.size()) = (long)holes.size()) = 1989
+(long)holes.size()) = 19891990
+
+(long)holes.size()) = (long)holes.size()) = 1992
+1991
+(long)holes.size()) = 1994
+(long)holes.size()) = 1995
+(long)holes.size()) = 1996
+(long)holes.size()) = 1997
+(long)holes.size()) = 1998
+(long)holes.size()) = 1999(long)holes.size()) = 
+(long)holes.size()) = 2000
+(long)holes.size()) = 2001
+(long)holes.size()) = 2002
+(long)holes.size()) = 20031999
+
+(long)holes.size()) = 2004
+(long)holes.size()) = 2005
+(long)holes.size()) = (long)holes.size()) = 2007
+2006(long)holes.size()) = 2008
+
+(long)holes.size()) = (long)holes.size()) = 20092010
+(long)holes.size()) = 2011
+(long)holes.size()) = 2012
+(long)holes.size()) = 2013
+(long)holes.size()) = 2014
+(long)holes.size()) = 
+2015
+(long)holes.size()) = 2016(long)holes.size()) = 2017
+
+(long)holes.size()) = 2018
+(long)holes.size()) = 2019
+(long)holes.size()) = 2020
+(long)holes.size()) = 2021
+(long)holes.size()) = 2022
+(long)holes.size()) = 2024
+(long)holes.size()) = 2025
+(long)holes.size()) = 2026
+(long)holes.size()) = 2027
+(long)holes.size()) = 2028
+(long)holes.size()) = 2029
+(long)holes.size()) = 2030
+(long)holes.size()) = 2031
+(long)holes.size()) = 2032
+(long)holes.size()) = 2033
+(long)holes.size()) = 2034
+(long)holes.size()) = 2035
+(long)holes.size()) = 2036
+(long)holes.size()) = 2037
+(long)holes.size()) = 2038
+(long)holes.size()) = 2039
+(long)holes.size()) = 2040
+(long)holes.size()) = 2041
+(long)holes.size()) = 2042
+(long)holes.size()) = 2043
+(long)holes.size()) = 2044
+(long)holes.size()) = 2045
+(long)holes.size()) = 2046
+			joined thread!!!
+			joined thread!!!
+
+
+
+================================================================================
+Results for thread	0:
+================================================================================
+	Total time		= 0.061372
+statPrintIndexLimit = 28
+--------------------------------
+	Chunks in "in use" list:	1.000000
+	Chunks in "holes" list:		0.000000
+		Average size of chunks in "in use" list:	8993.000000
+		Average size of chunks in holes list:		-nan
+
+--------------------------------
+	Chunks in "in use" list:	171.000000
+	Chunks in "holes" list:		7.000000
+		Average size of chunks in "in use" list:	120920.450292
+		Average size of chunks in holes list:		11972.000000
+
+--------------------------------
+	Chunks in "in use" list:	266.000000
+	Chunks in "holes" list:		17.000000
+		Average size of chunks in "in use" list:	130786.165414
+		Average size of chunks in holes list:		16525.882353
+
+--------------------------------
+	Chunks in "in use" list:	350.000000
+	Chunks in "holes" list:		36.000000
+		Average size of chunks in "in use" list:	128038.537143
+		Average size of chunks in holes list:		25811.944444
+
+--------------------------------
+	Chunks in "in use" list:	473.000000
+	Chunks in "holes" list:		63.000000
+		Average size of chunks in "in use" list:	126270.228330
+		Average size of chunks in holes list:		14295.634921
+
+--------------------------------
+	Chunks in "in use" list:	559.000000
+	Chunks in "holes" list:		83.000000
+		Average size of chunks in "in use" list:	130616.114490
+		Average size of chunks in holes list:		13792.337349
+
+--------------------------------
+	Chunks in "in use" list:	657.000000
+	Chunks in "holes" list:		134.000000
+		Average size of chunks in "in use" list:	131044.234399
+		Average size of chunks in holes list:		16696.656716
+
+--------------------------------
+	Chunks in "in use" list:	754.000000
+	Chunks in "holes" list:		176.000000
+		Average size of chunks in "in use" list:	132647.957560
+		Average size of chunks in holes list:		19995.738636
+
+--------------------------------
+	Chunks in "in use" list:	830.000000
+	Chunks in "holes" list:		235.000000
+		Average size of chunks in "in use" list:	132059.989157
+		Average size of chunks in holes list:		22062.612766
+
+--------------------------------
+	Chunks in "in use" list:	877.000000
+	Chunks in "holes" list:		302.000000
+		Average size of chunks in "in use" list:	133196.210946
+		Average size of chunks in holes list:		24767.417219
+
+--------------------------------
+	Chunks in "in use" list:	932.000000
+	Chunks in "holes" list:		376.000000
+		Average size of chunks in "in use" list:	133106.978541
+		Average size of chunks in holes list:		28304.356383
+
+--------------------------------
+	Chunks in "in use" list:	980.000000
+	Chunks in "holes" list:		442.000000
+		Average size of chunks in "in use" list:	133004.113265
+		Average size of chunks in holes list:		29123.348416
+
+--------------------------------
+	Chunks in "in use" list:	1019.000000
+	Chunks in "holes" list:		522.000000
+		Average size of chunks in "in use" list:	131709.469087
+		Average size of chunks in holes list:		30884.153257
+
+--------------------------------
+	Chunks in "in use" list:	1057.000000
+	Chunks in "holes" list:		612.000000
+		Average size of chunks in "in use" list:	132584.980132
+		Average size of chunks in holes list:		32671.825163
+
+--------------------------------
+	Chunks in "in use" list:	1052.000000
+	Chunks in "holes" list:		678.000000
+		Average size of chunks in "in use" list:	131453.366920
+		Average size of chunks in holes list:		36122.353982
+
+--------------------------------
+	Chunks in "in use" list:	1047.000000
+	Chunks in "holes" list:		769.000000
+		Average size of chunks in "in use" list:	131868.207259
+		Average size of chunks in holes list:		37196.369311
+
+--------------------------------
+	Chunks in "in use" list:	1020.000000
+	Chunks in "holes" list:		867.000000
+		Average size of chunks in "in use" list:	133133.818627
+		Average size of chunks in holes list:		39017.086505
+
+--------------------------------
+	Chunks in "in use" list:	988.000000
+	Chunks in "holes" list:		967.000000
+		Average size of chunks in "in use" list:	132252.692308
+		Average size of chunks in holes list:		43125.850052
+
+--------------------------------
+	Chunks in "in use" list:	961.000000
+	Chunks in "holes" list:		1081.000000
+		Average size of chunks in "in use" list:	132453.637877
+		Average size of chunks in holes list:		43830.333025
+
+--------------------------------
+	Chunks in "in use" list:	849.000000
+	Chunks in "holes" list:		1195.000000
+		Average size of chunks in "in use" list:	133044.897527
+		Average size of chunks in holes list:		51377.727197
+
+--------------------------------
+	Chunks in "in use" list:	739.000000
+	Chunks in "holes" list:		1305.000000
+		Average size of chunks in "in use" list:	135432.004060
+		Average size of chunks in holes list:		56837.047510
+
+--------------------------------
+	Chunks in "in use" list:	626.000000
+	Chunks in "holes" list:		1418.000000
+		Average size of chunks in "in use" list:	134575.875399
+		Average size of chunks in holes list:		63636.366714
+
+--------------------------------
+	Chunks in "in use" list:	522.000000
+	Chunks in "holes" list:		1523.000000
+		Average size of chunks in "in use" list:	134596.155172
+		Average size of chunks in holes list:		68427.349311
+
+--------------------------------
+	Chunks in "in use" list:	409.000000
+	Chunks in "holes" list:		1636.000000
+		Average size of chunks in "in use" list:	132910.603912
+		Average size of chunks in holes list:		73377.243276
+
+--------------------------------
+	Chunks in "in use" list:	300.000000
+	Chunks in "holes" list:		1744.000000
+		Average size of chunks in "in use" list:	135950.893333
+		Average size of chunks in holes list:		76693.866972
+
+--------------------------------
+	Chunks in "in use" list:	179.000000
+	Chunks in "holes" list:		1864.000000
+		Average size of chunks in "in use" list:	131708.843575
+		Average size of chunks in holes list:		80821.642704
+
+--------------------------------
+	Chunks in "in use" list:	95.000000
+	Chunks in "holes" list:		1948.000000
+		Average size of chunks in "in use" list:	134194.105263
+		Average size of chunks in holes list:		82971.655544
+
+--------------------------------
+	Chunks in "in use" list:	7.000000
+	Chunks in "holes" list:		2040.000000
+		Average size of chunks in "in use" list:	132768.285714
+		Average size of chunks in holes list:		85158.729902
+
+
+
+
+================================================================================
+Results for thread	1:
+================================================================================
+	Total time		= 0.060377
+statPrintIndexLimit = 28
+--------------------------------
+	Chunks in "in use" list:	10.000000
+	Chunks in "holes" list:		0.000000
+		Average size of chunks in "in use" list:	111446.100000
+		Average size of chunks in holes list:		-nan
+
+--------------------------------
+	Chunks in "in use" list:	100.000000
+	Chunks in "holes" list:		1.000000
+		Average size of chunks in "in use" list:	116144.930000
+		Average size of chunks in holes list:		1226.000000
+
+--------------------------------
+	Chunks in "in use" list:	218.000000
+	Chunks in "holes" list:		15.000000
+		Average size of chunks in "in use" list:	126183.504587
+		Average size of chunks in holes list:		23001.533333
+
+--------------------------------
+	Chunks in "in use" list:	362.000000
+	Chunks in "holes" list:		39.000000
+		Average size of chunks in "in use" list:	127491.607735
+		Average size of chunks in holes list:		15433.717949
+
+--------------------------------
+	Chunks in "in use" list:	458.000000
+	Chunks in "holes" list:		58.000000
+		Average size of chunks in "in use" list:	125768.851528
+		Average size of chunks in holes list:		13628.741379
+
+--------------------------------
+	Chunks in "in use" list:	567.000000
+	Chunks in "holes" list:		87.000000
+		Average size of chunks in "in use" list:	130105.574956
+		Average size of chunks in holes list:		14758.022989
+
+--------------------------------
+	Chunks in "in use" list:	636.000000
+	Chunks in "holes" list:		121.000000
+		Average size of chunks in "in use" list:	129773.622642
+		Average size of chunks in holes list:		15833.950413
+
+--------------------------------
+	Chunks in "in use" list:	744.000000
+	Chunks in "holes" list:		172.000000
+		Average size of chunks in "in use" list:	133071.551075
+		Average size of chunks in holes list:		19636.133721
+
+--------------------------------
+	Chunks in "in use" list:	814.000000
+	Chunks in "holes" list:		225.000000
+		Average size of chunks in "in use" list:	133054.877150
+		Average size of chunks in holes list:		22678.186667
+
+--------------------------------
+	Chunks in "in use" list:	869.000000
+	Chunks in "holes" list:		292.000000
+		Average size of chunks in "in use" list:	132692.535098
+		Average size of chunks in holes list:		24585.308219
+
+--------------------------------
+	Chunks in "in use" list:	919.000000
+	Chunks in "holes" list:		354.000000
+		Average size of chunks in "in use" list:	132646.065288
+		Average size of chunks in holes list:		28450.290960
+
+--------------------------------
+	Chunks in "in use" list:	966.000000
+	Chunks in "holes" list:		428.000000
+		Average size of chunks in "in use" list:	132984.926501
+		Average size of chunks in holes list:		28482.441589
+
+--------------------------------
+	Chunks in "in use" list:	1007.000000
+	Chunks in "holes" list:		498.000000
+		Average size of chunks in "in use" list:	131850.048659
+		Average size of chunks in holes list:		30362.526104
+
+--------------------------------
+	Chunks in "in use" list:	1051.000000
+	Chunks in "holes" list:		587.000000
+		Average size of chunks in "in use" list:	132444.729781
+		Average size of chunks in holes list:		31429.918228
+
+--------------------------------
+	Chunks in "in use" list:	1050.000000
+	Chunks in "holes" list:		689.000000
+		Average size of chunks in "in use" list:	131505.405714
+		Average size of chunks in holes list:		35929.076923
+
+--------------------------------
+	Chunks in "in use" list:	1045.000000
+	Chunks in "holes" list:		773.000000
+		Average size of chunks in "in use" list:	131753.803828
+		Average size of chunks in holes list:		37344.089263
+
+--------------------------------
+	Chunks in "in use" list:	1023.000000
+	Chunks in "holes" list:		861.000000
+		Average size of chunks in "in use" list:	133022.539589
+		Average size of chunks in holes list:		38914.770035
+
+--------------------------------
+	Chunks in "in use" list:	985.000000
+	Chunks in "holes" list:		974.000000
+		Average size of chunks in "in use" list:	132143.886294
+		Average size of chunks in holes list:		43262.803901
+
+--------------------------------
+	Chunks in "in use" list:	960.000000
+	Chunks in "holes" list:		1074.000000
+		Average size of chunks in "in use" list:	132831.448958
+		Average size of chunks in holes list:		43481.007449
+
+--------------------------------
+	Chunks in "in use" list:	853.000000
+	Chunks in "holes" list:		1191.000000
+		Average size of chunks in "in use" list:	132810.000000
+		Average size of chunks in holes list:		51131.819479
+
+--------------------------------
+	Chunks in "in use" list:	751.000000
+	Chunks in "holes" list:		1294.000000
+		Average size of chunks in "in use" list:	135336.829561
+		Average size of chunks in holes list:		56184.595054
+
+--------------------------------
+	Chunks in "in use" list:	623.000000
+	Chunks in "holes" list:		1422.000000
+		Average size of chunks in "in use" list:	134901.064205
+		Average size of chunks in holes list:		63597.843882
+
+--------------------------------
+	Chunks in "in use" list:	520.000000
+	Chunks in "holes" list:		1525.000000
+		Average size of chunks in "in use" list:	134829.607692
+		Average size of chunks in holes list:		68455.078033
+
+--------------------------------
+	Chunks in "in use" list:	412.000000
+	Chunks in "holes" list:		1632.000000
+		Average size of chunks in "in use" list:	133019.376214
+		Average size of chunks in holes list:		73108.617034
+
+--------------------------------
+	Chunks in "in use" list:	305.000000
+	Chunks in "holes" list:		1738.000000
+		Average size of chunks in "in use" list:	134537.924590
+		Average size of chunks in holes list:		76657.822785
+
+--------------------------------
+	Chunks in "in use" list:	214.000000
+	Chunks in "holes" list:		1829.000000
+		Average size of chunks in "in use" list:	132806.682243
+		Average size of chunks in holes list:		79638.411700
+
+--------------------------------
+	Chunks in "in use" list:	126.000000
+	Chunks in "holes" list:		1917.000000
+		Average size of chunks in "in use" list:	138235.904762
+		Average size of chunks in holes list:		81671.904017
+
+--------------------------------
+	Chunks in "in use" list:	49.000000
+	Chunks in "holes" list:		1993.000000
+		Average size of chunks in "in use" list:	129670.122449
+		Average size of chunks in holes list:		84106.444556
+

@@ -61,7 +61,7 @@ void * _firstFit(const size_t chunk_size)
      readers.exitCritical() is called.  */
   freeVsAllocsReaders.enterCritical();
 
-   TRY_AGAIN:  
+  //   TRY_AGAIN:  
   allocsReaders.enterCritical();
   checkZeroChunkSize(chunk_size);
   
@@ -74,8 +74,9 @@ void * _firstFit(const size_t chunk_size)
 	  if(!chunkLockTestAndSet(*candidate))
 	    {
 	      //std::cout<<"trying again in ChunkLockTestAndSet\n";
-	      allocsReaders.exitCritical();
-	      goto TRY_AGAIN;
+	      //	      allocsReaders.exitCritical();
+	      //	      goto TRY_AGAIN;
+	      continue;
 	    }
 	    
 	  allocsReaders.exitCritical();
@@ -97,8 +98,9 @@ void * _firstFit(const size_t chunk_size)
 	      if(!chunkLockTestAndSet(*candidate))
 		{
 		  //		  std::cout<<"trying again in next one\n";
-		  allocsReaders.exitCritical();
-		  goto TRY_AGAIN;
+		  //		  allocsReaders.exitCritical();
+		  //		  goto TRY_AGAIN;
+		  continue;
 		}
 		
 	      allocsReaders.exitCritical();
@@ -134,60 +136,70 @@ void * _firstFit(const size_t chunk_size)
 void * _bestFit(const size_t chunk_size)
 {
   using namespace mmState;
-  /*
+
   freeVsAllocsReaders.enterCritical();
- TRY_AGAIN:
+  TRY_AGAIN:
   allocsReaders.enterCritical();
   checkZeroChunkSize(chunk_size);
-  
+  std::cout<<"hello\n";
   if(!holes.empty())
     {
     if(std::next(holes.begin()) == holes.cend())
-	{		*/	// There is only one hole in the holes list.
-	  /*	  if(!chunkLockTestAndSet(*std::next(candidate)))
+	{			// There is only one hole in the holes list.
+	  	      std::cout<<"in fist if \n";
+	  if(!chunkLockTestAndSet(*holes.begin()))
 	    {
+	      std::cout<<"in fist try again\n";
 	      allocsReaders.exitCritical();
 	      goto TRY_AGAIN;
 	    }
 
 	  allocsReaders.exitCritical();
 
+	  std::cout<<"locking \n";
 	  sem_wait(&locking::rwSem);
-	  setChunkLockFalse(*std::next(candidate));
+	  std::cout<<"<<<<<<<<<<<<<<<<<<<\n";
+	  setChunkLockFalse(*holes.begin());
+	  std::cout<<"^^^^^^^^^^^^^^^^^^^^^^^^^6\n";
 	  auto ret = handleOneHole(chunk_size);
+	  std::cout<<"lkdsafjflk\n";
 	  sem_post(&locking::rwSem);
 
 	  freeVsAllocsReaders.exitCritical();
 	  
 	  if(ret != nullptr)
-	  return ret;*/
-  /*	}
+	  return ret;
+	}
       else
 	{
-	  auto bestFit {holes.before_begin()};
+	  	  	      std::cout<<"in fist else \n";
+	  auto bestFit {holes.begin()};
 	  bool foundBestFit {false};
-	  for(auto candidate {holes.before_begin()};
+	  for(auto candidate {holes.begin()};
 	      std::next(candidate) != holes.cend(); ++candidate)
-	    {
-	      if(((*std::next(candidate))->size) == chunk_size)
-	      {*/		// Must be best fit.
-		  /*  if(!chunkLockTestAndSet(*std::next(candidate)))
+    {
+	      	  	  	      std::cout<<"in for else \n";
+	      if(((*candidate)->size) == chunk_size)
+		{		// Must be best fit.
+		  if(!chunkLockTestAndSet(*candidate))
 		    {
-		      allocsReaders.exitCritical();
-		      goto TRY_AGAIN;
+		      std::cout<<"in second try again\n";
+		      // allocsReaders.exitCritical();
+		      // goto TRY_AGAIN;
+		      continue;
 		    }
 
 		  allocsReaders.exitCritical();
 
 		  sem_wait(&locking::rwSem);
-		  setChunkLockFalse(*std::next(candidate));
+		  setChunkLockFalse(*candidate);
 		  auto ret = useChunkFromHoles(candidate);
 		  sem_post(&locking::rwSem);
 
 		  freeVsAllocsReaders.exitCritical();
 		  
-		  return ret;*/
-  /*		}
+		  return ret;
+		}
 	      else
 		{
 		  if(((*std::next(candidate))->size) >=
@@ -209,12 +221,30 @@ void * _bestFit(const size_t chunk_size)
 	    }
 	  if(foundBestFit)
 	    {		// A best fit (not exact size) was found.
-	      return splitChunkFromHoles(chunk_size, bestFit);
+	      if(!chunkLockTestAndSet(*bestFit))
+		    {
+		      std::cout<<"in second try again\n";
+		      allocsReaders.exitCritical();
+		      goto TRY_AGAIN;
+		    }
+	      
+	      allocsReaders.exitCritical();
+
+	      sem_wait(&locking::rwSem);
+	      setChunkLockFalse(*bestFit);
+	      auto ret = splitChunkFromHoles(chunk_size, bestFit);
+	      sem_post(&locking::rwSem);
+
+	      freeVsAllocsReaders.exitCritical();
+			  
+	      return ret;
 	    }
 	}
     }
+  std::cout<<"getting new chunk from system\n";
+  freeVsAllocsReaders.exitCritical();
   // Holes was empty or no hole of large enough size was found.
-  return getNewChunkFromSystem(chunk_size);*/
+  return getNewChunkFromSystem(chunk_size);
 }
 
 
@@ -441,6 +471,8 @@ void free(const void * chunk)
 {
   using namespace mmState;
 
+  constexpr long mergeRate {4096};
+
   sem_wait(&locking::freeVsAllocsRwSem);
     
   for(auto candidate {inUse.begin()};
@@ -450,13 +482,17 @@ void free(const void * chunk)
 	{
 	  holes.push_front(*candidate);
 	  inUse.erase(candidate);
-	  mergeHoles();
-	  mergeHoles();
+
+	  if(holes.size() > (mergeRate * inUse.size()))
+	    { 
+	      mergeHoles();
+	      mergeHoles();
+	    }
 
 	  sem_post(&locking::freeVsAllocsRwSem);
 	  return;
 	}
-    }  
+    }
 
   /* We do this here and not in dealloc for perfomance reasons (we would have to
      have a separate test in dealloc.) */

@@ -1,0 +1,10 @@
+Using first fit.
+Starting battery of 3 test\s of type "randomFixedSizeAllocationsAndDeallocations()"
+
+Test size		= 4096
+Allocation unit		= 1
+
+Calculating random allocation and deallocation sequence...
+Calculating random allocation and deallocation sequence...
+Calculating random allocation and deallocation sequence...
+(long)holes.size()) = 0
